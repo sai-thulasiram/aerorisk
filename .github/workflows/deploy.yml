@@ -33,6 +33,7 @@ jobs:
           SITE_NAME: ${{ vars.SITE_NAME }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
+          CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
           ALLOW_AI_TRAINING: ${{ vars.ALLOW_AI_TRAINING }}
           INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
         run: |
