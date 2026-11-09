@@ -7,6 +7,13 @@ Why Cloudflare: free static hosting with Indian and European edge locations, AI-
 
 ---
 
+## Quick start without a domain (workers.dev)
+
+1. Cloudflare → **Workers & Pages** → note **Your subdomain** (`<sub>.workers.dev`; click *Change* to pick one). The site will live at `https://aerorisk.<sub>.workers.dev`.
+2. Cloudflare → **Web Analytics** → **Add a site** → hostname `aerorisk.<sub>.workers.dev` → **Done** → **Manage site** → copy the `token` value from the snippet into the `CF_BEACON_TOKEN` variable.
+3. Set `SITE_URL=https://aerorisk.<sub>.workers.dev` and run the workflow.
+4. Don't submit this URL to Google or Bing. When you buy a domain, attach it (Worker → **Domains** tab), change `SITE_URL`, delete `CF_BEACON_TOKEN` (automatic setup takes over), add `INDEXNOW_KEY`, then submit the sitemap.
+
 ## 0. Decide before you start (your call, not technical)
 
 - **Name and domain.** "AeroRisk" implies risk scores, which the site deliberately does not publish, and it is the phrase most likely to draw airline or press scrutiny. Consider a neutral name before buying a domain. If you rename, set `SITE_NAME`, edit `tools/og.html`, and run `python tools/make_og.py`.
@@ -61,7 +68,7 @@ npx wrangler deploy
 
 ## 3. Attach the domain
 
-Workers & Pages → `aerorisk` → Settings → Domains & Routes → **Add custom domain**. Add both `yourdomain.com` and `www.yourdomain.com`. You can do the same with the commented `routes` block in `wrangler.jsonc`. Then add a redirect rule from `www` to the bare domain, so there is one canonical host.
+Workers & Pages → `aerorisk` → **Domains** tab → **Add custom domain**. Add both `yourdomain.com` and `www.yourdomain.com`. You can do the same with the commented `routes` block in `wrangler.jsonc`. Then add a redirect rule from `www` to the bare domain, so there is one canonical host.
 
 ## 4. Analytics
 
