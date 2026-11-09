@@ -1,0 +1,12 @@
+[
+  {
+    "_comment": "SYNTHETIC test fixture shaped like an AeroDataBox FlightContract. Not real flight data.",
+    "number": "FR 9999",
+    "status": "Expected",
+    "codeshareStatus": "IsOperator",
+    "departure": {"airport": {"icao": "EIDW", "iata": "DUB"}},
+    "arrival": {"airport": {"icao": "EGSS", "iata": "STN"}},
+    "aircraft": {"reg": "EI-TEST", "model": "Boeing 737-800"},
+    "airline": {"name": "Ryanair", "iata": "FR", "icao": "RYR"}
+  }
+]

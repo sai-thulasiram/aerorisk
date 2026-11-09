@@ -1,0 +1,12 @@
+[
+  {
+    "_comment": "SYNTHETIC test fixture shaped like an AeroDataBox FlightContract. Not real flight data.",
+    "number": "6E 9999",
+    "status": "Expected",
+    "codeshareStatus": "IsOperator",
+    "departure": {"airport": {"icao": "VOTP", "iata": "TIR", "name": "Tirupati"}},
+    "arrival": {"airport": {"icao": "VOBL", "iata": "BLR", "name": "Bengaluru"}},
+    "aircraft": {"model": "Airbus A320 NEO"},
+    "airline": {"name": "IndiGo", "iata": "6E", "icao": "IGO"}
+  }
+]

@@ -1,0 +1,8 @@
+site/
+out/
+__pycache__/
+.pytest_cache/
+.wrangler/
+node_modules/
+aircraftDatabase.csv
+.env

@@ -1,0 +1,17 @@
+{
+  // Cloudflare Workers with static assets. Static only for now; add "main" later for the flight-lookup API
+  // (keeps the AeroDataBox key server-side).
+  "name": "aerorisk",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./site",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  // Uncomment once your domain is on Cloudflare (or add it in the dashboard instead):
+  // "routes": [
+  //   { "pattern": "yourdomain.com", "custom_domain": true },
+  //   { "pattern": "www.yourdomain.com", "custom_domain": true }
+  // ],
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,3 @@
+registration,config_id,source,verified_at
+# Add one row per tail you have VERIFIED against the airline's live seat map or a photo of the safety card.
+# Only rows here can produce an "exact" match. Lines starting with # are ignored.

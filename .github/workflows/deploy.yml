@@ -1,0 +1,54 @@
+name: build-and-deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test
+        run: |
+          pip install pytest
+          python -m pytest -q
+
+      - name: Build site
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          SITE_NAME: ${{ vars.SITE_NAME }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
+          ALLOW_AI_TRAINING: ${{ vars.ALLOW_AI_TRAINING }}
+          INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+        run: |
+          test -n "$SITE_URL" || { echo "Set the SITE_URL repository variable"; exit 1; }
+          python -m aerorisk site --out site
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: Ping IndexNow (Bing, Yandex, Seznam, Naver)
+        if: ${{ vars.INDEXNOW_KEY != '' }}
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+        run: python -m aerorisk indexnow --site-dir site || echo "IndexNow ping failed (non-fatal)"

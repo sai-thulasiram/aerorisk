@@ -1,0 +1,169 @@
+{
+  "id": "6E-A20N-180Y",
+  "operator": {
+    "iata": "6E",
+    "icao": "IGO",
+    "name": "IndiGo"
+  },
+  "group_operators_icao": [],
+  "aircraft": {
+    "icao": "A20N",
+    "iata": "32N",
+    "name": "Airbus A320neo"
+  },
+  "variant_label": "180Y all-economy (Type 2, full-size rear lavs)",
+  "total_seats": 180,
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "rows": {
+    "first": 1,
+    "last": 30,
+    "skip": []
+  },
+  "missing_seats": [],
+  "pitch_in": {
+    "default": 28,
+    "unknown_rows": [
+      1
+    ],
+    "rows": {
+      "2": 29,
+      "3": 29,
+      "4": 29,
+      "5": 29,
+      "6": 29,
+      "7": 29,
+      "8": 29,
+      "9": 29,
+      "10": 29,
+      "11": 29,
+      "12": 35,
+      "13": 35
+    }
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 12,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 13,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 30,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [],
+    "misaligned_window": [
+      "2F",
+      "25A",
+      "25F",
+      "28A",
+      "28F"
+    ],
+    "no_recline": [
+      "11A",
+      "11B",
+      "11E",
+      "11F",
+      "12A",
+      "12B",
+      "12E",
+      "12F"
+    ]
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear",
+      "note": "Full-size rear lavatory bank"
+    }
+  ],
+  "fleet_share_prior": 0.12,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://www.goindigo.in/information/fees-and-charges.html",
+      "https://www.goindigo.in/aircraft-and-fleet.html",
+      "https://www.aerolopa.com/6e-32n-2",
+      "https://seatcompare.ai/insights/indigo-a320neo-seat-selection-guide-2026",
+      "https://seatmaps.com/airlines/6e-indigo/airbus-a320neo"
+    ],
+    "conflicts": [
+      "planefyi.com (one locale) lists XL exit rows 13-14; IndiGo's own pages say 12-13. Using IndiGo."
+    ],
+    "fleet_share_note": "AeroLOPA: 21 aircraft; seatcompare.ai: 22 (Aug 2026). Both put the 186Y share at ~88%.",
+    "authored_at": "2026-11-09",
+    "verify_against": "IndiGo web check-in seat map",
+    "corroboration": {
+      "rows_1_30": [
+        "IndiGo fees page (seat price bands)",
+        "AeroLOPA",
+        "seatcompare.ai"
+      ],
+      "exit_rows_12_13": [
+        "IndiGo aircraft-and-fleet page",
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "xl_rows_1_12_13": [
+        "IndiGo aircraft-and-fleet page",
+        "seatcompare.ai"
+      ],
+      "row_1_legroom": [
+        "IndiGo fees page: XL rows >= 83.8 cm legroom vs <= 73.7 cm non-XL (legroom, not pitch)"
+      ],
+      "pitch_values": [
+        "seatcompare.ai only"
+      ]
+    },
+    "primary_source_check": "partial: row ranges, exit rows and XL rows confirmed on goindigo.in; seat-level flags are secondary-source only"
+  },
+  "swap_risk": [
+    {
+      "config_hint": "6E-A20N-186Y",
+      "note": "Dominant 31-row variant."
+    }
+  ]
+}

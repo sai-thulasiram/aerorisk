@@ -1,0 +1,177 @@
+{
+  "id": "FR-B738-189Y",
+  "operator": {
+    "iata": "FR",
+    "icao": "RYR",
+    "name": "Ryanair"
+  },
+  "group_operators_icao": [
+    "RUK",
+    "MLT",
+    "RYS",
+    "LDA"
+  ],
+  "aircraft": {
+    "icao": "B738",
+    "iata": "738",
+    "name": "Boeing 737-800"
+  },
+  "variant_label": "189Y all-economy",
+  "total_seats": 189,
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "rows": {
+    "first": 1,
+    "last": 33,
+    "skip": [
+      13
+    ]
+  },
+  "missing_seats": [
+    "1D",
+    "1E",
+    "1F"
+  ],
+  "pitch_in": {
+    "default": 29.5,
+    "rows": {
+      "1": 40,
+      "2": 34,
+      "16": 35,
+      "17": 35,
+      "18": 31,
+      "19": 31
+    }
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "after_row": null,
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 16,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 17,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 33,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [
+      "12A",
+      "12F"
+    ],
+    "window_disputed": [
+      "11A"
+    ],
+    "misaligned_window": [
+      "20A",
+      "20F",
+      "23A",
+      "23F",
+      "32A",
+      "32F"
+    ],
+    "no_recline": "all"
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front",
+      "side": "R",
+      "note": "Forward lav + galley occupy the 1D-1F footprint"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/ryanair-737-800-seat-selection-guide-2026",
+      "https://www.seatlink.com/airlines/ryanair/seat-maps/ryanair-boeing-737-800-seat-map/",
+      "https://seatmaps.com/airlines/fr-ryanair/boeing-737-800/",
+      "https://seat.guru/airlines/Ryanair/Ryanair_Boeing_737-800"
+    ],
+    "conflicts": [
+      "Exit rows: planefyi.com says 17-18; seatcompare.ai, seatlink.com and seatmaps.com say 16-17. Using 16-17 (3 vs 1).",
+      "11A: seatmaps.com and seatlink.com say no window; seatcompare.ai says window present but behind the seat. Flagged window_disputed.",
+      "Ryanair's own help-centre seat page could not be fetched (site error); no first-party confirmation yet."
+    ],
+    "authored_at": "2026-11-09",
+    "verify_against": "Ryanair live seat map at booking/check-in",
+    "corroboration": {
+      "rows_1_33_no_row_13": [
+        "seatcompare.ai",
+        "seatlink.com"
+      ],
+      "row_1_ABC_only": [
+        "seatcompare.ai",
+        "seatlink.com"
+      ],
+      "overwing_exit_rows_16_17": [
+        "seatcompare.ai",
+        "seatlink.com",
+        "seatmaps.com"
+      ],
+      "total_189": [
+        "seatcompare.ai",
+        "seatmaps.com",
+        "seat.guru",
+        "seatlink.com (by count)"
+      ],
+      "no_window_12A_12F": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "pitch_values": [
+        "seatcompare.ai only"
+      ]
+    },
+    "primary_source_check": "not done"
+  },
+  "swap_risk": [
+    {
+      "config_hint": "FR-B38M-197Y",
+      "note": "Ryanair swaps 737-800 and 737 MAX 8-200 on the same routes; exit rows and rear numbering differ."
+    }
+  ]
+}
