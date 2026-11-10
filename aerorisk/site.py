@@ -427,7 +427,7 @@ def shell(s: Settings, head_html: str, body: str, band: str = "", band_cls: str 
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="brand" href="/"><img src="/assets/favicon.svg" alt="" width="22" height="22">{_e(s.name)}</a>
-<nav><a href="/#lookup">Find my cabin</a><a href="/#seat-maps">Seat maps</a><a href="/research/">Safest seats?</a></nav>
+<nav><a href="/#lookup">Which plane is my flight?</a><a href="/#seat-maps">Seat maps</a><a href="/research/">Safest seats?</a></nav>
 </div></header>
 {band_html}
 <main id="main" class="wrap">
@@ -507,7 +507,8 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     pitch = "; ".join(f["pitch_specific"] + ([f'other rows: {f["pitch_default_text"]}'] if f["pitch_default_text"] else []))
     if f["pitch_unknown_rows"]:
         pitch += f'; row{"s" if len(f["pitch_unknown_rows"]) > 1 else ""} {_ranges(f["pitch_unknown_rows"])}: unknown'
-    rows.append(("Seat pitch (approx.)", _e(pitch)))
+    rows.append(('Legroom (pitch) <span class="muted small" title="Pitch is the distance from one seat to the same point on the seat in front. About 28–29 in is tight, 30–32 in is standard economy, 34 in or more is roomy.">?</span>',
+                 _e(pitch) + '<br><span class="muted small">Pitch is the distance from one seat to the same point on the seat in front. About 28–29 in is tight, 30–32 in is standard economy, 34 in or more is roomy.</span>'))
     if f["no_recline"]:
         rows.append(("No recline", _e(f["no_recline"] if isinstance(f["no_recline"], str)
                                       else ", ".join(f["no_recline"]))))
@@ -586,16 +587,16 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <div class="grid">
   <section class="mapcard" aria-label="Interactive seat map">
     <div class="viewbar" role="group" aria-label="Map view">
-      <button type="button" class="viewbtn on" data-view="facts" aria-pressed="true">Seat facts</button>
-      <button type="button" class="viewbtn" data-view="pattern" aria-pressed="false">Crash-study pattern</button>
+      <button type="button" class="viewbtn on" data-view="pattern" aria-pressed="true">Crash-study pattern</button>
+      <button type="button" class="viewbtn" data-view="facts" aria-pressed="false">Seat facts</button>
       <button type="button" class="viewbtn" data-view="near" aria-pressed="false">Near an exit</button>
     </div>
-    <div class="legend" data-for="facts"><span class="sw sw-exit"></span>Exit row <span class="sw sw-door"></span>Exit</div>
-    <div class="legend" data-for="pattern" hidden><span class="sw sw-lower"></span>Lower in both studies <span class="sw sw-higher"></span>Higher
+    <div class="legend" data-for="facts" hidden><span class="sw sw-exit"></span>Exit row <span class="sw sw-door"></span>Exit</div>
+    <div class="legend" data-for="pattern"><span class="sw sw-lower"></span>Lower in both studies <span class="sw sw-higher"></span>Higher
       <p class="small muted">{_e(BASIS)}. Front and middle don't differ consistently, so they share a colour. <a href="/research/">What the studies found</a></p></div>
     <div class="legend" data-for="near" hidden><span class="sw sw-near"></span>Within 5 rows of an exit
       <p class="small muted">The most consistent finding in evacuation research (University of Greenwich). <a href="/research/#exits">Source</a></p></div>
-    <div class="mapwrap view-facts" id="mapwrap">{svg}</div>
+    <div class="mapwrap view-pattern" id="mapwrap">{svg}</div>
   </section>
   <aside class="panel" id="panel" aria-live="polite">
     <h2>Seat details</h2>
@@ -621,7 +622,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 {aircraft_html(cfg)}
 <section><h2>Row by row</h2>
 <details class="rows"><summary>Show all {f["row_count"]} rows</summary>
-<table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Pitch</th><th>Notes</th></tr></thead>
+<table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Legroom (pitch)</th><th>Notes</th></tr></thead>
 <tbody>{"".join(row_html)}</tbody></table></details></section>
 <section><h2>Sources</h2>
 <p class="muted">{_e(lede(p))}</p>
@@ -698,15 +699,24 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 </form>
 </section>
 <section class="lookup" id="lookup" aria-labelledby="lookup-h">
-<h2 id="lookup-h">Find my cabin</h2>
-<p class="muted">Enter your flight number and date. We'll show which cabin version you're likely to get and open its seat map.</p>
+<h2 id="lookup-h">Which plane is my flight?</h2>
+<p class="muted">Airlines fly several cabin versions of the same aircraft and swap planes on a route, so your ticket doesn't tell you which seat map applies. Enter the flight number and date: we look up the aircraft scheduled for it and show which seat map you're likely to get.</p>
 <form id="lookupform" class="inline-form">
 <label>Flight number <input id="lf" required placeholder="6E 2134" autocomplete="off" maxlength="9" autocapitalize="characters"></label>
 <label>Date <input id="ld" type="date" required></label>
 <button type="submit">Look up</button>
 </form>
 <p class="muted small" id="lookupnote">Covers the airlines listed below. Flight data from AeroDataBox.</p>
-<div id="lookupout" aria-live="polite"></div>
+<div id="lookupout" aria-live="polite">
+<div class="result example" aria-label="Example result">
+<p class="small muted"><strong>Example result</strong></p>
+<p class="result-head"><strong>6E 1234</strong> KWI → HYD · 2026-11-09 23:45</p>
+<p>IndiGo · Airbus A321neo · registration VT-NOF</p>
+<p><span class="badge">Likely</span> IndiGo flies more than one cabin version of this aircraft; ranked by share of the fleet.</p>
+<ul><li><a href="/seat-maps/indigo-airbus-a321neo-232-seats/">IndiGo Airbus A321neo (232 seats)</a> · <a class="luckylink" href="/seat-maps/indigo-airbus-a321neo-232-seats/#lucky">lucky seat</a> — about 64%</li>
+<li>Other versions we haven't mapped yet — about 36%</li></ul>
+<p class="small muted">You get: the route and time, the aircraft type and its registration (when the airline has assigned it), how likely each cabin version is, and one tap to that seat map or your lucky seat on it.</p>
+</div></div>
 </section>
 <section id="seat-maps">
 <div class="searchrow"><h2>Seat maps</h2>
@@ -741,7 +751,7 @@ def index_page(s: Settings, pages: list[Page]) -> str:
     body = body.replace("__LUCKY_OPTIONS__", "".join(opts))
     band = """<h1>Find your <span>lucky seat</span>, and know the plane you're on</h1>
 <p class="lede">Your sun sign and numbers pick a lucky seat, just for fun. Then see the real thing: exit rows, cabin sections, what crash studies found, and the aircraft behind your flight, every fact sourced.</p>
-<p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#lookup">Find my cabin</a></p>"""
+<p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#lookup">Which plane is my flight?</a></p>"""
     return shell(s, head(s, title=f"{s.name}: {s.tagline}", description=desc, path="/",
                          jsonld=[site_ld, org_ld, catalog]), body, band=band, band_cls="band-home")
 
@@ -886,7 +896,7 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
     pitch = "; ".join(f["pitch_specific"] + ([f"other rows: {f['pitch_default_text']}"] if f["pitch_default_text"] else []))
     if f["pitch_unknown_rows"]:
         pitch += f"; row{'s' if len(f['pitch_unknown_rows']) > 1 else ''} {_ranges(f['pitch_unknown_rows'])}: unknown"
-    lines.append(f"- Seat pitch (approx., see sources): {pitch}")
+    lines.append(f"- Legroom (seat pitch, approx., see sources): {pitch}. Pitch is the distance from one seat to the same point on the seat in front. About 28–29 in is tight, 30–32 in is standard economy, 34 in or more is roomy.")
     lines += [f"- Seat safety: {safest_answer(p)}", ""]
     lines += ["## Cabin sections", "", "| Section | Rows | Crash-study pattern | Seats within 5 rows of an exit |", "|---|---|---|---|"]
     for name, v in sections_info(p).items():
@@ -934,7 +944,8 @@ def llms_txt(s: Settings, pages: list[Page]) -> str:
         lines.append(f"- [{p.title}]({s.url}{p.md_path}): {p.facts['total_seats']} seats; {exits_sentence(p.facts)}")
     lines += ["", "## Data", "",
               f"- [Catalog (JSON)]({s.url}/api/v1/index.json): every configuration with summary facts",
-              f"- [OpenAPI]({s.url}/openapi.json): static JSON endpoints",
+              f"- [OpenAPI]({s.url}/openapi.json): JSON endpoints, including the live flight lookup",
+              f"- Live flight lookup: GET {s.url}/api/lookup?flight=6E1234&date=YYYY-MM-DD returns the scheduled aircraft, registration if assigned, and the likely seat maps with probabilities (rate-limited; covered airlines only)",
               f"- [Full text]({s.url}/llms-full.txt): all seat maps in one Markdown file", "",
               "## Docs", "",
               f"- [Where you sit and crash outcomes]({s.url}/research.md): the studies, their samples and limits, and how the section colours are derived",
@@ -999,6 +1010,17 @@ def openapi(s: Settings) -> dict[str, Any]:
                  "license": {"name": s.data_license, **({"url": s.license_url} if s.license_url else {})}},
         "servers": [{"url": s.url}],
         "paths": {
+            "/api/lookup": {"get": {
+                "operationId": "lookupFlight",
+                "summary": "Which seat map a flight is likely to use",
+                "description": "Looks up the aircraft scheduled for a flight number and local date and matches it to mapped cabin versions with probabilities. Covered airlines only; rate-limited; results cached.",
+                "parameters": [
+                    {"name": "flight", "in": "query", "required": True, "schema": {"type": "string"}, "description": "Flight number, e.g. 6E1234 or FR 1234"},
+                    {"name": "date", "in": "query", "required": True, "schema": {"type": "string", "format": "date"}, "description": "Local departure date, YYYY-MM-DD"}],
+                "responses": {"200": {"description": "Legs with aircraft, registration and match (tier, reason, candidates, uncovered_share)",
+                                      "content": {"application/json": {"schema": {"type": "object"}}}},
+                              "400": {"description": "Bad flight number or date"}, "429": {"description": "Rate limited"},
+                              "503": {"description": "Lookup not configured"}}}},
             "/api/v1/index.json": {"get": {"operationId": "listSeatMaps", "summary": "List all seat map configurations",
                                            "responses": {"200": {"description": "Catalog",
                                                                  "content": {"application/json": {"schema": {"type": "object"}}}}}}},
@@ -1190,7 +1212,7 @@ APP_JS = r"""(() => {
     panel.innerHTML = '<h2>Seat ' + esc(seat) + '</h2>' +
       '<dl>' + (multiCabin ? '<dt>Cabin</dt><dd>' + esc(f.c) + '</dd>' : '') + '<dt>Position</dt><dd>' + esc(f.p) + ', ' + side + ' side</dd>' +
       '<dt>Seats to aisle</dt><dd>' + f.a + '</dd>' +
-      '<dt>Pitch</dt><dd>' + (f.ps === 'range' ? esc(data.pitchRange) : (f.pi === null ? 'unknown' : f.pi + ' in')) + ' <span class="muted small">(' + words(f.ps) + ')</span></dd>' +
+      '<dt title="Distance from this seat to the same point on the seat in front">Legroom (pitch)</dt><dd>' + (f.ps === 'range' ? esc(data.pitchRange) : (f.pi === null ? 'unknown' : f.pi + ' in')) + ' <span class="muted small">(' + words(f.ps) + ')</span></dd>' +
       '<dt>Exit row</dt><dd>' + (f.x ? 'yes' : 'no') + '</dd>' +
       '<dt>Section</dt><dd>' + esc(sec.name) + ' (rows ' + sec.rows[0] + '–' + sec.rows[1] + ')</dd>' +
       '<dt>Crash studies</dt><dd><span class="sw sw-' + esc(sec.band) + '"></span>' + esc(sec.band_label) + ' <a href="/research/">why</a></dd>' +
@@ -1357,7 +1379,7 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .inline-form button:disabled,.inline-form input:disabled{opacity:.55;cursor:not-allowed}
 .lookup,.lucky{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:24px}
 .lookup h2,.lucky h2{margin-top:0}
-.result{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.result p{margin:4px 0}.result-head{font-size:17px}
+.result.example{opacity:.85;border-top:1px dashed var(--line)}.result{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.result p{margin:4px 0}.result-head{font-size:17px}
 .badge.tier-exact{background:var(--okbg);color:var(--ok)}.badge.tier-unavailable{background:var(--fus);color:var(--muted)}
 .badge-fun{background:var(--lucky-bg);color:var(--lucky-ink);vertical-align:middle}
 .seat.lucky{fill:var(--lucky-bg);stroke:var(--lucky-ink);stroke-width:2}
