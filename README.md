@@ -15,6 +15,9 @@ Flight number + date → operating aircraft → cabin configuration (with honest
 | `6E-A320-180Y` | IndiGo | A320 | 180 | draft |
 | `AI-A20N-164` | Air India | A20N | 8J / 24W / 132Y | draft |
 | `IX-B38M-189Y` | Air India Express | B38M | 189 | section map (rows + exits) |
+| `AI-A21N-189` | Air India (ex-Vistara) | A21N | 12J/24W/153Y | seat-level draft |
+| `SG-B738-189Y` | SpiceJet | B738 | 189 | section map (rows + exits) |
+| `QP-B38M-189Y` | Akasa Air | B38M | 189 | section map (rows + exits) |
 | `U2-A20N-186Y`, `U2-A320-186Y`, `U2-A21N-235Y` | easyJet (+ EJU, EZS) | A20N, A320, A21N | 186 / 186 / 235 | draft |
 | `W6-A21N-239Y` | Wizz Air (+ UK, Abu Dhabi, Malta) | A21N | 239 | draft |
 
@@ -72,11 +75,12 @@ Builds static HTML seat-map pages, Markdown twins, a JSON API, `robots.txt`, `si
 ## Research backlog (not published: sources conflict)
 
 - **IndiGo ATR 72-600**: 76 vs 77 vs 78 seats across sources; exits not documented.
-- **Akasa 737 MAX 8 (189)**: row 13 and exit rows unclear; one source shows a full row 1, another implies a partial row.
+- **Akasa 737 MAX 8 186 and 737-8-200 197**: no row-level source yet. (The 189 is published as a section map; which row is short is still unconfirmed.)
 - **IndiGoStretch A321neo (12C + 208Y)**: row counts don't reconcile across sources.
 - **AirAsia A320**: 180 vs 186-seat split at AirAsia Malaysia unknown.
 - **Air India Express 737-8 176 (8 business)**: single source; 2 aircraft.
-- **Air India A320neo 180Y, A321neo**: second Air India A320neo version undocumented.
+- **Air India A320neo 180Y**: second Air India A320neo version undocumented. (Ex-Vistara A321neo published.)
+- **SpiceJet 737-800 186, 737 MAX 8, Q400**: not started.
 
 ## Layout
 

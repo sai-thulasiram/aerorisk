@@ -1,0 +1,169 @@
+{
+  "id": "AI-A21N-189",
+  "operator": {
+    "iata": "AI",
+    "icao": "AIC",
+    "name": "Air India"
+  },
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "group_operators_icao": [],
+  "aircraft": {
+    "icao": "A21N",
+    "iata": "32Q",
+    "name": "Airbus A321neo"
+  },
+  "variant_label": "12 Business, 24 Premium Economy, 153 Economy (former Vistara)",
+  "total_seats": 189,
+  "rows": {
+    "first": 1,
+    "last": 34,
+    "skip": [
+      13
+    ]
+  },
+  "missing_seats": [
+    "34A",
+    "34B",
+    "34C"
+  ],
+  "cabins": [
+    {
+      "name": "Business",
+      "rows": [
+        1,
+        3
+      ],
+      "letters": [
+        "A",
+        "C",
+        "D",
+        "F"
+      ],
+      "aisles_after": [
+        "C"
+      ],
+      "pitch_in": 63
+    },
+    {
+      "name": "Premium Economy",
+      "rows": [
+        4,
+        7
+      ],
+      "pitch_in": 33
+    }
+  ],
+  "pitch_in": {
+    "default_range": [
+      28,
+      29
+    ]
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "before_row": 12,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L3/R3",
+      "kind": "door",
+      "before_row": 24,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L4/R4",
+      "kind": "door",
+      "after_row": 34,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "lavatory_behind": [
+      "33A",
+      "33B",
+      "33C"
+    ]
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "other_versions_unquantified": true,
+  "swap_risk": [],
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/air-india-a321neo-seat-selection-guide-2026",
+      "https://seatmaps.com/airlines/ai-air-india/airbus-a321neo/"
+    ],
+    "corroboration": {
+      "business_12_premium_economy_24": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "business_rows_1_3_2_2": [
+        "seatcompare.ai"
+      ],
+      "premium_rows_4_7_pitch_33": [
+        "seatcompare.ai",
+        "seatmaps.com (33 in)"
+      ],
+      "economy_rows_8_34_no_row_13_row_34_DEF": [
+        "seatcompare.ai only"
+      ],
+      "four_door_pairs_no_overwing_exits": [
+        "seatcompare.ai only"
+      ],
+      "business_pitch_63": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ]
+    },
+    "conflicts": [
+      "Economy count: 153 (seatcompare.ai, derived from rows 8–34) vs 152 (seatmaps.com). Total 189 vs 188.",
+      "Economy pitch: about 28 in (seatcompare.ai) vs 29 in (seatmaps.com)."
+    ],
+    "fleet_share_note": "seatcompare.ai says all 21 former Vistara A321neos share this layout. Air India's other A321neo deliveries may differ and are not mapped.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-11",
+    "verify_against": "Air India web check-in seat map"
+  }
+}

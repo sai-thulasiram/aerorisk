@@ -1,0 +1,142 @@
+{
+  "id": "SG-B738-189Y",
+  "operator": {
+    "iata": "SG",
+    "icao": "SEJ",
+    "name": "SpiceJet"
+  },
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "group_operators_icao": [],
+  "aircraft": {
+    "icao": "B738",
+    "iata": "738",
+    "name": "Boeing 737-800"
+  },
+  "variant_label": "189Y all-economy",
+  "total_seats": 189,
+  "detail": "sections_only",
+  "rows": {
+    "first": 1,
+    "last": 32,
+    "skip": []
+  },
+  "missing_seats": [
+    "1D",
+    "1E",
+    "1F"
+  ],
+  "pitch_in": {
+    "default_range": [
+      29,
+      30
+    ]
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 15,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 16,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 32,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {},
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "other_versions_unquantified": true,
+  "swap_risk": [],
+  "engine_on_this_fleet": {
+    "text": "CFM56-7B (the only engine for the 737-800).",
+    "source": {
+      "label": "Boeing: Longest 737 makes first flight (1997)",
+      "url": "https://boeing.mediaroom.com/1997-07-31-Longest-Boeing-737-Makes-First-Flight"
+    }
+  },
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://www.seatlink.com/airlines/spicejet/seat-maps/spicejet-boeing-737-800-seat-map/",
+      "https://seatmap.app/seat-map/spicejet-737-800",
+      "https://seatmaps.com/airlines/sg-spicejet/boeing-737-800/",
+      "https://www.aerolopa.com/sg"
+    ],
+    "corroboration": {
+      "total_189_all_economy": [
+        "seatlink.com (derived)",
+        "seatmap.app",
+        "seatmaps.com",
+        "aerolopa.com"
+      ],
+      "rows_1_32_one_short_row": [
+        "seatlink.com",
+        "seatmap.app"
+      ],
+      "overwing_exits_rows_15_16": [
+        "seatlink.com",
+        "seatmap.app (extra legroom 15–16, limited recline row 14)"
+      ],
+      "pitch_29_30": [
+        "seatmaps.com",
+        "seatlink.com (29)",
+        "seatmap.app (29)"
+      ]
+    },
+    "conflicts": [
+      "Row 1 has three seats, but sources disagree on the side: ABC (seatlink.com) vs DEF (seatmap.app). Published as a section map until checked.",
+      "SpiceJet also flies a 186-seat 737-800 (seatmaps.com, aerolopa.com); its share is unknown."
+    ],
+    "fleet_share_note": "186-seat version exists; share unknown.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-11",
+    "verify_against": "SpiceJet web check-in seat map"
+  }
+}

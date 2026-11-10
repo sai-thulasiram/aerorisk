@@ -1,0 +1,139 @@
+{
+  "id": "QP-B38M-189Y",
+  "operator": {
+    "iata": "QP",
+    "icao": "AKJ",
+    "name": "Akasa Air"
+  },
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "group_operators_icao": [],
+  "aircraft": {
+    "icao": "B38M",
+    "iata": "7M8",
+    "name": "Boeing 737 MAX 8"
+  },
+  "variant_label": "189Y all-economy",
+  "total_seats": 189,
+  "detail": "sections_only",
+  "rows": {
+    "first": 1,
+    "last": 32,
+    "skip": []
+  },
+  "missing_seats": [
+    "1D",
+    "1E",
+    "1F"
+  ],
+  "pitch_in": {
+    "default_range": [
+      29,
+      30
+    ]
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 15,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 16,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 32,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {},
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "other_versions_unquantified": true,
+  "swap_risk": [],
+  "engine_on_this_fleet": {
+    "text": "CFM LEAP-1B (the only engine for the 737 MAX).",
+    "source": {
+      "label": "Airframer: Boeing 737 supply chain",
+      "url": "https://www.airframer.com/program/b737/supply-chain"
+    }
+  },
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://www.aerolopa.com/qp-7m8-1",
+      "https://seatmap.app/seat-map/akasa-air-737-max-8",
+      "https://seatmaps.com/airlines/qp-akasa-air/boeing-737-max-8",
+      "https://100knots.com/akasa-air-reconfiguring-b737-spacious-seats-with-a-standard-one/"
+    ],
+    "corroboration": {
+      "total_189_all_economy": [
+        "aerolopa.com (189M)",
+        "seatmap.app",
+        "seatmaps.com (V.1)"
+      ],
+      "rows_1_32": [
+        "aerolopa.com",
+        "seatmap.app"
+      ],
+      "overwing_exits_rows_15_16": [
+        "seatmap.app only (extra legroom 15–16, limited recline row 14)"
+      ],
+      "pitch_29_30": [
+        "seatmaps.com",
+        "seatmap.app (29)"
+      ]
+    },
+    "conflicts": [
+      "Which row has only three seats is unclear (seatmap.app shows a short row 13 but also seat 1F). Published as a section map until checked.",
+      "Akasa also flies 197-seat 737-8-200s and 186-seat 737 MAX 8s (aerolopa.com, seatmaps.com); early aircraft had 174 seats with a 2-2 front cabin, being converted to 189 (100knots, Aug 2023). Shares unknown."
+    ],
+    "fleet_share_note": "197-seat 737-8-200 and 186-seat versions exist; shares unknown.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-11",
+    "verify_against": "Akasa Air web check-in seat map"
+  }
+}

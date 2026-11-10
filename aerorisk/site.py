@@ -1313,7 +1313,7 @@ APP_JS = r"""(() => {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const LABEL = { outermost_seat_window_seat_absent: 'outermost seat in this row (no window seat beside it)',
     row_ahead_of_exit_row: 'row in front of an exit row', no_window: 'no window', misaligned_window: 'window offset',
-    window_disputed: 'window disputed by sources', no_recline: 'no recline', first_row: 'first row', last_row: 'last row',
+    window_disputed: 'window disputed by sources', no_recline: 'no recline', lavatory_behind: 'lavatory behind',  first_row: 'first row', last_row: 'last row',
     mid_aft_exit: 'rear-cabin exit', overwing: 'over-wing exit', row_specific: 'row-specific', cabin_default: 'cabin default' };
   const words = s => esc(LABEL[s] || String(s).replace(/_/g, ' '));
   track('seatmap_view', { config: data.config });

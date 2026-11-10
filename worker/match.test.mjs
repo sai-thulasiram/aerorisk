@@ -65,6 +65,7 @@ test("known carriers gate API calls", () => {
   assert.ok(knownCarrier(index, "EJU"));
   assert.ok(!knownCarrier(index, "QR"));
   assert.ok(knownCarrier(index, "AI") && knownCarrier(index, "IX") && knownCarrier(index, "W6"));
+  assert.ok(knownCarrier(index, "QP") && knownCarrier(index, "SG") && knownCarrier(index, "AKJ"));
 });
 
 test("codeshare legs are dropped in favour of the operating leg", () => {
@@ -88,4 +89,14 @@ test("only departures on the requested date are kept", () => {
   assert.equal(r.legs[0].departure_local.slice(0, 10), "2026-11-10");
   const none = buildResult({ flight: "6E1234", date: "2026-11-12" }, parseAdb([mk("2026-11-09 23:45+03:00", "Airbus A321 NEO")]), index);
   assert.equal(none.legs.length, 1);
+});
+
+test("Indian additions match: Akasa MAX 8, SpiceJet 737-800, Air India A321neo", () => {
+  const qp = matchLeg(leg({ operator: { iata: "QP", icao: "AKJ", name: "Akasa Air" }, aircraft_model: "Boeing 737 MAX 8", aircraft_icao: "B38M" }), index);
+  assert.equal(qp.candidates[0].config_id, "QP-B38M-189Y");
+  assert.match(qp.reason, /share is unknown/);
+  const sg = matchLeg(leg({ operator: { iata: "SG", icao: "SEJ", name: "SpiceJet" }, aircraft_model: "Boeing 737-800", aircraft_icao: "B738" }), index);
+  assert.equal(sg.candidates[0].config_id, "SG-B738-189Y");
+  const ai = matchLeg(leg({ operator: { iata: "AI", icao: "AIC", name: "Air India" }, aircraft_model: "Airbus A321 NEO", aircraft_icao: "A21N" }), index);
+  assert.equal(ai.candidates[0].config_id, "AI-A21N-189");
 });

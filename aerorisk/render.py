@@ -84,8 +84,14 @@ def _airframe(cabin: Cabin, width: float, top: float, last_y: float) -> list[str
         yr0 = top + min(e.y_in for e in ow) * PX_PER_IN - 2 * SEAT_H
         yr1 = top + max(e.y_in for e in ow) * PX_PER_IN + 3 * SEAT_H
     else:
-        mid = top + last_y * PX_PER_IN * 0.42
-        yr0, yr1 = mid - 2 * SEAT_H, mid + 3 * SEAT_H
+        # No over-wing exits (e.g. A321neo with four door pairs): the wing sits between the two mid-cabin doors.
+        mids = sorted(e.y_in for e in cabin.exits if e.at_row is None and 0 < e.pos < len(cabin.rows) - 1)
+        if len(mids) >= 2:
+            yr0 = top + mids[0] * PX_PER_IN + SEAT_H
+            yr1 = max(yr0 + 5 * SEAT_H, top + mids[-1] * PX_PER_IN - 2 * SEAT_H)
+        else:
+            mid = top + last_y * PX_PER_IN * 0.42
+            yr0, yr1 = mid - 2 * SEAT_H, mid + 3 * SEAT_H
     out = []
     for sign, root in ((-1, fx0), (1, fx1)):
         tip = root + sign * (WING - 8)
@@ -157,7 +163,7 @@ def _render_svg(cabin: Cabin, highlight: str | None, *, title: bool, inline_styl
             tx = ex + (8 if side == "L" else -8)
             anchor = "start" if side == "L" else "end"
             out.append(f'<text class="exittxt" x="{tx:.0f}" y="{ey+3:.0f}" text-anchor="{anchor}">EXIT</text>'
-                       if e.at_row is None else "")
+                       if e.at_row is None and not (0 < e.pos < len(cabin.rows) - 1) else "")
     # rows + seats
     aisle_x = xs[cabin.config["aisles_after"][0]] + SEAT_W + GAP + AISLE_W / 2 - GAP / 2
     seen_rows = set()
