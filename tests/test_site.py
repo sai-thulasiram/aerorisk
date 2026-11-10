@@ -145,7 +145,7 @@ def test_seatmap_page_states_facts_in_html(site):
     page = (out / "seat-maps/ryanair-boeing-737-800-189-seats/index.html").read_text()
     assert "Over-wing exit rows 16 and 17" in page
     assert "no row 13" in page
-    assert "Draft" in page
+    assert "Built from public seat guides" in page and "Draft" not in page.split("<main")[0]
     assert "%" not in re.sub(r"<script.*?</script>|<style.*?</style>", "", page, flags=re.S).split("Which version")[0]
 
 
@@ -215,4 +215,4 @@ def test_multi_cabin_page(site):
     assert "8 Business in rows 1–2, 2-2" in page and "Premium Economy" in page and "cab-business" in page
     assert "share unknown" in page
     ix = (out / "seat-maps/air-india-express-boeing-737-max-8-189-seats/index.html").read_text()
-    assert "Section map" in ix
+    assert "Rows &amp; exits only" in ix

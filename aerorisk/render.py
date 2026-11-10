@@ -186,7 +186,7 @@ def _render_svg(cabin: Cabin, highlight: str | None, *, title: bool, inline_styl
             spans[st.section] = [min(lo, y0), max(hi, y0 + SEAT_H)]
         for name, (y0, y1) in spans.items():
             mid = (y0 + y1) / 2
-            lx = (-WING + 22) if shape else 22
+            lx = (SIDE - 26) if shape else 22
             out.append(f'<g class="secmark sec-{name}"><line x1="{lx}" y1="{y0:.0f}" x2="{lx}" y2="{y1:.0f}"/>'
                        f'<text x="{lx-8}" y="{mid:.0f}" transform="rotate(-90 {lx-8} {mid:.0f})" text-anchor="middle">'
                        f'{name.upper()}</text></g>')

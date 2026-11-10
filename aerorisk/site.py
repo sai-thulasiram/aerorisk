@@ -624,7 +624,8 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Pitch</th><th>Notes</th></tr></thead>
 <tbody>{"".join(row_html)}</tbody></table></details></section>
 <section><h2>Sources</h2>
-<p class="muted">{_e(prov["method"])}. First-party check: {_e(prov.get("primary_source_check", "not done"))}.</p>
+<p class="muted">{_e(lede(p))}</p>
+<p class="muted">Built from public seat guides and checked across sources (updated {_e(updated)}). Airlines change cabins, so the seat map at check-in is final. Spotted a difference? Use Feedback.</p>
 <ul>{src_html}</ul>
 <h3>How each fact is corroborated</h3><ul>{corr_html}</ul>
 {f"<h3>Where sources disagree</h3><ul>{conf_html}</ul>" if conf_html else ""}
@@ -650,10 +651,26 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     }
     if s.license_url:
         dataset["license"] = s.license_url
+    chips = [f'{f["total_seats"]} seats']
+    chips += ([f'{c["seats"]} {c["name"]}' for c in f["cabins"]] if len(f["cabins"]) > 1 else [f'{f["layout"]} layout'])
+    ow = f["exit_rows"].get("overwing", [])
+    if ow:
+        chips.append("Exit rows " + " & ".join(map(str, sorted(ow))))
+    other = [r for k, v in f["exit_rows"].items() if k != "overwing" for r in v]
+    if other:
+        chips.append("Extra exit row " + ", ".join(map(str, sorted(other))))
+    if 13 in f["rows_skipped"]:
+        chips.append("No row 13")
+    if f["no_window"]:
+        chips.append("No window: " + ", ".join(f["no_window"]))
+    if cfg.get("detail") == "sections_only":
+        chips.append("Rows & exits only")
+    eng = (cfg.get("engine_on_this_fleet") or {}).get("text", "")
+    chip_html = "".join(f'<li>{_e(c)}</li>' for c in chips)
     band = f"""<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <a href="/#seat-maps">Seat maps</a> › {_e(cfg["operator"]["name"])}</nav>
 <h1>{_e(p.title)} seat map</h1>
-<p class="lede">{_e(lede(p))}</p>
-<p>{status_badge(cfg)} <span class="muted">Updated {_e(updated)}</span></p>"""
+<ul class="chips-row">{chip_html}</ul>
+<p class="bandcta"><a class="btn btn-yellow" href="#lucky">Find my lucky seat</a> <a class="btn btn-ghost" href="#mapwrap">Explore the seats</a></p>"""
     return shell(s, head(s, title=title, description=desc, path=p.path, jsonld=[crumbs, dataset],
                          md_path=p.md_path, og_type="article"), body, band=band)
 
@@ -681,6 +698,16 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 <p class="muted small" id="lookupnote">Covers the airlines listed below. Flight data from AeroDataBox.</p>
 <div id="lookupout" aria-live="polite"></div>
 </section>
+<section class="lucky" id="luckyhome" aria-labelledby="luckyhome-h">
+<h2 id="luckyhome-h">Lucky seat finder <span class="badge badge-fun">Just for fun</span></h2>
+<p class="muted">Pick your aircraft and birth date. We pick a lucky section and seat from your sun sign and numerology. Your birth date stays in your browser.</p>
+<form id="luckyhomeform" class="inline-form">
+<label>Aircraft <select id="lh-ac" required>__LUCKY_OPTIONS__</select></label>
+<label>Date of birth <input type="date" id="lh-dob" required></label>
+<label>Seat type <select id="lh-pref"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
+<button type="submit">Find my lucky seat</button>
+</form>
+</section>
 <section id="seat-maps">
 <div class="searchrow"><h2>Seat maps</h2>
 <label class="sr" for="q">Filter by airline or aircraft</label>
@@ -702,8 +729,19 @@ def index_page(s: Settings, pages: list[Page]) -> str:
     catalog = {"@context": "https://schema.org", "@type": "DataCatalog", "name": f"{s.name} seat maps",
                "url": s.url + "/", "dataset": [{"@type": "Dataset", "name": f"{p.title} seat map",
                                                 "url": s.url + p.path} for p in pages]}
+    opts, cur = [], None
+    for p in pages:
+        op = p.cfg["operator"]["name"]
+        if op != cur:
+            if cur is not None:
+                opts.append("</optgroup>")
+            opts.append(f'<optgroup label="{_e(op)}">'); cur = op
+        opts.append(f'<option value="{_e(p.path)}">{_e(p.cfg["aircraft"]["name"])} · {p.cfg["total_seats"]} seats</option>')
+    opts.append("</optgroup>")
+    body = body.replace("__LUCKY_OPTIONS__", "".join(opts))
     band = """<h1>Know your seat <span>before you fly</span></h1>
-<p class="lede">Exit rows, cabin sections, what crash studies found, and the aircraft behind your flight. Every fact has a source.</p>"""
+<p class="lede">Exit rows, cabin sections, what crash studies found, and the aircraft behind your flight. Every fact has a source.</p>
+<p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#seat-maps">Browse seat maps</a></p>"""
     return shell(s, head(s, title=f"{s.name} — {s.tagline}", description=desc, path="/",
                          jsonld=[site_ld, org_ld, catalog]), body, band=band, band_cls="band-home")
 
@@ -1070,6 +1108,17 @@ APP_JS = r"""(() => {
     });
   }
 
+  // 3b. Lucky seat finder shortcut (home page): birth date travels in the URL fragment, never to the server.
+  const lhf = document.getElementById('luckyhomeform');
+  if (lhf) lhf.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const path = document.getElementById('lh-ac').value, dob = document.getElementById('lh-dob').value;
+    const pref = document.getElementById('lh-pref').value;
+    if (!path || !dob) return;
+    track('lucky_shortcut', { path });
+    location.href = path + '#lucky=' + encodeURIComponent(dob) + '&pref=' + encodeURIComponent(pref);
+  });
+
   // 4. Flight lookup (home page)
   const lform = document.getElementById('lookupform');
   if (lform) {
@@ -1100,6 +1149,7 @@ APP_JS = r"""(() => {
       out.innerHTML = j.legs.map(l => {
         const m = l.match;
         const cands = m.candidates.map(c => '<li><a href="' + esc2(c.path) + '">' + esc2(c.label) + '</a>' +
+          ' · <a class="luckylink" href="' + esc2(c.path) + '#lucky">lucky seat</a>' +
           (m.tier === 'exact' ? '' : (c.probability >= 0.995 && !m.uncovered_share ? ' — the only version we know of' : ' — about ' + Math.round(c.probability * 100) + '%')) + '</li>').join('') +
           (m.uncovered_share ? '<li>Other versions we haven\'t mapped yet — about ' + Math.round(m.uncovered_share * 100) + '%</li>' : '');
         return '<div class="result"><p class="result-head"><strong>' + esc2(j.query.flight.replace(/^([A-Z0-9]{2})(\d)/, '$1 $2')) + '</strong> ' +
@@ -1228,8 +1278,30 @@ LUCKY_JS = r"""(() => {
       '<p class="muted small">Also lucky for you: ' + rest.slice(0, 2).map(r => esc(r.seat)).join(', ') +
       '. Moon sign needs your birth time and place, so it isn\'t used here.</p>' +
       '<p class="muted small">For fun only. It isn\'t a rating of any kind; use the facts above to choose a seat.</p>';
+    const pageUrl = location.origin + location.pathname;
+    const msg = 'My lucky seat on the ' + document.querySelector('h1').textContent.replace(/ seat map$/, '') + ' is ' + top.seat +
+      ' (' + sign.name + ', ' + luckySection + ' section). Find yours: ' + pageUrl + '#lucky';
+    out.insertAdjacentHTML('beforeend', '<div class="sharebar">' +
+      (navigator.share ? '<button type="button" class="share-native">Share</button>' : '') +
+      '<a class="share-wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(msg) + '">Share on WhatsApp</a></div>');
+    const nb = out.querySelector('.share-native');
+    if (nb) nb.addEventListener('click', () => { navigator.share({ title: 'My lucky seat', text: msg, url: pageUrl + '#lucky' }).catch(() => {}); track('lucky_share', { via: 'native' }); });
+    out.querySelector('.share-wa').addEventListener('click', () => track('lucky_share', { via: 'whatsapp' }));
     track('lucky_seat', { config: data.config, sign: sign.name, pref });
   });
+
+  // Arriving from the home-page shortcut or a shared link: #lucky=YYYY-MM-DD&pref=window
+  const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+  if (location.hash.startsWith('#lucky')) {
+    const sec = document.getElementById('lucky');
+    if (h.get('lucky')) {
+      document.getElementById('dob').value = h.get('lucky');
+      if (h.get('pref')) document.getElementById('pref').value = h.get('pref');
+      history.replaceState(null, '', location.pathname + '#lucky');   // drop the birth date from the address bar
+      form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit'));
+    }
+    if (sec) setTimeout(() => sec.scrollIntoView({ block: 'start' }), 50);
+  }
 })();
 """
 
@@ -1316,6 +1388,16 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .mapcard,.panel,.lookup,.lucky,.aircraft,.three>div,.card a,table{box-shadow:0 4px 16px rgba(13,26,46,.06)}
 .mapcard,.panel,.lookup,.lucky,.three>div{border-color:transparent}
 .card a{border-color:transparent}
+.chips-row{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:14px 0 4px}
+.chips-row li{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:99px;padding:5px 12px;font-size:14px;font-weight:600;backdrop-filter:blur(4px)}
+.bandcta{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 0}
+.btn{display:inline-block;font-weight:700;text-decoration:none;border-radius:12px;padding:11px 18px;font-size:16px}
+.btn-yellow{background:var(--yellow);color:var(--yellow-ink)}.btn-yellow:hover{filter:brightness(1.05)}
+.btn-ghost{color:#fff;border:1.5px solid rgba(255,255,255,.6)}.btn-ghost:hover{background:rgba(255,255,255,.12)}
+.luckylink{color:var(--lucky-ink);font-weight:600;font-size:14px}
+.sharebar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sharebar a,.sharebar button{font:inherit;font-weight:700;font-size:14px;border-radius:10px;padding:8px 14px;border:0;cursor:pointer;text-decoration:none}
+.share-wa{background:#25d366;color:#06281a}.share-native{background:var(--accent);color:#fff}
+@media(max-width:700px){.mapcard{overflow-x:hidden}.mapcard svg{width:150%;max-width:none;margin-left:-25%}}
 .tablewrap{overflow-x:auto}main a{overflow-wrap:anywhere}.cite{font-size:12px;margin-left:4px;color:var(--muted)}.aircraft{border-top:4px solid var(--navy);background:var(--card);border-radius:14px;padding:16px;margin-top:24px}.aircraft h2{margin-top:0}.suppliers td:first-child{font-weight:600}.sections td{white-space:normal}
 .lucky .inline-form button{background:var(--yellow);color:var(--yellow-ink)}
 .lucky{border-top:4px solid var(--yellow)}.lookup{border-top:4px solid var(--accent)}
