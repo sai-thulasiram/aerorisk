@@ -188,3 +188,22 @@ def test_assets_are_cache_busted(site):
         html = p.read_text()
         for asset in ("/assets/app.js", "/assets/site.css"):
             assert re.search(re.escape(asset) + r"\?v=[0-9a-f]{10}", html), (p, asset)
+
+
+def test_aircraft_section(site):
+    out, _ = site
+    page = (out / "seat-maps/ryanair-boeing-737-max-8-200-197-seats/index.html").read_text()
+    assert "About the Boeing 737 MAX 8" in page and "Renton" in page and "LEAP-1B" in page and "Turkish Aerospace" in page
+    page = (out / "seat-maps/indigo-airbus-a320neo-186-seats/index.html").read_text()
+    assert "PW1100G" in page and "MTU Aero Engines" in page and "Broughton" in page and "Engines on IndiGo" in page
+    api = json.loads((out / "api/v1/seatmaps/U2-A20N-186Y.json").read_text())
+    assert api["aircraft"]["manufacturer"]["name"] == "Airbus" and "LEAP-1A" in api["engine_on_this_fleet"]["text"]
+
+
+def test_every_aircraft_fact_has_a_source():
+    from pathlib import Path
+    for f in (Path(__file__).resolve().parent.parent / "aircraft").glob("*.json"):
+        a = json.loads(f.read_text())
+        keys = [a.get("final_assembly_source")] + [m["source"] for m in a["milestones"]] + \
+               [e["source"] for e in a["engine_options"]] + [c["source"] for c in a["components"]]
+        assert all(k in a["sources"] for k in keys if k), f.name

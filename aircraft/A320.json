@@ -1,0 +1,125 @@
+{
+  "icao": "A320",
+  "name": "Airbus A320 (ceo)",
+  "manufacturer": {
+    "name": "Airbus",
+    "country": "France (headquarters: Toulouse); European group"
+  },
+  "final_assembly": [
+    {
+      "site": "Hamburg",
+      "country": "Germany",
+      "note": "4 lines"
+    },
+    {
+      "site": "Toulouse",
+      "country": "France",
+      "note": "2 lines"
+    },
+    {
+      "site": "Mobile, Alabama",
+      "country": "United States",
+      "note": "2 lines"
+    },
+    {
+      "site": "Tianjin",
+      "country": "China",
+      "note": "2 lines"
+    }
+  ],
+  "final_assembly_note": "Airbus's A320-family network as of July 2023; every line can build the A321.",
+  "final_assembly_source": "avweb_fal",
+  "components": [
+    {
+      "part": "Wings",
+      "maker": "Airbus Broughton",
+      "country": "United Kingdom (Wales)",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Centre wing box",
+      "maker": "Airbus Nantes",
+      "country": "France",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Wing high-lift systems",
+      "maker": "Airbus Bremen",
+      "country": "Germany",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Vertical tail",
+      "maker": "Airbus Stade",
+      "country": "Germany",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Horizontal tail",
+      "maker": "Airbus Getafe",
+      "country": "Spain",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Auxiliary power unit (APU)",
+      "maker": "Honeywell 131-9A",
+      "country": "United States",
+      "source": "honeywell_apu"
+    }
+  ],
+  "milestones": [
+    {
+      "event": "First flight",
+      "when": "February 1987, Toulouse",
+      "source": "a320_30y"
+    },
+    {
+      "event": "Entered service",
+      "when": "1988, Air France",
+      "source": "a320_30y"
+    }
+  ],
+  "engine_options": [
+    {
+      "name": "CFM56-5B",
+      "maker": "CFM International",
+      "makers": [
+        {
+          "name": "GE Aerospace",
+          "country": "United States",
+          "share": "50%"
+        },
+        {
+          "name": "Safran Aircraft Engines",
+          "country": "France",
+          "share": "50%"
+        }
+      ],
+      "source": "safran_easyjet"
+    }
+  ],
+  "engine_options_note": "A second engine option, the IAE V2500, is not covered here yet.",
+  "sources": {
+    "a320_30y": {
+      "label": "AirlineGeeks: 30 years of the A320",
+      "url": "https://airlinegeeks.com/2017/02/22/delightfully-responsive-and-reassuringly-stable-to-fly-marking-30-years-of-the-airbus-a320/"
+    },
+    "aerotime_sites": {
+      "label": "AeroTime: Where Airbus aircraft are made",
+      "url": "https://www.aerotime.aero/articles/24385-airbus-manufacturing-sites/amp"
+    },
+    "avweb_fal": {
+      "label": "AVweb: Airbus opens new A320 final assembly line (2023)",
+      "url": "https://avweb.com/aviation-news/airbus-opens-new-a320-final-assembly-line/"
+    },
+    "honeywell_apu": {
+      "label": "Airframer: Honeywell APU standard on all A320s (2017)",
+      "url": "https://www.airframer.com/news/release/honeywell-auxiliary-power-units-now-standard-on-all-airbus-a320s"
+    },
+    "safran_easyjet": {
+      "label": "Safran: easyJet orders LEAP-1A (2024)",
+      "url": "https://www.safran-group.com/pressroom/easyjet-orders-cfm-leap-1a-engines-power-new-fleet-a320neo-family-aircraft-2024-01-24"
+    }
+  },
+  "authored_at": "2026-11-10"
+}

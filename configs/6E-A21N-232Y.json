@@ -148,5 +148,12 @@
     "authored_at": "2026-11-10",
     "verify_against": "IndiGo web check-in seat map"
   },
-  "swap_risk": []
+  "swap_risk": [],
+  "engine_on_this_fleet": {
+    "text": "Pratt & Whitney PW1100G or CFM LEAP-1A depending on the aircraft; IndiGo's 2019 order switched incoming A320neo-family jets to LEAP-1A.",
+    "source": {
+      "label": "Aviation Week: IndiGo switches to CFM for incoming A320neos (2019)",
+      "url": "https://aviationweek.com/paris-2019-indias-indigo-switches-cfm-engines-incoming-a320neos"
+    }
+  }
 }

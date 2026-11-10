@@ -35,6 +35,67 @@ from .research import BAND_LABEL, BANDS, BASIS, CAVEATS, EXIT_STUDY, STUDIES
 from .render import SVG_CSS, render_svg
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+AIRCRAFT_DIR = Path(__file__).resolve().parent.parent / "aircraft"
+
+
+def aircraft_info(icao: str) -> dict[str, Any] | None:
+    f = AIRCRAFT_DIR / f"{icao}.json"
+    return json.loads(f.read_text()) if f.exists() else None
+
+
+def aircraft_html(cfg: dict[str, Any]) -> str:
+    a = aircraft_info(cfg["aircraft"]["icao"])
+    if not a:
+        return ""
+    src = a["sources"]
+    cite = lambda k: (f' <a class="cite" href="{_e(src[k]["url"])}" rel="nofollow noopener" data-track="source_click" '
+                      f'title="{_e(src[k]["label"])}">source</a>') if k in src else ""
+    fal = ", ".join(f'{_e(x["site"])} ({_e(x["country"])}{": " + _e(x["note"]) if x.get("note") else ""})' for x in a["final_assembly"])
+    rows = [("Manufacturer", f'{_e(a["manufacturer"]["name"])} · {_e(a["manufacturer"]["country"])}'),
+            ("Final assembly", fal + (f'. {_e(a["final_assembly_note"])}' if a.get("final_assembly_note") else "")
+             + cite(a.get("final_assembly_source")))]
+    rows += [(_e(m["event"]), _e(m["when"]) + cite(m["source"])) for m in a["milestones"]]
+    eng = cfg.get("engine_on_this_fleet")
+    if eng:
+        rows.append((f'Engines on {_e(cfg["operator"]["name"])}\'s fleet',
+                     _e(eng["text"]) + f' <a class="cite" href="{_e(eng["source"]["url"])}" rel="nofollow noopener" '
+                     f'data-track="source_click" title="{_e(eng["source"]["label"])}">source</a>'))
+    top = "".join(f"<tr><th scope=row>{k}</th><td>{v}</td></tr>" for k, v in rows)
+    engines = "".join(
+        f'<li><strong>{_e(e["name"])}</strong>: ' +
+        "; ".join(f'{_e(m["name"])} ({_e(m["country"])}{", " + _e(m["share"]) if m.get("share") else ""}'
+                  f'{": " + _e(m["builds"]) if m.get("builds") else ""})' for m in e["makers"]) + cite(e["source"]) + "</li>"
+        for e in a["engine_options"])
+    if a.get("engine_options_note"):
+        engines += f'<li class="muted">{_e(a["engine_options_note"])}</li>'
+    comps = "".join(f'<tr><td>{_e(c["part"])}</td><td>{_e(c["maker"])}</td><td>{_e(c["country"])}{cite(c["source"])}</td></tr>'
+                    for c in a["components"])
+    return f"""<section class="aircraft" id="aircraft"><h2>About the {_e(a["name"])}</h2>
+<table class="facts">{top}</table>
+<h3>Engine options and who makes them</h3><ul>{engines}</ul>
+<h3>Major parts and suppliers</h3>
+<div class="tablewrap"><table class="facts suppliers"><thead><tr><th>Part</th><th>Made by</th><th>Country</th></tr></thead><tbody>{comps}</tbody></table></div>
+<p class="small muted">Major components only; an airliner has thousands of suppliers, and cabin items like seats vary by airline.</p>
+</section>
+"""
+
+
+def aircraft_md(cfg: dict[str, Any]) -> list[str]:
+    a = aircraft_info(cfg["aircraft"]["icao"])
+    if not a:
+        return []
+    L = [f"## About the {a['name']}", "",
+         f"- Manufacturer: {a['manufacturer']['name']} ({a['manufacturer']['country']})",
+         "- Final assembly: " + "; ".join(f"{x['site']}, {x['country']}" + (f" ({x['note']})" if x.get('note') else "") for x in a["final_assembly"])]
+    L += [f"- {m['event']}: {m['when']}" for m in a["milestones"]]
+    if cfg.get("engine_on_this_fleet"):
+        L.append(f"- Engines on {cfg['operator']['name']}'s fleet: {cfg['engine_on_this_fleet']['text']}")
+    for e in a["engine_options"]:
+        L.append(f"- Engine {e['name']}: " + "; ".join(f"{m['name']} ({m['country']}{', ' + m['share'] if m.get('share') else ''})" for m in e["makers"]))
+    L += ["", "| Part | Made by | Country |", "|---|---|---|"]
+    L += [f"| {c['part']} | {c['maker']} | {c['country']} |" for c in a["components"]]
+    L += ["", "Sources: " + "; ".join(f"{v['label']} ({v['url']})" for v in a["sources"].values()), ""]
+    return L
 LICENSE_URLS = {"CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
                 "CC0 1.0": "https://creativecommons.org/publicdomain/zero/1.0/"}
 
@@ -531,6 +592,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <table class="facts sections"><thead><tr><th>Section</th><th>Rows</th><th>Crash-study pattern</th><th>Seats within 5 rows of an exit</th></tr></thead><tbody>{sec_rows}</tbody></table>
 <p class="small muted">Pattern basis: {_e(BASIS)}. It describes past accidents, not your flight, and no individual seat is rated. <a href="/research/">Read the studies and their limits</a></p></section>
 {var_html}
+{aircraft_html(cfg)}
 <section><h2>Row by row</h2>
 <details class="rows"><summary>Show all {f["row_count"]} rows</summary>
 <table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Pitch</th><th>Notes</th></tr></thead>
@@ -771,6 +833,7 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
         for v in swaps:
             lines.append(f"- {v['label']} (swapped onto the same routes): {s.url}/seat-maps/{v['slug']}.md")
         lines.append("")
+    lines += aircraft_md(cfg)
     lines += ["## Row by row", "", "| Row | Seats | Exit row |", "|---|---|---|"]
     exit_rows = {e.at_row for e in p.cabin.exits if e.at_row is not None}
     for r in p.cabin.rows:
@@ -792,6 +855,7 @@ def llms_txt(s: Settings, pages: list[Page]) -> str:
              "Notes for agents:",
              "- Status matters: \"draft\" layouts are from public sources and not yet checked against the airline's live seat map. Say so when citing.",
              "- One airline + aircraft type can have several cabin versions; the aircraft registration decides which. Each page lists the versions and fleet shares.",
+             "- Each page also covers the aircraft type: where it is assembled, engine options and makers, and major part suppliers with countries, each with a source.",
              f"- Licence: {s.data_license}. Please cite the canonical page URL.", "",
              "## Seat maps", ""]
     for p in pages:
@@ -843,6 +907,8 @@ def api_record(s: Settings, p: Page, updated: str, *, with_seats: bool) -> dict[
         "seat_safety": {"estimable": False,
                         "reason": "No validated occupant-level dataset supports a per-seat survival probability."},
         "sections": sections_info(p),
+        "aircraft": aircraft_info(cfg["aircraft"]["icao"]),
+        "engine_on_this_fleet": cfg.get("engine_on_this_fleet"),
         "section_pattern": {"basis": BASIS, "studies": [x["id"] for x in STUDIES], "research": s.url + "/research/",
                             "caveat": "Describes past US accidents; not a prediction for any flight or seat."},
     }
@@ -1202,7 +1268,7 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .view-pattern .seat.exitrow{stroke:var(--line)}
 .view-near .seat.exitrow{fill:var(--seat)}.view-near .seat.near-exit{stroke:var(--accent);stroke-width:2.2}
 .view-pattern .seat.sel,.view-near .seat.sel{fill:var(--sel)}
-.tablewrap{overflow-x:auto}.sections td{white-space:normal}
+.tablewrap{overflow-x:auto}.cite{font-size:12px;margin-left:4px;color:var(--muted)}.aircraft{border-top:4px solid var(--navy);background:var(--card);border-radius:14px;padding:16px;margin-top:24px}.aircraft h2{margin-top:0}.suppliers td:first-child{font-weight:600}.sections td{white-space:normal}
 .lucky .inline-form button{background:var(--yellow);color:var(--yellow-ink)}
 .lucky{border-top:4px solid var(--yellow)}.lookup{border-top:4px solid var(--accent)}
 .badge-fun{background:var(--lucky-bg);color:var(--lucky-ink)}

@@ -164,5 +164,12 @@
       "config_hint": "FR-B738-189Y",
       "note": "Swapped with the 737-800 on the same routes."
     }
-  ]
+  ],
+  "engine_on_this_fleet": {
+    "text": "CFM LEAP-1B (the only engine for the 737 MAX).",
+    "source": {
+      "label": "Airframer: Boeing 737 supply chain",
+      "url": "https://www.airframer.com/program/b737/supply-chain"
+    }
+  }
 }

@@ -137,5 +137,12 @@
   "group_operators_iata": [
     "EC",
     "DS"
-  ]
+  ],
+  "engine_on_this_fleet": {
+    "text": "CFM56-5B.",
+    "source": {
+      "label": "Safran: easyJet orders LEAP-1A (2024)",
+      "url": "https://www.safran-group.com/pressroom/easyjet-orders-cfm-leap-1a-engines-power-new-fleet-a320neo-family-aircraft-2024-01-24"
+    }
+  }
 }

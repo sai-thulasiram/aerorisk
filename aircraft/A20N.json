@@ -1,0 +1,181 @@
+{
+  "icao": "A20N",
+  "name": "Airbus A320neo",
+  "manufacturer": {
+    "name": "Airbus",
+    "country": "France (headquarters: Toulouse); European group"
+  },
+  "final_assembly": [
+    {
+      "site": "Hamburg",
+      "country": "Germany",
+      "note": "4 lines"
+    },
+    {
+      "site": "Toulouse",
+      "country": "France",
+      "note": "2 lines"
+    },
+    {
+      "site": "Mobile, Alabama",
+      "country": "United States",
+      "note": "2 lines"
+    },
+    {
+      "site": "Tianjin",
+      "country": "China",
+      "note": "2 lines"
+    }
+  ],
+  "final_assembly_note": "Airbus's A320-family network as of July 2023; every line can build the A321.",
+  "final_assembly_source": "avweb_fal",
+  "components": [
+    {
+      "part": "Wings",
+      "maker": "Airbus Broughton",
+      "country": "United Kingdom (Wales)",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Centre wing box",
+      "maker": "Airbus Nantes",
+      "country": "France",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Wing high-lift systems",
+      "maker": "Airbus Bremen",
+      "country": "Germany",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Vertical tail",
+      "maker": "Airbus Stade",
+      "country": "Germany",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Horizontal tail",
+      "maker": "Airbus Getafe",
+      "country": "Spain",
+      "source": "aerotime_sites"
+    },
+    {
+      "part": "Auxiliary power unit (APU)",
+      "maker": "Honeywell 131-9A",
+      "country": "United States",
+      "source": "honeywell_apu"
+    },
+    {
+      "part": "Landing gear, wheels and carbon brakes",
+      "maker": "Safran Landing Systems",
+      "country": "France",
+      "source": "safran_a320neo"
+    },
+    {
+      "part": "Engine nacelles (LEAP-1A)",
+      "maker": "Safran Nacelles",
+      "country": "France",
+      "source": "safran_a320neo"
+    },
+    {
+      "part": "Electrical wiring (about 65 km)",
+      "maker": "Safran Electrical & Power",
+      "country": "France",
+      "source": "safran_a320neo"
+    },
+    {
+      "part": "Air inlets",
+      "maker": "Airbus Nantes",
+      "country": "France",
+      "source": "aerotime_sites"
+    }
+  ],
+  "milestones": [
+    {
+      "event": "First flight",
+      "when": "September 2014, Toulouse",
+      "source": "a320neo_ff"
+    },
+    {
+      "event": "First delivery",
+      "when": "January 2016, Lufthansa",
+      "source": "a320neo_lh"
+    }
+  ],
+  "engine_options": [
+    {
+      "name": "CFM LEAP-1A",
+      "maker": "CFM International",
+      "makers": [
+        {
+          "name": "GE Aerospace",
+          "country": "United States",
+          "share": "50%"
+        },
+        {
+          "name": "Safran Aircraft Engines",
+          "country": "France",
+          "share": "50%"
+        }
+      ],
+      "source": "safran_a320neo"
+    },
+    {
+      "name": "Pratt & Whitney PW1100G-JM (geared turbofan)",
+      "maker": "Pratt & Whitney",
+      "makers": [
+        {
+          "name": "Pratt & Whitney",
+          "country": "United States",
+          "share": "about 59%",
+          "builds": "engine integration, high-pressure compressor (with MTU)"
+        },
+        {
+          "name": "Japanese Aero Engines Corporation (JAEC)",
+          "country": "Japan",
+          "share": "23%",
+          "builds": "fan, low-pressure compressor, combustor"
+        },
+        {
+          "name": "MTU Aero Engines",
+          "country": "Germany",
+          "share": "18%",
+          "builds": "low-pressure turbine"
+        }
+      ],
+      "source": "pw_gtf_partners"
+    }
+  ],
+  "sources": {
+    "a320neo_ff": {
+      "label": "Aviation Today: A320neo takes flight (Sept 2014)",
+      "url": "https://aviationtoday.com/2014/09/26/airbus-a320neo-takes-flight-with-pratt-and-whitney-engines"
+    },
+    "a320neo_lh": {
+      "label": "Aviation Today: Airbus delivers first A320neo to Lufthansa (Jan 2016)",
+      "url": "https://www.aviationtoday.com/2016/01/20/airbus-delivers-first-a320neo-to-lufthansa/"
+    },
+    "aerotime_sites": {
+      "label": "AeroTime: Where Airbus aircraft are made",
+      "url": "https://www.aerotime.aero/articles/24385-airbus-manufacturing-sites/amp"
+    },
+    "avweb_fal": {
+      "label": "AVweb: Airbus opens new A320 final assembly line (2023)",
+      "url": "https://avweb.com/aviation-news/airbus-opens-new-a320-final-assembly-line/"
+    },
+    "honeywell_apu": {
+      "label": "Airframer: Honeywell APU standard on all A320s (2017)",
+      "url": "https://www.airframer.com/news/release/honeywell-auxiliary-power-units-now-standard-on-all-airbus-a320s"
+    },
+    "pw_gtf_partners": {
+      "label": "Pratt & Whitney, JAEC and MTU collaborate on PW1100G-JM",
+      "url": "https://prnewswire.com/news-releases/pratt--whitney-jaec-and-mtu-to-collaborate-on-purepower-pw1100g-jm-for-airbus-a320neo-program-130692103.html"
+    },
+    "safran_a320neo": {
+      "label": "Safran on board the A320neo",
+      "url": "https://web.safran-group.com/safran-on-board/en/a320neo.html"
+    }
+  },
+  "authored_at": "2026-11-10"
+}

@@ -1,0 +1,96 @@
+{
+  "icao": "B738",
+  "name": "Boeing 737-800",
+  "manufacturer": {
+    "name": "Boeing",
+    "country": "United States"
+  },
+  "final_assembly": [
+    {
+      "site": "Renton, Washington",
+      "country": "United States",
+      "note": ""
+    }
+  ],
+  "final_assembly_note": "",
+  "final_assembly_source": "b738_ff",
+  "milestones": [
+    {
+      "event": "First flight",
+      "when": "31 July 1997, Renton",
+      "source": "b738_ff"
+    },
+    {
+      "event": "First delivery (planned at first flight)",
+      "when": "1998, Hapag-Lloyd",
+      "source": "b738_ff"
+    }
+  ],
+  "engine_options": [
+    {
+      "name": "CFM56-7B",
+      "maker": "CFM International",
+      "makers": [
+        {
+          "name": "GE Aerospace",
+          "country": "United States",
+          "share": "50%"
+        },
+        {
+          "name": "Safran Aircraft Engines",
+          "country": "France",
+          "share": "50%"
+        }
+      ],
+      "source": "b738_ff"
+    }
+  ],
+  "engine_options_note": "The CFM56-7B is the only engine for the 737-800.",
+  "components": [
+    {
+      "part": "Fuselage",
+      "maker": "Boeing Wichita (formerly Spirit AeroSystems)",
+      "country": "United States (Kansas)",
+      "source": "spirit"
+    },
+    {
+      "part": "Engine nacelles and thrust reversers",
+      "maker": "Boeing Wichita (formerly Spirit AeroSystems)",
+      "country": "United States",
+      "source": "airframer_737"
+    },
+    {
+      "part": "Auxiliary power unit (APU)",
+      "maker": "Honeywell 131 series",
+      "country": "United States",
+      "source": "airframer_737"
+    },
+    {
+      "part": "CFM56 low-pressure compressor",
+      "maker": "Safran Aero Boosters",
+      "country": "Belgium",
+      "source": "airframer_737"
+    },
+    {
+      "part": "Aluminium for fuselage skins and wing ribs",
+      "maker": "Arconic, Davenport Works",
+      "country": "United States",
+      "source": "airframer_737"
+    }
+  ],
+  "sources": {
+    "airframer_737": {
+      "label": "Airframer: Boeing 737 supply chain",
+      "url": "https://www.airframer.com/program/b737/supply-chain"
+    },
+    "b738_ff": {
+      "label": "Boeing: Longest 737 makes first flight (1997)",
+      "url": "https://boeing.mediaroom.com/1997-07-31-Longest-Boeing-737-Makes-First-Flight"
+    },
+    "spirit": {
+      "label": "Airways: Boeing finalizes Spirit AeroSystems reacquisition (Dec 2025)",
+      "url": "https://www.airwaysmag.com/new-post/boeing-finalizes-spirit-aerosystems-reacquisition"
+    }
+  },
+  "authored_at": "2026-11-10"
+}

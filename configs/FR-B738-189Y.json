@@ -173,5 +173,12 @@
       "config_hint": "FR-B38M-197Y",
       "note": "Ryanair swaps 737-800 and 737 MAX 8-200 on the same routes; exit rows and rear numbering differ."
     }
-  ]
+  ],
+  "engine_on_this_fleet": {
+    "text": "CFM56-7B (the only engine for the 737-800).",
+    "source": {
+      "label": "Boeing: Longest 737 makes first flight (1997)",
+      "url": "https://boeing.mediaroom.com/1997-07-31-Longest-Boeing-737-Makes-First-Flight"
+    }
+  }
 }

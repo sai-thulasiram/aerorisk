@@ -165,5 +165,12 @@
       "config_hint": "6E-A20N-186Y",
       "note": "Dominant 31-row variant."
     }
-  ]
+  ],
+  "engine_on_this_fleet": {
+    "text": "Pratt & Whitney PW1100G on most of IndiGo's earlier A320neos; aircraft from IndiGo's 2019 order (about 280 A320neo-family jets) use CFM LEAP-1A. The registration tells you which.",
+    "source": {
+      "label": "Aviation Week: IndiGo switches to CFM for incoming A320neos (2019)",
+      "url": "https://aviationweek.com/paris-2019-indias-indigo-switches-cfm-engines-incoming-a320neos"
+    }
+  }
 }
