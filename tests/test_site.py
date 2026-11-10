@@ -180,3 +180,11 @@ def test_research_page_and_pattern_view(site):
 
 def Collect_jsonld(html):
     c = Collect(); c.feed(html); return c.jsonld
+
+
+def test_assets_are_cache_busted(site):
+    out, _ = site
+    for p in html_files(out):
+        html = p.read_text()
+        for asset in ("/assets/app.js", "/assets/site.css"):
+            assert re.search(re.escape(asset) + r"\?v=[0-9a-f]{10}", html), (p, asset)

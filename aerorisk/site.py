@@ -309,7 +309,7 @@ def head(s: Settings, *, title: str, description: str, path: str, jsonld: list[d
         '<meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)">',
         '<meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">',
         '<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">',
-        '<link rel="stylesheet" href="/assets/site.css">',
+        f'<link rel="stylesheet" href="/assets/site.css?v={ASSET_VERSION}">',
         f'<link rel="alternate" type="text/plain" title="LLM summary" href="/llms.txt">',
     ]
     if md_path:
@@ -323,7 +323,7 @@ def head(s: Settings, *, title: str, description: str, path: str, jsonld: list[d
     if s.cf_beacon_token:
         parts.append('<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
                      f'data-cf-beacon=\'{{"token":"{_e(s.cf_beacon_token)}"}}\'></script>')
-    parts.append('<script defer src="/assets/app.js"></script>')
+    parts.append(f'<script defer src="/assets/app.js?v={ASSET_VERSION}"></script>')
     return "\n".join(parts)
 
 
@@ -530,7 +530,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <p class="small"><a href="/api/v1/seatmaps/{_e(cfg["id"])}.json">JSON</a> · <a href="{_e(p.md_path)}">Markdown</a></p>
 </section>
 <script type="application/json" id="seatdata">{payload}</script>
-<script defer src="/assets/lucky.js"></script>
+<script defer src="/assets/lucky.js?v={ASSET_VERSION}"></script>
 """
     crumbs = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": s.url + "/"},
@@ -1318,3 +1318,8 @@ def indexnow(site_dir: str | Path, settings: Settings | None = None) -> int:
                                  headers={"Content-Type": "application/json; charset=utf-8"})
     with urllib.request.urlopen(req, timeout=20) as r:
         return r.status
+
+
+# Content hash of the CSS/JS so every change gets a new URL (assets are cached for a day).
+import hashlib as _hashlib
+ASSET_VERSION = _hashlib.sha256((SITE_CSS + APP_JS + LUCKY_JS).encode()).hexdigest()[:10]
