@@ -37,7 +37,8 @@ test("flight page renders live result, history, JSON-LD and stays indexable", ()
   assert.match(p.html, /VT-NOF/);
   assert.match(p.html, /VT-NOE/);
   assert.match(p.html, /"@type":"Flight"/);
-  assert.match(p.html, /href="https:\/\/x\.test\/flights\/6e-1234\/"|example\.com\/flights\/6e-1234\//);
+  assert.match(p.html, /<link rel="canonical" href="https?:\/\/[^"]+\/flights\/6e-1234\/">/);
+  assert.match(p.html, /"item":"https:\/\/x\.test\/flights\/6e-1234\/"/);
   assert.ok(!/__TITLE__|__DESC__|__SLUG__|<!--BODY-->|<!--BAND-->|<!--JSONLD-->/.test(p.html));
   assert.ok(!/ style="/.test(p.html), "inline style breaks CSP");
   for (const m of p.html.matchAll(/<script([^>]*)>/g)) assert.ok(/src=|application\/ld\+json|application\/json/.test(m[1]), m[0]);
