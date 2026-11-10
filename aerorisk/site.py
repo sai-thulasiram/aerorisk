@@ -7,7 +7,7 @@ adds the interactive seat inspector and analytics events.
 
 Configuration (environment variables):
     SITE_URL            https://your-domain (required for production; canonical, sitemap, robots)
-    SITE_NAME           default "AeroRisk"
+    SITE_NAME           default "MyLuckySeat"
     CONTACT_EMAIL       shown for corrections; omitted if unset
     UMAMI_WEBSITE_ID    enables Umami (custom events). Optional.
     UMAMI_SRC           default https://cloud.umami.is/script.js
@@ -113,8 +113,8 @@ AI_REFERRERS = ["chatgpt.com", "chat.openai.com", "perplexity.ai", "claude.ai", 
 @dataclass
 class Settings:
     url: str = "https://example.com"
-    name: str = "AeroRisk"
-    tagline: str = "Aircraft seat maps where every fact has a source"
+    name: str = "MyLuckySeat"
+    tagline: str = "Find your lucky seat, and know the plane you're on"
     contact_email: str | None = None
     umami_website_id: str | None = None
     umami_src: str = "https://cloud.umami.is/script.js"
@@ -687,7 +687,17 @@ def index_page(s: Settings, pages: list[Page]) -> str:
     desc = (f"{s.tagline}. Row-by-row seat maps with exit rows, missing and windowless seats, "
             f"each fact sourced and marked with how well it is verified.")
     body = f"""
-<section class="lookup lift" id="lookup" aria-labelledby="lookup-h">
+<section class="lucky lift" id="luckyhome" aria-labelledby="luckyhome-h">
+<h2 id="luckyhome-h">Find your lucky seat <span class="badge badge-fun">Just for fun</span></h2>
+<p class="muted">Pick your aircraft and birth date. We pick a lucky section and seat from your sun sign and numerology. Your birth date stays in your browser.</p>
+<form id="luckyhomeform" class="inline-form">
+<label>Aircraft <select id="lh-ac" required>__LUCKY_OPTIONS__</select></label>
+<label>Date of birth <input type="date" id="lh-dob" required></label>
+<label>Seat type <select id="lh-pref"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
+<button type="submit">Find my lucky seat</button>
+</form>
+</section>
+<section class="lookup" id="lookup" aria-labelledby="lookup-h">
 <h2 id="lookup-h">Find my cabin</h2>
 <p class="muted">Enter your flight number and date. We'll show which cabin version you're likely to get and open its seat map.</p>
 <form id="lookupform" class="inline-form">
@@ -697,16 +707,6 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 </form>
 <p class="muted small" id="lookupnote">Covers the airlines listed below. Flight data from AeroDataBox.</p>
 <div id="lookupout" aria-live="polite"></div>
-</section>
-<section class="lucky" id="luckyhome" aria-labelledby="luckyhome-h">
-<h2 id="luckyhome-h">Lucky seat finder <span class="badge badge-fun">Just for fun</span></h2>
-<p class="muted">Pick your aircraft and birth date. We pick a lucky section and seat from your sun sign and numerology. Your birth date stays in your browser.</p>
-<form id="luckyhomeform" class="inline-form">
-<label>Aircraft <select id="lh-ac" required>__LUCKY_OPTIONS__</select></label>
-<label>Date of birth <input type="date" id="lh-dob" required></label>
-<label>Seat type <select id="lh-pref"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
-<button type="submit">Find my lucky seat</button>
-</form>
 </section>
 <section id="seat-maps">
 <div class="searchrow"><h2>Seat maps</h2>
@@ -736,13 +736,13 @@ def index_page(s: Settings, pages: list[Page]) -> str:
             if cur is not None:
                 opts.append("</optgroup>")
             opts.append(f'<optgroup label="{_e(op)}">'); cur = op
-        opts.append(f'<option value="{_e(p.path)}">{_e(p.cfg["aircraft"]["name"])} · {p.cfg["total_seats"]} seats</option>')
+        opts.append(f'<option value="{_e(p.path)}">{_e(op)} · {_e(p.cfg["aircraft"]["name"])} · {p.cfg["total_seats"]} seats</option>')
     opts.append("</optgroup>")
     body = body.replace("__LUCKY_OPTIONS__", "".join(opts))
-    band = """<h1>Know your seat <span>before you fly</span></h1>
-<p class="lede">Exit rows, cabin sections, what crash studies found, and the aircraft behind your flight. Every fact has a source.</p>
-<p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#seat-maps">Browse seat maps</a></p>"""
-    return shell(s, head(s, title=f"{s.name} — {s.tagline}", description=desc, path="/",
+    band = """<h1>Find your <span>lucky seat</span>, and know the plane you're on</h1>
+<p class="lede">Your sun sign and numbers pick a lucky seat, just for fun. Then see the real thing: exit rows, cabin sections, what crash studies found, and the aircraft behind your flight, every fact sourced.</p>
+<p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#lookup">Find my cabin</a></p>"""
+    return shell(s, head(s, title=f"{s.name}: {s.tagline}", description=desc, path="/",
                          jsonld=[site_ld, org_ld, catalog]), body, band=band, band_cls="band-home")
 
 
@@ -921,7 +921,7 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
 
 def llms_txt(s: Settings, pages: list[Page]) -> str:
     lines = [f"# {s.name}", "",
-             f"> {s.tagline}. Row-by-row airline seat maps (exit rows, seats that don't exist, windowless seats, "
+             f"> {s.name}: a just-for-fun lucky seat finder (sun sign and numerology) on top of sourced, row-by-row airline seat maps (exit rows, seats that don't exist, windowless seats, "
              "approximate pitch), each fact with its sources and a verification status. "
              "Cabin sections are coloured by what two small crash studies found; no seat-level risk scores.", "",
              "Notes for agents:",
@@ -1280,7 +1280,7 @@ LUCKY_JS = r"""(() => {
       '<p class="muted small">For fun only. It isn\'t a rating of any kind; use the facts above to choose a seat.</p>';
     const pageUrl = location.origin + location.pathname;
     const msg = 'My lucky seat on the ' + document.querySelector('h1').textContent.replace(/ seat map$/, '') + ' is ' + top.seat +
-      ' (' + sign.name + ', ' + luckySection + ' section). Find yours: ' + pageUrl + '#lucky';
+      ' (' + sign.name + ', ' + luckySection + ' section) on MyLuckySeat. Find yours: ' + pageUrl + '#lucky';
     out.insertAdjacentHTML('beforeend', '<div class="sharebar">' +
       (navigator.share ? '<button type="button" class="share-native">Share</button>' : '') +
       '<a class="share-wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(msg) + '">Share on WhatsApp</a></div>');

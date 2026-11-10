@@ -7,6 +7,18 @@ Why Cloudflare: free static hosting with Indian and European edge locations, AI-
 
 ---
 
+## Connecting a domain bought at GoDaddy
+
+1. **Cloudflare → Add a domain** (home page, "Onboard a domain"): enter the domain, choose **Free**. When asked about AI crawlers, choose **allow**.
+2. Cloudflare imports GoDaddy's DNS records. **Delete** any `A` / `CNAME` records for `@` and `www` (GoDaddy parking); the Worker creates its own.
+3. Cloudflare shows **two nameservers** (`xxx.ns.cloudflare.com`). In **GoDaddy → My Products → your domain → DNS → Nameservers → Change nameservers → "I'll use my own nameservers"**, replace GoDaddy's with the two Cloudflare ones and save. Turn **DNSSEC off** at GoDaddy if it's on.
+4. Wait for Cloudflare's "your domain is now active" email (usually under an hour, up to 24h).
+5. **Workers & Pages → aerorisk → Domains → Add custom domain** → add `yourdomain` and `www.yourdomain`.
+6. **Rules → Redirect Rules → Create from template → "Redirect from WWW to root"** so there is one address.
+7. GitHub variables: `SITE_URL=https://yourdomain` (no trailing slash), add `INDEXNOW_KEY`, delete `CF_BEACON_TOKEN`. Re-run the workflow.
+8. Web Analytics → Add a site → pick the domain (automatic setup). Umami → edit the website's domain.
+9. Google Search Console and Bing Webmaster Tools → add the domain → submit `/sitemap.xml`.
+
 ## Quick start without a domain (workers.dev)
 
 1. Cloudflare → **Workers & Pages** → note **Your subdomain** (`<sub>.workers.dev`; click *Change* to pick one). The site will live at `https://aerorisk.<sub>.workers.dev`.

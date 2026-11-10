@@ -208,7 +208,7 @@ def render_html(cabins: list[Cabin], *, match: dict | None = None) -> str:
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AeroRisk Seat Inspector</title>
+<title>MyLuckySeat Seat Inspector</title>
 <style>
 :root{{--bg:#faf9f6;--card:#fff;--ink:#22211f;--muted:#6f6b63;--line:#b3ada2;--fus:#f1eee7;--seat:#fff;
 --exitrow:#dff0e3;--sel:#1f5fbf;--exit:#c0392b;--fac:#dcd8cf;--warn:#8a5a00;--warnbg:#fff4dc}}
@@ -232,7 +232,7 @@ dl{{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:12px 
 .na{{border-left:3px solid var(--warn);padding:8px 10px;background:var(--warnbg);border-radius:6px;font-size:13px}}
 small,a{{color:var(--muted)}}a{{overflow-wrap:anywhere}}ul{{padding-left:18px;margin:6px 0}}
 </style></head><body><main>
-<header><h1>AeroRisk Seat Inspector</h1>
+<header><h1>MyLuckySeat Seat Inspector</h1>
 <p class="sub">Layout facts only. Hand-authored draft configurations — verify against the airline's live seat map.</p>
 <div id="match" class="sub"></div></header>
 <div class="map"><label class="sub" for="cfg">Configuration</label><select id="cfg"></select><div id="svg"></div></div>
