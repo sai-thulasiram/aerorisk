@@ -364,7 +364,7 @@ def head(s: Settings, *, title: str, description: str, path: str, jsonld: list[d
         f'<meta property="og:title" content="{_e(title)}">',
         f'<meta property="og:description" content="{_e(description)}">',
         f'<meta property="og:url" content="{_e(canonical)}">',
-        f'<meta property="og:image" content="{_e(s.url)}/assets/og.png">',
+        f'<meta property="og:image" content="{_e(s.url)}/assets/og.jpg">',
         '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">',
         '<meta name="twitter:card" content="summary_large_image">',
         '<meta name="theme-color" content="#0b2545" media="(prefers-color-scheme: light)">',
@@ -388,7 +388,8 @@ def head(s: Settings, *, title: str, description: str, path: str, jsonld: list[d
     return "\n".join(parts)
 
 
-def shell(s: Settings, head_html: str, body: str) -> str:
+def shell(s: Settings, head_html: str, body: str, band: str = "", band_cls: str = "band-page") -> str:
+    band_html = f'<section class="band {band_cls}"><div class="wrap">{band}</div></section>' if band else ""
     contact = (f' · <a href="mailto:{_e(s.contact_email)}?subject=Seat%20map%20correction" '
                f'data-track="correction_click">Report a correction</a>' if s.contact_email else "")
     return f"""<!doctype html>
@@ -402,6 +403,7 @@ def shell(s: Settings, head_html: str, body: str) -> str:
 <a class="brand" href="/"><img src="/assets/favicon.svg" alt="" width="22" height="22">{_e(s.name)}</a>
 <nav><a href="/#lookup">Find my cabin</a><a href="/#seat-maps">Seat maps</a><a href="/research/">Safest seats?</a></nav>
 </div></header>
+{band_html}
 <main id="main" class="wrap">
 {body}
 </main>
@@ -542,7 +544,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
                        f'{_e(re.sub(r"^https?://(www[.])?", "", u))}</a></li>' for u in prov["sources"])
     conf_html = "".join(f"<li>{_e(c)}</li>" for c in prov.get("conflicts", []))
 
-    svg = render_svg(p.cabin, title=False, inline_style=False, sections=True)
+    svg = render_svg(p.cabin, title=False, inline_style=False, sections=True, shape=True)
     secinfo = sections_info(p)
     sec_rows = "".join(
         f'<tr><th scope=row>{name.capitalize()}</th><td>{v["rows"][0]}–{v["rows"][1]}</td>'
@@ -553,10 +555,6 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
                          separators=(",", ":")).replace("</", "<\\/")
 
     body = f"""
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <a href="/#seat-maps">Seat maps</a> › {_e(cfg["operator"]["name"])}</nav>
-<h1>{_e(p.title)} seat map</h1>
-<p class="lede">{_e(lede(p))}</p>
-<p>{status_badge(cfg)} <span class="muted">Updated {_e(updated)}</span></p>
 <div class="grid">
   <section class="mapcard" aria-label="Interactive seat map">
     <div class="viewbar" role="group" aria-label="Map view">
@@ -624,8 +622,12 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     }
     if s.license_url:
         dataset["license"] = s.license_url
+    band = f"""<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <a href="/#seat-maps">Seat maps</a> › {_e(cfg["operator"]["name"])}</nav>
+<h1>{_e(p.title)} seat map</h1>
+<p class="lede">{_e(lede(p))}</p>
+<p>{status_badge(cfg)} <span class="muted">Updated {_e(updated)}</span></p>"""
     return shell(s, head(s, title=title, description=desc, path=p.path, jsonld=[crumbs, dataset],
-                         md_path=p.md_path, og_type="article"), body)
+                         md_path=p.md_path, og_type="article"), body, band=band)
 
 
 def index_page(s: Settings, pages: list[Page]) -> str:
@@ -640,13 +642,9 @@ def index_page(s: Settings, pages: list[Page]) -> str:
     desc = (f"{s.tagline}. Row-by-row seat maps with exit rows, missing and windowless seats, "
             f"each fact sourced and marked with how well it is verified.")
     body = f"""
-<section class="hero">
-<h1>Aircraft seat maps where <span>every fact has a source</span></h1>
-<p class="lede">Row-by-row aircraft seat maps showing exit rows, seats that don't exist, windowless seats and pitch. Every fact lists its sources and how well it has been checked. Where we don't know, we say so.</p>
-</section>
-<section class="lookup" id="lookup" aria-labelledby="lookup-h">
-<h2 id="lookup-h">Which cabin will my flight have?</h2>
-<p class="muted">Enter a flight number and date. We show which cabin versions the airline flies on that aircraft, how likely each is, and link the seat map.</p>
+<section class="lookup lift" id="lookup" aria-labelledby="lookup-h">
+<h2 id="lookup-h">Find my cabin</h2>
+<p class="muted">Enter your flight number and date. We'll show which cabin version you're likely to get and open its seat map.</p>
 <form id="lookupform" class="inline-form">
 <label>Flight number <input id="lf" required placeholder="6E 2134" autocomplete="off" maxlength="9" autocapitalize="characters"></label>
 <label>Date <input id="ld" type="date" required></label>
@@ -676,8 +674,10 @@ def index_page(s: Settings, pages: list[Page]) -> str:
     catalog = {"@context": "https://schema.org", "@type": "DataCatalog", "name": f"{s.name} seat maps",
                "url": s.url + "/", "dataset": [{"@type": "Dataset", "name": f"{p.title} seat map",
                                                 "url": s.url + p.path} for p in pages]}
+    band = """<h1>Know your seat <span>before you fly</span></h1>
+<p class="lede">Exit rows, cabin sections, what crash studies found, and the aircraft behind your flight. Every fact has a source.</p>"""
     return shell(s, head(s, title=f"{s.name} — {s.tagline}", description=desc, path="/",
-                         jsonld=[site_ld, org_ld, catalog]), body)
+                         jsonld=[site_ld, org_ld, catalog]), body, band=band, band_cls="band-home")
 
 
 PRIVACY_MD = """# Privacy
@@ -786,8 +786,12 @@ def strip_anchors(md: str) -> str:
 
 
 def text_page(s: Settings, md: str, path: str, title: str, description: str) -> str:
+    lines = md.strip().split("\n")
+    h1 = lines[0][2:] if lines and lines[0].startswith("# ") else title
+    rest = "\n".join(lines[1:]) if lines and lines[0].startswith("# ") else md
     return shell(s, head(s, title=f"{title} — {s.name}", description=description, path=path,
-                         md_path=path.rstrip("/") + ".md"), f'<article class="prose">{md_to_html(md)}</article>')
+                         md_path=path.rstrip("/") + ".md"), f'<article class="prose">{md_to_html(rest)}</article>',
+                 band=f"<h1>{_e(h1)}</h1>")
 
 
 # --------------------------------------------------------------------------- markdown / agents
@@ -1199,9 +1203,9 @@ LUCKY_JS = r"""(() => {
 """
 
 SITE_CSS = """
-:root{--bg:#f3f6fb;--card:#fff;--ink:#0f1b2d;--muted:#5a6578;--line:#d2d9e5;--accent:#1d4ed8;--navy:#0b2545;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#eaf0f8;--seat:#fff;--exitrow:#fff1bf;--sel:#1d4ed8;--exit:#d92d20;--fac:#d7deea;--warn:#7a4f00;--warnbg:#fff3cd;--ok:#146c43;--okbg:#d9f2e4;--lucky-bg:#ffe28a;--lucky-ink:#5c4300;--band-lower:#cdebdc;--band-higher:#fbd8c6}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1120;--card:#121b2d;--ink:#e8edf6;--muted:#9aa6bb;--line:#26324a;--accent:#7aa8ff;--navy:#07101f;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#16213a;--seat:#1c2944;--exitrow:#3b3212;--sel:#5b8ff0;--exit:#f2705f;--fac:#2a3650;--warn:#ffd36b;--warnbg:#33290e;--ok:#7fd8a6;--okbg:#123224;--lucky-bg:#4a3a08;--lucky-ink:#ffd866;--band-lower:#173a2c;--band-higher:#4a2a1c}}
-:root[data-theme="dark"]{--bg:#0a1120;--card:#121b2d;--ink:#e8edf6;--muted:#9aa6bb;--line:#26324a;--accent:#7aa8ff;--navy:#07101f;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#16213a;--seat:#1c2944;--exitrow:#3b3212;--sel:#5b8ff0;--exit:#f2705f;--fac:#2a3650;--warn:#ffd36b;--warnbg:#33290e;--ok:#7fd8a6;--okbg:#123224;--lucky-bg:#4a3a08;--lucky-ink:#ffd866;--band-lower:#173a2c;--band-higher:#4a2a1c}
+:root{--bg:#e9f0fa;--card:#fff;--ink:#0d1a2e;--muted:#4f5d73;--line:#c5d2e6;--accent:#1d4ed8;--navy:#0b2545;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#f4f7fc;--seat:#dfe9fb;--exitrow:#ffd95a;--wing:#cfdaee;--sel:#1d4ed8;--exit:#d92d20;--fac:#d7deea;--warn:#7a4f00;--warnbg:#fff3cd;--ok:#146c43;--okbg:#d9f2e4;--lucky-bg:#ffe28a;--lucky-ink:#5c4300;--band-lower:#8fdcb6;--band-higher:#ffb58c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1120;--card:#121b2d;--ink:#e8edf6;--muted:#9aa6bb;--line:#26324a;--accent:#7aa8ff;--navy:#07101f;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#16213a;--seat:#22355a;--exitrow:#6b5410;--wing:#1f2c47;--sel:#5b8ff0;--exit:#f2705f;--fac:#2a3650;--warn:#ffd36b;--warnbg:#33290e;--ok:#7fd8a6;--okbg:#123224;--lucky-bg:#4a3a08;--lucky-ink:#ffd866;--band-lower:#1f6b49;--band-higher:#8a4526}}
+:root[data-theme="dark"]{--bg:#0a1120;--card:#121b2d;--ink:#e8edf6;--muted:#9aa6bb;--line:#26324a;--accent:#7aa8ff;--navy:#07101f;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#16213a;--seat:#22355a;--exitrow:#6b5410;--wing:#1f2c47;--sel:#5b8ff0;--exit:#f2705f;--fac:#2a3650;--warn:#ffd36b;--warnbg:#33290e;--ok:#7fd8a6;--okbg:#123224;--lucky-bg:#4a3a08;--lucky-ink:#ffd866;--band-lower:#1f6b49;--band-higher:#8a4526}
 --seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff;--band-lower:#1d3d39;--band-higher:#4a3220}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -1217,7 +1221,7 @@ main{padding:24px 16px 48px}
 h1{font-size:clamp(26px,4.5vw,40px);line-height:1.15;letter-spacing:-.02em;margin:8px 0 12px}
 h2{font-size:22px;letter-spacing:-.01em;margin:36px 0 12px}h3{font-size:17px;margin:20px 0 8px}
 .lede{font-size:18px;max-width:68ch}.muted{color:var(--muted)}.small{font-size:14px}
-.crumbs{font-size:14px;color:var(--muted)}.crumbs a{color:var(--muted);margin:0}
+.crumbs{font-size:14px;color:var(--muted);display:block}.crumbs a{color:var(--muted);margin:0}
 .badge{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--warnbg);color:var(--warn);margin-right:8px}
 .badge-verified{background:var(--okbg);color:var(--ok)}
 .hero{padding:28px 0 8px}.hero h1 span{background:linear-gradient(transparent 62%,var(--yellow) 62%);padding:0 2px}
@@ -1230,9 +1234,9 @@ input[type=search]{font:inherit;padding:10px 12px;border:1px solid var(--line);b
 .three{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:32px}
 .three>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}.three h3{margin-top:0}
 .grid{display:grid;gap:16px;grid-template-columns:minmax(0,1fr);margin-top:16px}
-@media(min-width:820px){.grid{grid-template-columns:minmax(0,380px) minmax(0,1fr)}.panel{position:sticky;top:16px;align-self:start}}
+@media(min-width:820px){.grid{grid-template-columns:minmax(0,500px) minmax(0,1fr)}.panel{position:sticky;top:16px;align-self:start}}
 .mapcard,.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
-.mapcard{max-height:78vh;overflow:auto}.mapcard svg{display:block;width:100%;max-width:340px;margin:0 auto}
+.mapcard{max-height:82vh;overflow:auto;background:linear-gradient(180deg,var(--bg),var(--card))}.mapcard svg{display:block;width:100%;max-width:440px;margin:0 auto}
 .panel{padding:16px}.panel h2{margin-top:0}
 dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:8px 0}dt{color:var(--muted)}dd{margin:0}
 .note{font-size:14px;border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 10px;border-radius:6px}
@@ -1268,7 +1272,20 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .view-pattern .seat.exitrow{stroke:var(--line)}
 .view-near .seat.exitrow{fill:var(--seat)}.view-near .seat.near-exit{stroke:var(--accent);stroke-width:2.2}
 .view-pattern .seat.sel,.view-near .seat.sel{fill:var(--sel)}
-.tablewrap{overflow-x:auto}.cite{font-size:12px;margin-left:4px;color:var(--muted)}.aircraft{border-top:4px solid var(--navy);background:var(--card);border-radius:14px;padding:16px;margin-top:24px}.aircraft h2{margin-top:0}.suppliers td:first-child{font-weight:600}.sections td{white-space:normal}
+.band{color:#fff;background:linear-gradient(180deg,rgba(6,21,47,.62),rgba(6,21,47,.30) 55%,rgba(6,21,47,.62)),url(/assets/band.jpg) center 40%/cover}
+.band-home{background:linear-gradient(90deg,rgba(6,21,47,.78),rgba(6,21,47,.25) 75%),url(/assets/hero.jpg) center 45%/cover}
+.band .wrap{padding:32px 16px 40px}.band-home .wrap{padding:64px 16px 128px}
+.band h1{color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.35);margin-top:6px}.band h1 span{color:var(--yellow);background:none}
+.band-home h1{font-size:clamp(34px,6vw,60px);max-width:14ch}
+.band .lede{color:rgba(255,255,255,.93);text-shadow:0 1px 10px rgba(0,0,0,.3)}.band .muted{color:rgba(255,255,255,.82)}
+.band .crumbs,.band .crumbs a{color:rgba(255,255,255,.82)}
+.band .badge{background:rgba(255,199,44,.95);color:var(--yellow-ink)}
+.lift{margin-top:-96px;position:relative;z-index:2;box-shadow:0 18px 40px rgba(6,21,47,.18)}
+.lookup .inline-form input{font-size:17px;padding:12px 14px}.lookup .inline-form button{font-size:17px;padding:13px 22px}
+.mapcard,.panel,.lookup,.lucky,.aircraft,.three>div,.card a,table{box-shadow:0 4px 16px rgba(13,26,46,.06)}
+.mapcard,.panel,.lookup,.lucky,.three>div{border-color:transparent}
+.card a{border-color:transparent}
+.tablewrap{overflow-x:auto}main a{overflow-wrap:anywhere}.cite{font-size:12px;margin-left:4px;color:var(--muted)}.aircraft{border-top:4px solid var(--navy);background:var(--card);border-radius:14px;padding:16px;margin-top:24px}.aircraft h2{margin-top:0}.suppliers td:first-child{font-weight:600}.sections td{white-space:normal}
 .lucky .inline-form button{background:var(--yellow);color:var(--yellow-ink)}
 .lucky{border-top:4px solid var(--yellow)}.lookup{border-top:4px solid var(--accent)}
 .badge-fun{background:var(--lucky-bg);color:var(--lucky-ink)}
@@ -1287,7 +1304,7 @@ dialog#feedback::backdrop{background:rgba(7,16,31,.55)}
 .chips input:checked+span{background:var(--accent);border-color:var(--accent);color:#fff}.chips input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
 .fbactions{display:flex;align-items:center;gap:12px}.fbactions button{font:inherit;font-weight:700;color:var(--yellow-ink);background:var(--yellow);border:0;border-radius:10px;padding:10px 18px;cursor:pointer}
 .hp{position:absolute!important;left:-9999px}
-main{padding-bottom:80px}
+main{padding-top:24px;padding-bottom:80px}
 .foot{border-top:1px solid var(--line);padding:16px 0;font-size:14px;color:var(--muted)}.foot a{color:var(--muted)}
 """ + SVG_CSS
 
@@ -1339,7 +1356,7 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
         md_paths.append(path.rstrip("/") + ".md")
         sitemap.append((path, s.build_date))
     write("/404.html", shell(s, head(s, title=f"Not found — {s.name}", description="Page not found", path="/404.html"),
-                             '<h1>Not found</h1><p>That page does not exist. <a href="/#seat-maps">Browse seat maps</a>.</p>')
+                             '<p>That page does not exist. <a href="/#seat-maps">Browse seat maps</a>.</p>', band="<h1>Not found</h1>")
           .replace('<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">',
                    '<meta name="robots" content="noindex">'))
 
@@ -1387,8 +1404,8 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
         warnings.append("CONTACT_EMAIL is not set: no correction link is shown.")
     if not s.umami_website_id:
         warnings.append("UMAMI_WEBSITE_ID is not set: only Cloudflare page-view analytics will run (no custom events).")
-    if not (STATIC_DIR / "og.png").exists():
-        warnings.append("static/og.png missing: social previews will have no image.")
+    if not (STATIC_DIR / "og.jpg").exists():
+        warnings.append("static/og.jpg missing: social previews will have no image.")
     return {"pages": len(sitemap), "seat_maps": len(pages), "out": str(out), "warnings": warnings,
             "urls": [s.url + p for p, _ in sitemap]}
 

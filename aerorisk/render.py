@@ -37,17 +37,71 @@ SVG_CSS = (".fus{fill:var(--fus,#f3f1ec);stroke:var(--line,#9a968c);stroke-width
            ".exit{fill:var(--exit,#c0392b)}.exittxt{font:700 8px system-ui,sans-serif;fill:var(--exit,#c0392b)}"
            ".fac{fill:var(--fac,#dcd8cf)}.factxt{font:500 8px system-ui,sans-serif;fill:var(--muted,#777)}"
            ".secmark line{stroke:var(--muted,#777);stroke-width:1.5}.secmark text{font:700 8px system-ui,sans-serif;fill:var(--muted,#777);letter-spacing:.08em}"
+           ".wing{fill:var(--wing,#d5deec);stroke:var(--line,#9a968c);stroke-width:1}.eng{fill:var(--line,#9a968c)}"
+           ".fin{fill:var(--line,#9a968c)}.cockpit{fill:var(--navy,#0b2545);opacity:.75}"
+           ".nosetxt{font:700 8px system-ui,sans-serif;fill:var(--muted,#777);letter-spacing:.12em}"
            "g[data-seat]:focus{outline:none}g[data-seat]:focus .seat{stroke:var(--sel,#1f5fbf);stroke-width:2.5}")
 
 
+NOSE, TAIL, WING = 96, 150, 112
+
+
+def _airframe(cabin: Cabin, width: float, top: float, last_y: float) -> list[str]:
+    """Top-down airliner outline (nose, wings at the over-wing exits, engines, tailplane) drawn behind the cabin."""
+    fx0, fx1 = SIDE - 14, width - SIDE + 14
+    cx, fw = width / 2, fx1 - fx0
+    y0, y1 = top - 34, top + last_y * PX_PER_IN + SEAT_H + 34
+    ow = [e for e in cabin.exits if e.kind == "overwing" and e.at_row is not None]
+    if ow:
+        yr0 = top + min(e.y_in for e in ow) * PX_PER_IN - 2 * SEAT_H
+        yr1 = top + max(e.y_in for e in ow) * PX_PER_IN + 3 * SEAT_H
+    else:
+        mid = top + last_y * PX_PER_IN * 0.42
+        yr0, yr1 = mid - 2 * SEAT_H, mid + 3 * SEAT_H
+    out = []
+    for sign, root in ((-1, fx0), (1, fx1)):
+        tip = root + sign * (WING - 8)
+        out.append(f'<path class="wing" d="M{root:.0f},{yr0:.0f} L{tip:.0f},{yr0+92:.0f} L{tip:.0f},{yr0+124:.0f} '
+                   f'L{root:.0f},{yr1:.0f} Z"/>')
+        ex = root + sign * WING * 0.42
+        out.append(f'<rect class="eng" x="{ex-10:.0f}" y="{yr0+8:.0f}" width="20" height="58" rx="9"/>')
+        hr0 = y1 + TAIL * 0.30
+        htip = root + sign * 58
+        out.append(f'<path class="wing" d="M{root - sign*4:.0f},{hr0:.0f} L{htip:.0f},{hr0+46:.0f} L{htip:.0f},{hr0+64:.0f} '
+                   f'L{root - sign*6:.0f},{hr0+58:.0f} Z"/>')
+    out.append(f'<path class="fus" d="M{fx0:.0f},{y0:.0f} C{fx0:.0f},{y0-NOSE*.55:.0f} {cx-fw*.28:.0f},{y0-NOSE:.0f} {cx:.0f},{y0-NOSE:.0f} '
+               f'C{cx+fw*.28:.0f},{y0-NOSE:.0f} {fx1:.0f},{y0-NOSE*.55:.0f} {fx1:.0f},{y0:.0f} L{fx1:.0f},{y1:.0f} '
+               f'C{fx1:.0f},{y1+TAIL*.55:.0f} {cx+10:.0f},{y1+TAIL:.0f} {cx:.0f},{y1+TAIL:.0f} '
+               f'C{cx-10:.0f},{y1+TAIL:.0f} {fx0:.0f},{y1+TAIL*.55:.0f} {fx0:.0f},{y1:.0f} Z"/>')
+    out.append(f'<path class="cockpit" d="M{cx-26:.0f},{y0-NOSE*.52:.0f} Q{cx:.0f},{y0-NOSE*.78:.0f} {cx+26:.0f},{y0-NOSE*.52:.0f} '
+               f'L{cx+20:.0f},{y0-NOSE*.42:.0f} Q{cx:.0f},{y0-NOSE*.6:.0f} {cx-20:.0f},{y0-NOSE*.42:.0f} Z"/>')
+    out.append(f'<rect class="fin" x="{cx-3:.0f}" y="{y1+TAIL*.25:.0f}" width="6" height="{TAIL*.62:.0f}" rx="3"/>')
+    out.append(f'<text class="nosetxt" x="{cx:.0f}" y="{y0-NOSE*.2:.0f}" text-anchor="middle">FRONT</text>')
+    return out
+
+
 def render_svg(cabin: Cabin, highlight: str | None = None, *, title: bool = True,
-               inline_style: bool = True, sections: bool = False) -> str:
-    """inline_style=False omits the <style> element (for pages with a strict CSP; use SVG_CSS in a stylesheet)."""
+               inline_style: bool = True, sections: bool = False, shape: bool = False) -> str:
+    """inline_style=False omits the <style> element (for pages with a strict CSP; use SVG_CSS in a stylesheet).
+    shape=True draws the cabin inside a top-down airliner outline."""
+    global TOP
+    saved_top = TOP
+    if shape:
+        TOP = saved_top + NOSE
+    try:
+        return _render_svg(cabin, highlight, title=title, inline_style=inline_style, sections=sections, shape=shape)
+    finally:
+        TOP = saved_top
+
+
+def _render_svg(cabin: Cabin, highlight: str | None, *, title: bool, inline_style: bool, sections: bool,
+                shape: bool) -> str:
     xs = _x_positions(cabin)
     width = _width(cabin)
     last_y = max(s.y_in for s in cabin.seats)
-    height = TOP + last_y * PX_PER_IN + 120
-    out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width:.0f} {height:.0f}" '
+    height = TOP + last_y * PX_PER_IN + (SEAT_H + 34 + TAIL + 16 if shape else 120)
+    x0, vw = (-WING, width + 2 * WING) if shape else (0, width)
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0:.0f} 0 {vw:.0f} {height:.0f}" '
            f'class="cabin" role="img" aria-label="Seat map {html.escape(cabin.id)}">']
     if inline_style:
         out.append("<style>" + SVG_CSS + "</style>")
@@ -56,8 +110,11 @@ def render_svg(cabin: Cabin, highlight: str | None = None, *, title: bool = True
                    f'style="font-size:11px;font-weight:700">{html.escape(cabin.config["aircraft"]["name"])} · '
                    f'{html.escape(cabin.config["operator"]["name"])} · {cabin.config["total_seats"]}Y</text>')
     # fuselage
-    out.append(f'<rect class="fus" x="{SIDE-14}" y="{TOP-34}" width="{width-2*(SIDE-14):.0f}" '
-               f'height="{last_y*PX_PER_IN+SEAT_H+68:.0f}" rx="{(width-2*(SIDE-14))/2:.0f}" ry="40"/>')
+    if shape:
+        out.extend(_airframe(cabin, width, TOP, last_y))
+    else:
+        out.append(f'<rect class="fus" x="{SIDE-14}" y="{TOP-34}" width="{width-2*(SIDE-14):.0f}" '
+                   f'height="{last_y*PX_PER_IN+SEAT_H+68:.0f}" rx="{(width-2*(SIDE-14))/2:.0f}" ry="40"/>')
     # facilities (front/rear blocks)
     for fac in cabin.config.get("facilities", []):
         fy = TOP - 28 if fac["position"] == "front" else TOP + last_y * PX_PER_IN + SEAT_H + 8
@@ -95,8 +152,9 @@ def render_svg(cabin: Cabin, highlight: str | None = None, *, title: bool = True
             spans[st.section] = [min(lo, y0), max(hi, y0 + SEAT_H)]
         for name, (y0, y1) in spans.items():
             mid = (y0 + y1) / 2
-            out.append(f'<g class="secmark sec-{name}"><line x1="22" y1="{y0:.0f}" x2="22" y2="{y1:.0f}"/>'
-                       f'<text x="14" y="{mid:.0f}" transform="rotate(-90 14 {mid:.0f})" text-anchor="middle">'
+            lx = (-WING + 22) if shape else 22
+            out.append(f'<g class="secmark sec-{name}"><line x1="{lx}" y1="{y0:.0f}" x2="{lx}" y2="{y1:.0f}"/>'
+                       f'<text x="{lx-8}" y="{mid:.0f}" transform="rotate(-90 {lx-8} {mid:.0f})" text-anchor="middle">'
                        f'{name.upper()}</text></g>')
     out.append("</svg>")
     return "".join(out)

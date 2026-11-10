@@ -61,7 +61,10 @@ async function callAdb(env, flight, date) {
 async function lookup(request, env, ctx) {
   const url = new URL(request.url);
   const enabled = Boolean(env.AERODATABOX_RAPIDAPI_KEY) || env.ADB_MOCK === "1";
-  if (url.searchParams.has("status")) return json({ enabled }, 200, { "cache-control": "no-store" });
+  if (url.searchParams.has("status")) {
+    return json({ enabled, key_present: Boolean(env.AERODATABOX_RAPIDAPI_KEY), mock: env.ADB_MOCK === "1" }, 200,
+                { "cache-control": "no-store" });
+  }
   if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405);
   if (!enabled) return json({ error: "lookup_not_configured", message: "Flight lookup isn't switched on yet." }, 503);
 
@@ -97,8 +100,12 @@ async function lookup(request, env, ctx) {
   try {
     payload = await callAdb(env, flight, date);
   } catch (e) {
-    return json({ error: "upstream_error", message: "The flight data service didn't answer. Try again shortly.",
-                  upstream_status: e.status || null }, 502);
+    const st = e.status || null;
+    const message =
+      st === 401 || st === 403 ? "The flight data key was rejected. Check that the key is subscribed to AeroDataBox on RapidAPI." :
+      st === 429 ? "The flight data plan's monthly or per-second limit is used up. Try again later." :
+      "The flight data service didn't answer. Try again shortly.";
+    return json({ error: "upstream_error", message, upstream_status: st }, 502);
   }
   const result = { ...buildResult(query, parseAdb(payload), index), source: "AeroDataBox", fetched_at: new Date().toISOString() };
   const daysAway = (Date.parse(date + "T00:00:00Z") - Date.now()) / 86400000;

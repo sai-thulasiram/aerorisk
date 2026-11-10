@@ -4,6 +4,8 @@
   "name": "aerorisk",
   "main": "./worker/index.js",
   "compatibility_date": "2025-09-01",
+  // Keep variables added in the Cloudflare dashboard when GitHub deploys (otherwise plain-text vars are wiped).
+  "keep_vars": true,
   "assets": {
     "directory": "./site",
     "binding": "ASSETS",

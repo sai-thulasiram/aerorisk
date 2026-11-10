@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+.scene{position:absolute;inset:0;background:linear-gradient(180deg,#06152f 0%,#0b2d6b 30%,#1f57b8 55%,#5d86d6 70%,#f0a35e 88%,#ffd27a 100%)}
+.cloud{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(38px)}
+.glow{position:absolute;left:-10%;right:-10%;bottom:-18%;height:45%;background:radial-gradient(ellipse at 60% 100%,rgba(255,214,120,.9),rgba(255,170,90,.35) 45%,transparent 70%);filter:blur(20px)}
+svg{position:absolute;inset:0;width:100%;height:100%}
+.blur{position:absolute;inset:0;filter:blur(var(--b,1.5px))}
+</style></head><body><div class="blur">
+<div class="scene"></div><div class="glow"></div>
+<div class="cloud" style="left:-5%;top:62%;width:55%;height:22%;opacity:.7"></div>
+<div class="cloud" style="left:35%;top:70%;width:50%;height:20%;opacity:.6"></div>
+<div class="cloud" style="left:70%;top:58%;width:45%;height:18%;opacity:.55"></div>
+<div class="cloud" style="left:10%;top:18%;width:30%;height:9%;opacity:.25"></div>
+<div class="cloud" style="left:55%;top:28%;width:28%;height:8%;opacity:.2"></div>
+<svg viewBox="0 0 2400 1200" preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="trail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<linearGradient id="body" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0a1b3b"/><stop offset=".5" stop-color="#1b335f"/><stop offset="1" stop-color="#0a1b3b"/></linearGradient>
+<filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+<g transform="translate(1660 330) rotate(62) scale(1.15)">
+  <g filter="url(#soft)" opacity=".9">
+   <rect x="-80" y="62" width="10" height="1100" fill="url(#trail)"/>
+   <rect x="70" y="62" width="10" height="1100" fill="url(#trail)"/>
+  </g>
+  <path d="M0,-215 C12,-212 17,-190 17,-150 L17,170 C17,195 8,215 0,222 C-8,215 -17,195 -17,170 L-17,-150 C-17,-190 -12,-212 0,-215Z" fill="url(#body)"/>
+  <path d="M17,-25 L205,75 L205,92 L17,40 Z M-17,-25 L-205,75 L-205,92 L-17,40 Z" fill="#12274d"/>
+  <path d="M15,150 L80,192 L80,202 L13,186 Z M-15,150 L-80,192 L-80,202 L-13,186 Z" fill="#12274d"/>
+  <rect x="64" y="0" width="22" height="58" rx="10" fill="#0a1b3b"/><rect x="-86" y="0" width="22" height="58" rx="10" fill="#0a1b3b"/>
+  <path d="M0,170 L3,215 L-3,215 Z" fill="#0a1b3b"/>
+</g>
+</svg></div></body></html>
