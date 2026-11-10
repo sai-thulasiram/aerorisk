@@ -22,10 +22,11 @@
   // Feedback storage. Read it at /api/feedback?token=<FEEDBACK_ADMIN_TOKEN> (secret; add &format=csv for a spreadsheet).
   "durable_objects": { "bindings": [{ "name": "FEEDBACK", "class_name": "FeedbackStore" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["FeedbackStore"] }],
-  // Uncomment once your domain is on Cloudflare (or add it in the dashboard instead):
-  // "routes": [
-  //   { "pattern": "yourdomain.com", "custom_domain": true },
-  //   { "pattern": "www.yourdomain.com", "custom_domain": true }
-  // ],
+  "routes": [
+    { "pattern": "myluckyseat.in", "custom_domain": true },
+    { "pattern": "www.myluckyseat.in", "custom_domain": true }
+  ],
+  // Keep the old workers.dev address until SITE_URL points at myluckyseat.in, then set to false.
+  "workers_dev": true,
   "observability": { "enabled": true }
 }
