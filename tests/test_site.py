@@ -257,3 +257,13 @@ def test_bad_adsense_client_is_rejected(monkeypatch):
     monkeypatch.setenv("ADSENSE_CLIENT", "pub-123")
     with pytest.raises(SystemExit):
         Settings.from_env()
+
+
+def test_flight_page_template_and_sitemap_hint(site):
+    out, _ = site
+    tpl = (out / "_tpl/flight.tpl").read_text()
+    for marker in ("__TITLE__", "__DESC__", "__SLUG__", "<!--BODY-->", "<!--BAND-->", "<!--JSONLD-->"):
+        assert marker in tpl, marker
+    assert "Sitemap: https://seatfacts.test/sitemap-flights.xml" in (out / "robots.txt").read_text()
+    assert "/_tpl/*" in (out / "_headers").read_text()
+    assert "/flights/6e-1234/" in (out / "llms.txt").read_text()

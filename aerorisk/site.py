@@ -882,6 +882,14 @@ def privacy_md(s: "Settings") -> str:
     return text
 
 
+def flight_template(s: "Settings") -> str:
+    """Shell for Worker-rendered flight pages; the Worker fills the placeholders."""
+    h = head(s, title="__TITLE__", description="__DESC__", path="/flights/__SLUG__/")
+    h = h.replace(f'<link rel="alternate" type="text/plain" title="LLM summary" href="/llms.txt">',
+                  '<link rel="alternate" type="text/plain" title="LLM summary" href="/llms.txt">\n<!--JSONLD-->')
+    return shell(s, h, "<!--BODY-->", band="<!--BAND-->")
+
+
 def research_md(s: "Settings") -> str:
     lines = ["# Where you sit and crash outcomes", "",
              "No seat is reliably safest. Two small US studies found that passengers in the rear of the cabin died less "
@@ -1045,6 +1053,7 @@ def llms_txt(s: Settings, pages: list[Page]) -> str:
     lines += ["", "## Data", "",
               f"- [Catalog (JSON)]({s.url}/api/v1/index.json): every configuration with summary facts",
               f"- [OpenAPI]({s.url}/openapi.json): JSON endpoints, including the live flight lookup",
+              f"- Flight pages: {s.url}/flights/6e-1234/ (any covered flight number) shows today's aircraft, likely seat map and aircraft seen on earlier days; list in {s.url}/sitemap-flights.xml",
               f"- Live flight lookup: GET {s.url}/api/lookup?flight=6E1234&date=YYYY-MM-DD returns the scheduled aircraft, registration if assigned, and the likely seat maps with probabilities (rate-limited; covered airlines only)",
               f"- [Full text]({s.url}/llms-full.txt): all seat maps in one Markdown file", "",
               "## Docs", "",
@@ -1067,7 +1076,7 @@ def robots_txt(s: Settings) -> str:
     lines += ["Allow: /" if s.allow_ai_training else "Disallow: /", ""]
     train = "yes" if s.allow_ai_training else "no"
     lines += ["# Content signals (contentsignals.org)", f"Content-Signal: search=yes, ai-input=yes, ai-train={train}", "",
-              f"Sitemap: {s.url}/sitemap.xml"]
+              f"Sitemap: {s.url}/sitemap.xml", f"Sitemap: {s.url}/sitemap-flights.xml"]
     return "\n".join(lines) + "\n"
 
 
@@ -1168,6 +1177,7 @@ def headers_file(s: Settings, md_paths: list[str]) -> str:
         "/llms-full.txt", "  Content-Type: text/plain; charset=utf-8", "",
         "/.well-known/api-catalog", "  Content-Type: application/linkset+json", "",
         "/openapi.json", "  Access-Control-Allow-Origin: *", "",
+        "/_tpl/*", "  X-Robots-Tag: noindex", "",
     ]
     for p in md_paths:
         blocks += [p, "  Content-Type: text/markdown; charset=utf-8", ""]
@@ -1300,7 +1310,7 @@ APP_JS = r"""(() => {
           (l.registration ? ' · ' + esc2(l.registration) : '') + '</p>' +
           '<p><span class="badge tier-' + esc2(m.tier) + '">' + esc2(TIER[m.tier] || m.tier) + '</span> ' + esc2(m.reason) + '</p>' +
           (cands ? '<ul>' + cands + '</ul>' : '') + '</div>';
-      }).join('') + '<p class="muted small">Flight data: AeroDataBox. Cabin versions can change on the day; the airline\'s seat map at check-in is final.</p>';
+      }).join('') + (j.page ? '<p><a href="' + esc2(j.page) + '">Page for this flight, with the aircraft seen on earlier days →</a></p>' : '') + '<p class="muted small">Flight data: AeroDataBox. Cabin versions can change on the day; the airline\'s seat map at check-in is final.</p>';
       track('lookup_result', { carrier, tier: j.legs[0].match.tier });
     });
   }
@@ -1585,6 +1595,7 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .tablewrap{overflow-x:auto}main a{overflow-wrap:anywhere}.cite{font-size:12px;margin-left:4px;color:var(--muted)}.aircraft{border-top:4px solid var(--navy);background:var(--card);border-radius:14px;padding:16px;margin-top:24px}.aircraft h2{margin-top:0}.suppliers td:first-child{font-weight:600}.sections td{white-space:normal}
 .lucky .inline-form button{background:var(--yellow);color:var(--yellow-ink)}
 .sponsor,.adslot{margin-top:24px;background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px 16px}.sponsor-tag{margin:0 0 8px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}.sponsor-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.sponsor-item{display:flex;flex-direction:column;gap:4px;padding:12px;border:1px solid var(--line);border-radius:10px;text-decoration:none;color:var(--ink)}.sponsor-item:hover{border-color:var(--accent)}.sponsor-cta{color:var(--accent);font-weight:600;font-size:14px}ins.adsbygoogle{display:block;min-height:90px}
+.tablewrap{overflow-x:auto}.hist{min-width:560px}.hist a{overflow-wrap:normal}.hist td:last-child{min-width:13em}
 .inline-form details.more{flex-basis:100%;width:100%}.inline-form details.more summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}.more-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}.more-grid label{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .lucky{border-top:4px solid var(--yellow)}.lookup{border-top:4px solid var(--accent)}
 .badge-fun{background:var(--lucky-bg);color:var(--lucky-ink)}
@@ -1688,6 +1699,7 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
     write("/assets/app.js", APP_JS.replace("__AI_REFERRERS__", json.dumps(AI_REFERRERS)))
     write("/assets/lucky.js", LUCKY_JS)
     write("/assets/astro.js", ASTRO_JS)
+    write("/_tpl/flight.tpl", flight_template(s))
     if s.adsense_client:
         write("/ads.txt", f"google.com, {s.adsense_client.replace('ca-', '', 1)}, DIRECT, f08c47fec0942fa0\n")
     write("/assets/favicon.svg", FAVICON)

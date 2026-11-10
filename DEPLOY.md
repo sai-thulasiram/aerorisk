@@ -42,6 +42,13 @@ Quota protection built in:
 
 Local test without a key: `npx wrangler dev --var ADB_MOCK:1`, which returns synthetic flights.
 
+## Flight pages (/flights/6e-1234/)
+
+Every covered flight number has a page, rendered by the Worker: today's aircraft, the likely seat map, and the aircraft seen on that flight on earlier days (from lookups on the site). Pages that get looked up are listed in `/sitemap-flights.xml`, so search engines find them as usage grows.
+
+- Page views that need fresh data share a daily cap of upstream calls, so crawlers can't use up your AeroDataBox plan. Default 150 a day; change it with a Worker variable `PAGE_LOOKUPS_PER_DAY`.
+- Submit `https://myluckyseat.in/sitemap-flights.xml` in Google Search Console and Bing Webmaster Tools next to `sitemap.xml`.
+
 ## Ads and sponsored links
 
 Both are off until you configure them.

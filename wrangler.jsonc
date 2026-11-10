@@ -11,7 +11,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
-    "run_worker_first": ["/api/lookup", "/api/feedback"]
+    "run_worker_first": ["/api/lookup", "/api/feedback", "/flights/*", "/sitemap-flights.xml"]
   },
   // Protect the API quota (AeroDataBox free tier is small). Only cache misses count.
   "ratelimits": [
@@ -20,8 +20,15 @@
     { "name": "FEEDBACK_PER_IP", "namespace_id": "1003", "simple": { "limit": 5, "period": 60 } }
   ],
   // Feedback storage. Read it at /api/feedback?token=<FEEDBACK_ADMIN_TOKEN> (secret; add &format=csv for a spreadsheet).
-  "durable_objects": { "bindings": [{ "name": "FEEDBACK", "class_name": "FeedbackStore" }] },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["FeedbackStore"] }],
+  // FLIGHTLOG keeps which aircraft each looked-up flight had (history table on /flights/... pages, flight sitemap).
+  "durable_objects": { "bindings": [
+    { "name": "FEEDBACK", "class_name": "FeedbackStore" },
+    { "name": "FLIGHTLOG", "class_name": "FlightLog" }
+  ] },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["FeedbackStore"] },
+    { "tag": "v2", "new_sqlite_classes": ["FlightLog"] }
+  ],
   "routes": [
     { "pattern": "myluckyseat.in", "custom_domain": true },
     { "pattern": "www.myluckyseat.in", "custom_domain": true }

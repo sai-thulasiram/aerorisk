@@ -4,6 +4,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { buildResult, knownCarrier, parseAdb, parseFlight, validDate } from "./match.js";
 import { cleanFeedback } from "./feedback.js";
+import { parseSlug, renderFlightPage, sitemapXml, slugFor, todayFor } from "./flightpage.js";
 
 // Feedback storage: one SQLite-backed Durable Object (free plan, no setup needed).
 export class FeedbackStore extends DurableObject {
@@ -23,6 +24,50 @@ export class FeedbackStore extends DurableObject {
     return this.ctx.storage.sql.exec("SELECT * FROM feedback ORDER BY id DESC LIMIT ?", limit).toArray();
   }
 }
+
+// Aircraft seen on each flight, from lookups. Powers the history table and the flight sitemap.
+export class FlightLog extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    ctx.storage.sql.exec(`CREATE TABLE IF NOT EXISTS obs (
+      flight TEXT NOT NULL, date TEXT NOT NULL, origin TEXT, destination TEXT, aircraft_model TEXT,
+      registration TEXT, config_id TEXT, seen_at TEXT NOT NULL, PRIMARY KEY (flight, date, origin))`);
+  }
+  async record(flight, date, legs) {
+    for (const l of legs) {
+      if (!l.aircraft_model) continue;
+      const top = l.match && l.match.candidates && l.match.candidates[0];
+      this.ctx.storage.sql.exec(
+        `INSERT INTO obs (flight, date, origin, destination, aircraft_model, registration, config_id, seen_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (flight, date, origin) DO UPDATE SET
+         aircraft_model = excluded.aircraft_model, registration = COALESCE(excluded.registration, obs.registration),
+         config_id = excluded.config_id, seen_at = excluded.seen_at`,
+        flight, date, l.origin || "", l.destination, l.aircraft_model, l.registration, top ? top.config_id : null,
+        new Date().toISOString());
+    }
+    return true;
+  }
+  // Daily cap on upstream calls triggered by page views (crawlers), so they can't use up the API plan.
+  async spend(day, max) {
+    this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS budget (day TEXT PRIMARY KEY, n INTEGER NOT NULL)");
+    const row = this.ctx.storage.sql.exec("SELECT n FROM budget WHERE day = ?", day).toArray()[0];
+    const n = row ? row.n : 0;
+    if (n >= max) return false;
+    this.ctx.storage.sql.exec("INSERT INTO budget (day, n) VALUES (?, 1) ON CONFLICT (day) DO UPDATE SET n = n + 1", day);
+    return true;
+  }
+  async history(flight, limit = 30) {
+    return this.ctx.storage.sql.exec("SELECT date, origin, destination, aircraft_model, registration, config_id FROM obs " +
+      "WHERE flight = ? ORDER BY date DESC LIMIT ?", flight, limit).toArray();
+  }
+  async flights(limit = 5000) {
+    const since = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
+    return this.ctx.storage.sql.exec("SELECT flight, MAX(date) AS last FROM obs WHERE date >= ? GROUP BY flight " +
+      "ORDER BY last DESC LIMIT ?", since, limit).toArray();
+  }
+}
+
+const flightLog = (env) => (env.FLIGHTLOG ? env.FLIGHTLOG.get(env.FLIGHTLOG.idFromName("all")) : null);
 
 const ADB_HOST = "aerodatabox.p.rapidapi.com";
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "x-content-type-options": "nosniff" };
@@ -58,6 +103,47 @@ async function callAdb(env, flight, date) {
   return res.json();
 }
 
+// Shared by /api/lookup and the flight pages. Returns { status, body, cacheHit }.
+async function lookupCore(env, ctx, request, flight, date, index, { perIp = true, budget = null } = {}) {
+  const query = { flight: flight.code, date };
+  const cacheKey = new Request(`https://lookup-cache.internal/v1/${flight.code}/${date}`);
+  const cache = caches.default;
+  const hit = await cache.match(cacheKey);
+  if (hit) return { status: hit.status, body: await hit.json(), cacheHit: true };
+
+  // Rate limits protect the API quota (only reached on cache misses).
+  const ip = request.headers.get("cf-connecting-ip") || "anon";
+  if (perIp && env.LOOKUP_PER_IP) {
+    const { success } = await env.LOOKUP_PER_IP.limit({ key: `ip:${ip}` });
+    if (!success) return { status: 429, body: { error: "rate_limited", message: "Too many lookups. Try again in a minute." } };
+  }
+  if (env.LOOKUP_GLOBAL) {
+    const { success } = await env.LOOKUP_GLOBAL.limit({ key: "global" });
+    if (!success) return { status: 429, body: { error: "busy", message: "Lookups are busy right now. Try again in a minute." } };
+  }
+  if (budget && !(await budget())) {
+    return { status: 429, body: { error: "budget", message: "Live data for this page will be back shortly. Use the lookup on the home page meanwhile." } };
+  }
+  let payload;
+  try {
+    payload = await callAdb(env, flight, date);
+  } catch (e) {
+    const st = e.status || null;
+    const message =
+      st === 401 || st === 403 ? "The flight data key was rejected. Check that the key is subscribed to AeroDataBox on RapidAPI." :
+      st === 429 ? "The flight data plan's monthly or per-second limit is used up. Try again later." :
+      "The flight data service didn't answer. Try again shortly.";
+    return { status: 502, body: { error: "upstream_error", message, upstream_status: st } };
+  }
+  const result = { ...buildResult(query, parseAdb(payload), index), source: "AeroDataBox", fetched_at: new Date().toISOString() };
+  const daysAway = (Date.parse(date + "T00:00:00Z") - Date.now()) / 86400000;
+  const ttl = daysAway < 2 ? 1800 : 6 * 3600;    // registrations appear close to departure
+  ctx.waitUntil(cache.put(cacheKey, json(result, 200, { "cache-control": `public, max-age=${ttl}` })));
+  const log = flightLog(env);
+  if (log && result.legs.length) ctx.waitUntil(log.record(flight.code, date, result.legs).catch(() => {}));
+  return { status: 200, body: result, cacheHit: false, ttl };
+}
+
 async function lookup(request, env, ctx) {
   const url = new URL(request.url);
   const enabled = Boolean(env.AERODATABOX_RAPIDAPI_KEY) || env.ADB_MOCK === "1";
@@ -79,40 +165,68 @@ async function lookup(request, env, ctx) {
     return json({ query, legs: [], unsupported_airline: true,
                   message: "We don't have seat maps for this airline yet." }, 200, { "cache-control": "public, max-age=3600" });
   }
-
-  const cacheKey = new Request(`https://lookup-cache.internal/v1/${flight.code}/${date}`);
-  const cache = caches.default;
-  const hit = await cache.match(cacheKey);
-  if (hit) return new Response(hit.body, { status: hit.status, headers: { ...Object.fromEntries(hit.headers), "x-cache": "HIT" } });
-
-  // Rate limits protect the API quota (only reached on cache misses).
-  const ip = request.headers.get("cf-connecting-ip") || "anon";
-  if (env.LOOKUP_PER_IP) {
-    const { success } = await env.LOOKUP_PER_IP.limit({ key: `ip:${ip}` });
-    if (!success) return json({ error: "rate_limited", message: "Too many lookups. Try again in a minute." }, 429, { "retry-after": "60" });
+  const r = await lookupCore(env, ctx, request, flight, date, index);
+  const extra = r.status === 429 ? { "retry-after": "60" } : {};
+  if (r.status === 200) {
+    r.body.page = `/flights/${slugFor(flight)}/`;
+    return json(r.body, 200, { "cache-control": `public, max-age=${r.ttl || 1800}`, "x-cache": r.cacheHit ? "HIT" : "MISS" });
   }
-  if (env.LOOKUP_GLOBAL) {
-    const { success } = await env.LOOKUP_GLOBAL.limit({ key: "global" });
-    if (!success) return json({ error: "busy", message: "Lookups are busy right now. Try again in a minute." }, 429, { "retry-after": "60" });
-  }
+  return json(r.body, r.status, extra);
+}
 
-  let payload;
-  try {
-    payload = await callAdb(env, flight, date);
-  } catch (e) {
-    const st = e.status || null;
-    const message =
-      st === 401 || st === 403 ? "The flight data key was rejected. Check that the key is subscribed to AeroDataBox on RapidAPI." :
-      st === 429 ? "The flight data plan's monthly or per-second limit is used up. Try again later." :
-      "The flight data service didn't answer. Try again shortly.";
-    return json({ error: "upstream_error", message, upstream_status: st }, 502);
+const HTML_HEADERS = { "content-type": "text/html; charset=utf-8" };
+
+async function flightPage(request, env, ctx) {
+  const url = new URL(request.url);
+  const m = /^\/flights\/([^/]+)\/?$/.exec(url.pathname);
+  const flight = m ? parseSlug(decodeURIComponent(m[1])) : null;
+  if (!flight) {
+    const nf = await env.ASSETS.fetch(new Request(new URL("/404.html", request.url)));
+    return new Response(nf.body, { status: 404, headers: { ...HTML_HEADERS, "x-robots-tag": "noindex" } });
   }
-  const result = { ...buildResult(query, parseAdb(payload), index), source: "AeroDataBox", fetched_at: new Date().toISOString() };
-  const daysAway = (Date.parse(date + "T00:00:00Z") - Date.now()) / 86400000;
-  const ttl = daysAway < 2 ? 1800 : 6 * 3600;    // registrations appear close to departure
-  const res = json(result, 200, { "cache-control": `public, max-age=${ttl}` });
-  ctx.waitUntil(cache.put(cacheKey, res.clone()));
-  return new Response(res.body, { status: 200, headers: { ...Object.fromEntries(res.headers), "x-cache": "MISS" } });
+  const slug = slugFor(flight);
+  const canonicalPath = `/flights/${slug}/`;
+  if (url.pathname !== canonicalPath) {
+    return Response.redirect(new URL(canonicalPath + url.search, request.url).toString(), 301);
+  }
+  const index = await loadIndex(env, request);
+  const tplRes = await env.ASSETS.fetch(new Request(new URL("/_tpl/flight.tpl", request.url)));
+  const tpl = await tplRes.text();
+  const today = todayFor(flight.carrier);
+  const reqDate = url.searchParams.get("date");
+  const date = reqDate && validDate(reqDate) ? reqDate : today;
+  const enabled = Boolean(env.AERODATABOX_RAPIDAPI_KEY) || env.ADB_MOCK === "1";
+
+  let result = null, liveNote = null;
+  if (!knownCarrier(index, flight.carrier)) {
+    liveNote = "We don't have seat maps for this airline yet.";
+  } else if (!enabled) {
+    liveNote = "Live flight data isn't switched on yet.";
+  } else {
+    const log = flightLog(env);
+    const max = Number(env.PAGE_LOOKUPS_PER_DAY || 150);
+    const budget = log ? () => log.spend(new Date().toISOString().slice(0, 10), max).catch(() => false) : null;
+    const r = await lookupCore(env, ctx, request, flight, date, index, { perIp: false, budget });
+    if (r.status === 200) result = r.body;
+    else liveNote = r.body.message || "Live flight data isn't available right now.";
+  }
+  const log = flightLog(env);
+  let history = [];
+  if (log) { try { history = await log.history(flight.code); } catch (_) { history = []; } }
+
+  const page = renderFlightPage(tpl, { flight, date, today, result, history, index, liveNote, slug, origin: `https://${url.host}` });
+  const status = page.indexable || (result && result.legs.length) || history.length ? 200 : 404;
+  return new Response(page.html, { status, headers: { ...HTML_HEADERS, "cache-control": "public, max-age=1800",
+    ...(page.indexable ? {} : { "x-robots-tag": "noindex" }) } });
+}
+
+async function flightSitemap(request, env) {
+  const log = flightLog(env);
+  let rows = [];
+  if (log) { try { rows = await log.flights(); } catch (_) { rows = []; } }
+  const slugs = rows.map((r) => parseSlug(r.flight)).filter(Boolean).map(slugFor);
+  return new Response(sitemapXml(`https://${new URL(request.url).host}`, slugs),
+    { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 
 function feedbackStub(env) {
@@ -159,6 +273,11 @@ export default {
       try { return await feedback(request, env); }
       catch (e) { return json({ error: "internal_error", message: "Could not save that. Please try again." }, 500); }
     }
+    if (pathname.startsWith("/flights/")) {
+      try { return await flightPage(request, env, ctx); }
+      catch (e) { return new Response("Something went wrong.", { status: 500 }); }
+    }
+    if (pathname === "/sitemap-flights.xml") return flightSitemap(request, env);
     if (pathname === "/api/lookup") {
       try { return await lookup(request, env, ctx); }
       catch (e) { return json({ error: "internal_error" }, 500); }
