@@ -63,7 +63,8 @@ test("exact only via verified tail", () => {
 test("known carriers gate API calls", () => {
   assert.ok(knownCarrier(index, "6E"));
   assert.ok(knownCarrier(index, "EJU"));
-  assert.ok(!knownCarrier(index, "AI"));
+  assert.ok(!knownCarrier(index, "QR"));
+  assert.ok(knownCarrier(index, "AI") && knownCarrier(index, "IX") && knownCarrier(index, "W6"));
 });
 
 test("codeshare legs are dropped in favour of the operating leg", () => {

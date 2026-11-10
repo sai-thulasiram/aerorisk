@@ -83,6 +83,7 @@ def match(fi: FlightInstance, *, configs: list[dict[str, Any]] | None = None,
            + ("single known layout for this operator/type" if len(ranked) == 1 and not uncovered
               else f"{len(ranked)} mapped variant(s), ranked by fleet share")
            + (f"; {round(uncovered * 100)}% of this fleet uses layouts not mapped yet" if uncovered else "")
+           + ("; other versions may exist, share unknown" if any(c.get("other_versions_unquantified") for c in cands) else "")
            + ("" if reg else "; registration not yet assigned")
            + ". Exact only once the tail is verified.")
     return MatchResult("likely", why, ranked, type_icao, reg, uncovered)

@@ -4,7 +4,7 @@ from __future__ import annotations
 import html
 import json
 
-from .layout import Cabin, seat_facts
+from .layout import Cabin, cabin_for, seat_facts
 
 SEAT_W, SEAT_H, GAP, AISLE_W = 26, 24, 4, 22
 PX_PER_IN = 1.05          # longitudinal scale: inches of pitch -> px
@@ -20,6 +20,32 @@ def _x_positions(cabin: Cabin) -> dict[str, float]:
         if letter in aisle_after:
             x += AISLE_W
     return xs
+
+
+def _blocks(letters: list[str], aisles: list[str]) -> list[list[str]]:
+    out: list[list[str]] = [[]]
+    for letter in letters:
+        out[-1].append(letter)
+        if letter in aisles:
+            out.append([])
+    return [b for b in out if b]
+
+
+def _seat_boxes(cabin: Cabin, letters: list[str], aisles: list[str]) -> dict[str, tuple[float, float]]:
+    """x and width for each letter. Cabins with fewer seats per block (e.g. 2-2 business) get wider seats
+    that fill the same block width as the main cabin."""
+    base = _x_positions(cabin)
+    main_blocks = _blocks(cabin.config["letters"], cabin.config["aisles_after"])
+    blocks = _blocks(letters, aisles)
+    if [len(b) for b in blocks] == [len(b) for b in main_blocks] or len(blocks) != len(main_blocks):
+        return {l: (base.get(l, base[cabin.config["letters"][0]]), SEAT_W) for l in letters}
+    out = {}
+    for mb, b in zip(main_blocks, blocks):
+        x0, x1 = base[mb[0]], base[mb[-1]] + SEAT_W
+        w = (x1 - x0 - GAP * (len(b) - 1)) / len(b)
+        for i, l in enumerate(b):
+            out[l] = (x0 + i * (w + GAP), w)
+    return out
 
 
 def _width(cabin: Cabin) -> float:
@@ -39,6 +65,8 @@ SVG_CSS = (".fus{fill:var(--fus,#f3f1ec);stroke:var(--line,#9a968c);stroke-width
            ".secmark line{stroke:var(--muted,#777);stroke-width:1.5}.secmark text{font:700 8px system-ui,sans-serif;fill:var(--muted,#777);letter-spacing:.08em}"
            ".wing{fill:var(--wing,#d5deec);stroke:var(--line,#9a968c);stroke-width:1}.eng{fill:var(--line,#9a968c)}"
            ".fin{fill:var(--line,#9a968c)}.cockpit{fill:var(--navy,#0b2545);opacity:.75}"
+           ".seat.cab-business{fill:var(--biz,#c9d6f2)}.seat.cab-premium-economy{fill:var(--prem,#d8e6fb)}"
+           ".seat.sel{fill:var(--sel,#1f5fbf)}"
            ".nosetxt{font:700 8px system-ui,sans-serif;fill:var(--muted,#777);letter-spacing:.12em}"
            "g[data-seat]:focus{outline:none}g[data-seat]:focus .seat{stroke:var(--sel,#1f5fbf);stroke-width:2.5}")
 
@@ -133,16 +161,22 @@ def _render_svg(cabin: Cabin, highlight: str | None, *, title: bool, inline_styl
     # rows + seats
     aisle_x = xs[cabin.config["aisles_after"][0]] + SEAT_W + GAP + AISLE_W / 2 - GAP / 2
     seen_rows = set()
+    box_cache: dict[str, dict[str, tuple[float, float]]] = {}
     for s in cabin.seats:
+        if s.cabin not in box_cache:
+            cab = cabin_for(cabin.config, s.row)
+            box_cache[s.cabin] = _seat_boxes(cabin, cab["letters"], cab["aisles_after"])
+        sx, sw = box_cache[s.cabin][s.letter]
         y = TOP + s.y_in * PX_PER_IN
         if s.row not in seen_rows:
             seen_rows.add(s.row)
             out.append(f'<text class="rown" x="{aisle_x:.0f}" y="{y+SEAT_H/2+3:.0f}" text-anchor="middle">{s.row}</text>')
         cls = ("seat" + (" exitrow" if s.in_exit_row else "") + (" sel" if s.seat == highlight else "")
                + (f" sec-{s.section}" + (" near-exit" if s.near_exit else "") if sections else ""))
-        out.append(f'<g data-seat="{s.seat}" tabindex="0" role="button" aria-label="Seat {s.seat}"><rect class="{cls}" x="{xs[s.letter]:.0f}" y="{y:.0f}" '
-                   f'width="{SEAT_W}" height="{SEAT_H}" rx="5"/>'
-                   f'<text class="lbl{" sel" if s.seat == highlight else ""}" x="{xs[s.letter]+SEAT_W/2:.0f}" '
+        cls += f" cab-{s.cabin.lower().replace(' ', '-')}"
+        out.append(f'<g data-seat="{s.seat}" tabindex="0" role="button" aria-label="Seat {s.seat}"><rect class="{cls}" x="{sx:.0f}" y="{y:.0f}" '
+                   f'width="{sw:.0f}" height="{SEAT_H}" rx="5"/>'
+                   f'<text class="lbl{" sel" if s.seat == highlight else ""}" x="{sx+sw/2:.0f}" '
                    f'y="{y+SEAT_H/2+3:.0f}" text-anchor="middle">{s.seat}</text></g>')
     if sections:
         spans: dict[str, list[float]] = {}

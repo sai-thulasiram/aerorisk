@@ -1,0 +1,143 @@
+{
+  "id": "IX-B38M-189Y",
+  "operator": {
+    "iata": "IX",
+    "icao": "AXB",
+    "name": "Air India Express"
+  },
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "group_operators_icao": [],
+  "aircraft": {
+    "icao": "B38M",
+    "iata": "7M8",
+    "name": "Boeing 737 MAX 8"
+  },
+  "variant_label": "189Y all-economy",
+  "total_seats": 189,
+  "detail": "sections_only",
+  "rows": {
+    "first": 1,
+    "last": 32,
+    "skip": []
+  },
+  "missing_seats": [
+    "1D",
+    "1E",
+    "1F"
+  ],
+  "pitch_in": {
+    "default_range": [
+      29,
+      30
+    ]
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 15,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 16,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 32,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [
+      "12A",
+      "12F"
+    ]
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front",
+      "side": "R"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "other_versions_unquantified": true,
+  "engine_on_this_fleet": {
+    "text": "CFM LEAP-1B (the only engine for the 737 MAX).",
+    "source": {
+      "label": "Airframer: Boeing 737 supply chain",
+      "url": "https://www.airframer.com/program/b737/supply-chain"
+    }
+  },
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/air-india-express-737-max-8-seat-selection-guide-2026",
+      "https://seatmaps.com/airlines/ix-air-india-express/boeing-737-max-8"
+    ],
+    "corroboration": {
+      "total_189_all_economy": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "mid_cabin_exit_row": [
+        "seatcompare.ai (rows 15–16)",
+        "seatmaps.com (no row numbers)"
+      ],
+      "rows_1_32_row_1_ABC": [
+        "seatcompare.ai only"
+      ],
+      "no_window_12A_12F": [
+        "seatcompare.ai only"
+      ],
+      "pitch_29_30": [
+        "seatmaps.com"
+      ]
+    },
+    "conflicts": [
+      "Row numbers and exit rows come from one source; published as a section map until checked."
+    ],
+    "fleet_share_note": "Air India Express also flies a 176-seat version with 8 business seats (2 aircraft per seatcompare.ai), not mapped yet.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-10",
+    "verify_against": "Air India Express web check-in seat map"
+  },
+  "swap_risk": []
+}

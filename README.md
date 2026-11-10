@@ -8,12 +8,17 @@ Flight number + date → operating aircraft → cabin configuration (with honest
 
 | Config | Operator | Type | Seats | Status |
 |---|---|---|---|---|
-| `FR-B738-189Y` | Ryanair (+ group: RUK, MLT, RYS, LDA) | B738 | 189 | draft_unverified |
-| `FR-B38M-197Y` | Ryanair (+ group) | B38M (737 MAX 8-200) | 197 | draft_unverified |
-| `6E-A21N-232Y` | IndiGo | A21N | 232 (~64% of IndiGo A321neos) | draft_unverified |
-| `U2-A20N-186Y` | easyJet (+ EJU, EZS) | A20N | 186 | draft_unverified |
-| `6E-A20N-186Y` | IndiGo | A20N | 186 | draft_unverified |
-| `6E-A20N-180Y` | IndiGo | A20N | 180 | draft_unverified |
+| `FR-B738-189Y` | Ryanair (+ group) | B738 | 189 | draft |
+| `FR-B38M-197Y` | Ryanair (+ group) | B38M (737 MAX 8-200) | 197 | draft |
+| `6E-A20N-186Y` / `6E-A20N-180Y` | IndiGo | A20N | 186 / 180 | draft |
+| `6E-A21N-232Y` | IndiGo | A21N | 232 (~64% of fleet) | draft |
+| `6E-A320-180Y` | IndiGo | A320 | 180 | draft |
+| `AI-A20N-164` | Air India | A20N | 8J / 24W / 132Y | draft |
+| `IX-B38M-189Y` | Air India Express | B38M | 189 | section map (rows + exits) |
+| `U2-A20N-186Y`, `U2-A320-186Y`, `U2-A21N-235Y` | easyJet (+ EJU, EZS) | A20N, A320, A21N | 186 / 186 / 235 | draft |
+| `W6-A21N-239Y` | Wizz Air (+ UK, Abu Dhabi, Malta) | A21N | 239 | draft |
+
+Multi-cabin layouts use `cabins` (per row range: name, letters, aisles, pitch). `detail: "sections_only"` marks layouts with only rows and exits verified. `other_versions_unquantified` flags airlines with further versions of unknown share.
 
 These are hand-authored from public secondary sources (listed in each JSON's `provenance`), **not licensed LOPA data**. Known source conflicts are recorded in `provenance.conflicts`. Verify each against the airline's live seat map before calling anything "verified".
 
@@ -68,8 +73,10 @@ Builds static HTML seat-map pages, Markdown twins, a JSON API, `robots.txt`, `si
 
 - **IndiGo ATR 72-600**: 76 vs 77 vs 78 seats across sources; exits not documented.
 - **Akasa 737 MAX 8 (189)**: row 13 and exit rows unclear; one source shows a full row 1, another implies a partial row.
-- **IndiGoStretch A321neo (12C + 208Y)**: needs multi-cabin support; row counts don't reconcile.
-- **Air India / Air India Express**: multi-cabin layouts; needs a schema extension for per-cabin seat letters.
+- **IndiGoStretch A321neo (12C + 208Y)**: row counts don't reconcile across sources.
+- **AirAsia A320**: 180 vs 186-seat split at AirAsia Malaysia unknown.
+- **Air India Express 737-8 176 (8 business)**: single source; 2 aircraft.
+- **Air India A320neo 180Y, A321neo**: second Air India A320neo version undocumented.
 
 ## Layout
 

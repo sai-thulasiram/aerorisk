@@ -46,6 +46,7 @@ class Seat:
     nearest_exits: list[dict[str, Any]] = field(default_factory=list)
     flags: list[str] = field(default_factory=list)
     section: str = "middle"            # front | middle | rear (cabin thirds by row)
+    cabin: str = "Economy"             # cabin class name (Business, Premium Economy, Economy)
     near_exit: bool = False            # an exit within 5 rows (the Galea / Greenwich finding)
 
     def to_dict(self) -> dict[str, Any]:
@@ -100,6 +101,13 @@ def validate_config(cfg: dict[str, Any]) -> None:
     for letter in cfg["aisles_after"]:
         if letter not in cfg["letters"]:
             raise ConfigError(f"{cfg['id']}: aisle after unknown letter {letter}")
+    for cab in cfg.get("cabins", []):
+        lo, hi = cab["rows"]
+        if not (cfg["rows"]["first"] <= lo <= hi <= cfg["rows"]["last"]):
+            raise ConfigError(f"{cfg['id']}: cabin {cab['name']} rows {cab['rows']} outside the cabin")
+        for letter in cab.get("aisles_after", []):
+            if letter not in cab.get("letters", cfg["letters"]):
+                raise ConfigError(f"{cfg['id']}: cabin {cab['name']} aisle after unknown letter {letter}")
     if not cfg["provenance"].get("sources"):
         raise ConfigError(f"{cfg['id']}: provenance.sources must not be empty")
 
@@ -110,12 +118,24 @@ def _row_numbers(cfg: dict[str, Any]) -> list[int]:
     return [n for n in range(r["first"], r["last"] + 1) if n not in skip]
 
 
+def cabin_for(cfg: dict[str, Any], row: int) -> dict[str, Any]:
+    """The cabin (class) a row belongs to. Configs without "cabins" are a single economy cabin."""
+    for cab in cfg.get("cabins", []):
+        if cab["rows"][0] <= row <= cab["rows"][1]:
+            return {"name": cab["name"], "letters": cab.get("letters", cfg["letters"]),
+                    "aisles_after": cab.get("aisles_after", cfg["aisles_after"]), "pitch_in": cab.get("pitch_in")}
+    return {"name": "Economy", "letters": cfg["letters"], "aisles_after": cfg["aisles_after"], "pitch_in": None}
+
+
 def _pitch(cfg: dict[str, Any], row: int) -> tuple[float | None, str]:
     p = cfg.get("pitch_in", {})
     if row in p.get("unknown_rows", []):
         return None, "unknown"
     if str(row) in p.get("rows", {}):
         return float(p["rows"][str(row)]), "row_specific"
+    cab_pitch = cabin_for(cfg, row).get("pitch_in")
+    if cab_pitch:
+        return float(cab_pitch), "cabin_class"
     if "default" in p:
         return float(p["default"]), "cabin_default"
     if "default_range" in p:
@@ -123,10 +143,11 @@ def _pitch(cfg: dict[str, Any], row: int) -> tuple[float | None, str]:
     return None, "unknown"
 
 
-def _column_info(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def _column_info(cfg: dict[str, Any], letters: list[str] | None = None,
+                 aisles: list[str] | None = None) -> dict[str, dict[str, Any]]:
     """Classify each letter as window/middle/aisle and count seats to the aisle."""
-    letters = cfg["letters"]
-    aisle_after = set(cfg["aisles_after"])
+    letters = letters or cfg["letters"]
+    aisle_after = set(aisles if aisles is not None else cfg["aisles_after"])
     # split into blocks separated by aisles
     blocks: list[list[str]] = [[]]
     for letter in letters:
@@ -210,12 +231,16 @@ def build_cabin(cfg: dict[str, Any]) -> Cabin:
     exit_rows = {e.at_row for e in exits if e.at_row is not None}
     missing = {s.upper() for s in cfg.get("missing_seats", [])}
     flags_cfg = cfg.get("seat_flags", {})
-    cols = _column_info(cfg)
+    col_cache: dict[str, dict[str, dict[str, Any]]] = {}
 
     seats: list[Seat] = []
     for r in rows:
         pitch, psrc = _pitch(cfg, r)
-        for letter in cfg["letters"]:
+        cab = cabin_for(cfg, r)
+        if cab["name"] not in col_cache:
+            col_cache[cab["name"]] = _column_info(cfg, cab["letters"], cab["aisles_after"])
+        cols = col_cache[cab["name"]]
+        for letter in cab["letters"]:
             label = f"{r}{letter}"
             if label in missing:
                 continue
@@ -241,7 +266,7 @@ def build_cabin(cfg: dict[str, Any]) -> Cabin:
                     flags.append(flag_name)
             if c["position"] != "window":
                 # window seat on this side is missing in this row (e.g. 28A beside an exit door)
-                row_side = [l for l in cfg["letters"] if cols[l]["side"] == c["side"]]
+                row_side = [l for l in cab["letters"] if cols[l]["side"] == c["side"]]
                 outer = row_side[0] if c["side"] == "L" else row_side[-1]
                 between = row_side[:row_side.index(letter)] if c["side"] == "L" else row_side[row_side.index(letter) + 1:]
                 if outer != letter and all(f"{r}{l}" in missing for l in between):
@@ -258,7 +283,7 @@ def build_cabin(cfg: dict[str, Any]) -> Cabin:
                 seats_to_aisle=c["seats_to_aisle"], pitch_in=pitch, pitch_source=psrc,
                 y_in=round(y_of[r], 1), in_exit_row=r in exit_rows,
                 nearest_exits=near[:2], flags=sorted(set(flags)),
-                section=section_of(cfg, rows, r),
+                section=section_of(cfg, rows, r), cabin=cab["name"],
                 near_exit=any(abs(ri - e.pos) <= NEAR_EXIT_ROWS for e in exits),
             ))
 

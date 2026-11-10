@@ -1,0 +1,154 @@
+{
+  "id": "W6-A21N-239Y",
+  "operator": {
+    "iata": "W6",
+    "icao": "WZZ",
+    "name": "Wizz Air"
+  },
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "group_operators_icao": [
+    "WUK",
+    "WAZ",
+    "WMT"
+  ],
+  "group_operators_iata": [
+    "W9",
+    "5W",
+    "W4"
+  ],
+  "aircraft": {
+    "icao": "A21N",
+    "iata": "32Q",
+    "name": "Airbus A321neo"
+  },
+  "variant_label": "239Y all-economy",
+  "total_seats": 239,
+  "rows": {
+    "first": 1,
+    "last": 40,
+    "skip": []
+  },
+  "missing_seats": [
+    "28F"
+  ],
+  "pitch_in": {
+    "default_range": [
+      28,
+      29
+    ]
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 18,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 19,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L3/R3",
+      "kind": "mid_aft_exit",
+      "at_row": 29,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L4/R4",
+      "kind": "door",
+      "after_row": 40,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [
+      "40A",
+      "40F"
+    ]
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/wizz-air-a321neo-seat-selection-guide-2026",
+      "https://seatmap.app/seat-map/wizz-air-a321neo",
+      "https://seatmaps.com/airlines/w6-wizz-air/airbus-a321neo/"
+    ],
+    "corroboration": {
+      "rows_1_40_total_239": [
+        "seatcompare.ai",
+        "seatmap.app",
+        "seatmaps.com (239 seats)"
+      ],
+      "missing_28F": [
+        "seatcompare.ai",
+        "seatmap.app"
+      ],
+      "exit_rows_18_19_29": [
+        "seatcompare.ai",
+        "seatmap.app"
+      ],
+      "no_window_40A_40F": [
+        "seatmap.app",
+        "seatmaps.com (last row has no windows)"
+      ],
+      "pitch_28_29": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ]
+    },
+    "conflicts": [
+      "Only 28F is missing on the right side; no source explains why row 28 is asymmetric."
+    ],
+    "fleet_share_note": "seatcompare.ai: roughly 189 A321neos, all 239 seats; the A321XLR uses the same cabin.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-10",
+    "verify_against": "Wizz Air seat selection at booking"
+  },
+  "swap_risk": []
+}

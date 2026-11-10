@@ -229,7 +229,23 @@ def summarize(cabin: Cabin) -> dict[str, Any]:
         groups.setdefault(v, []).append(r)
     pitch_lines = [f"rows {_ranges(rs)}: {v:g} in" for v, rs in sorted(groups.items(), key=lambda kv: min(kv[1]))]
     recline = flags.get("no_recline")
+    cab_list = []
+    for st in cabin.seats:
+        if not cab_list or cab_list[-1]["name"] != st.cabin:
+            cab_list.append({"name": st.cabin, "rows": [st.row, st.row], "seats": 0, "letters": []})
+        c = cab_list[-1]; c["rows"][1] = st.row; c["seats"] += 1
+        if st.letter not in c["letters"]:
+            c["letters"].append(st.letter)
+    for c in cab_list:
+        from .layout import cabin_for
+        cab = cabin_for(cfg, c["rows"][0]); n = 0; parts = []
+        for l in cab["letters"]:
+            n += 1
+            if l in cab["aisles_after"]:
+                parts.append(str(n)); n = 0
+        parts.append(str(n)); c["layout"] = "-".join(parts); c["letters"] = cab["letters"]
     return {
+        "cabins": cab_list,
         "total_seats": cfg["total_seats"],
         "layout": "-".join(str(b) for b in blocks),
         "row_first": cfg["rows"]["first"], "row_last": cfg["rows"]["last"],
@@ -262,9 +278,15 @@ def exits_sentence(f: dict[str, Any]) -> str:
 
 def lede(p: Page) -> str:
     f, cfg = p.facts, p.cfg
-    s = (f'{cfg["operator"]["name"]}\'s {cfg["aircraft"]["name"]} ({cfg["variant_label"]}) has '
-         f'{f["total_seats"]} seats in a {f["layout"]} layout across {f["row_count"]} rows numbered '
-         f'{f["row_first"]}–{f["row_last"]}')
+    if len(f["cabins"]) > 1:
+        seats_txt = (f'{f["total_seats"]} seats (' + ", ".join(f'{c["seats"]} {c["name"]} in rows {c["rows"][0]}–{c["rows"][1]}, {c["layout"]}'
+                                                            for c in f["cabins"]) + ')')
+        s = (f'{cfg["operator"]["name"]}\'s {cfg["aircraft"]["name"]} has {seats_txt} across {f["row_count"]} rows numbered '
+             f'{f["row_first"]}–{f["row_last"]}')
+    else:
+        s = (f'{cfg["operator"]["name"]}\'s {cfg["aircraft"]["name"]} ({cfg["variant_label"]}) has '
+             f'{f["total_seats"]} seats in a {f["layout"]} layout across {f["row_count"]} rows numbered '
+             f'{f["row_first"]}–{f["row_last"]}')
     s += f', with no row {_join([str(r) for r in f["rows_skipped"]])}. ' if f["rows_skipped"] else ". "
     s += exits_sentence(f) + ", plus doors at the front and rear. "
     if f["missing_seats"]:
@@ -285,6 +307,10 @@ def variants_for(cfg: dict[str, Any], all_cfgs: list[dict[str, Any]]) -> list[di
             "share": round(c.get("fleet_share_prior", 1.0) * scale, 2), "relation": "same_type",
             "current": c["id"] == cfg["id"]} for c in same]
     uncovered = round(max(0.0, 1 - sum(v["share"] for v in out)), 2)
+    if any(c.get("other_versions_unquantified") for c in same):
+        out.append({"id": None, "slug": None, "label": "Other cabin versions (share unknown)", "share": None,
+                    "relation": "unquantified", "current": False,
+                    "note": cfg["provenance"].get("fleet_share_note", "")})
     if uncovered >= 0.01:
         out.append({"id": None, "slug": None, "label": "Other cabin versions (not mapped yet)",
                     "share": uncovered, "relation": "unmapped", "current": False,
@@ -447,7 +473,7 @@ def _status_badge(cfg: dict[str, Any]) -> str:
 
 def seat_payload(cabin: Cabin) -> dict[str, Any]:
     return {s.seat: {"p": s.position, "sd": s.side, "a": s.seats_to_aisle, "pi": s.pitch_in, "ps": s.pitch_source,
-                     "x": s.in_exit_row, "f": s.flags, "z": s.section, "ne": s.near_exit,
+                     "x": s.in_exit_row, "f": s.flags, "z": s.section, "ne": s.near_exit, "c": s.cabin,
                      "e": [{"id": e["exit"], "k": e["kind"], "d": e["direction"], "r": e["rows_between"]}
                            for e in s.nearest_exits]}
             for s in cabin.seats}
@@ -463,7 +489,9 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     # key facts table
     rows = [
         ("Seats", f'{f["total_seats"]} ({_e(cfg["variant_label"])})'),
-        ("Layout", f'{f["layout"]} ({" ".join(cfg["letters"])})'),
+        (("Cabins", "; ".join(f'{_e(c["name"])}: rows {c["rows"][0]}–{c["rows"][1]}, {c["seats"]} seats, {c["layout"]} '
+                              f'({" ".join(c["letters"])})' for c in f["cabins"])) if len(f["cabins"]) > 1 else
+         ("Layout", f'{f["layout"]} ({" ".join(cfg["letters"])})')),
         ("Rows", f'{f["row_first"]}–{f["row_last"]}' +
          (f' (no row {", ".join(map(str, f["rows_skipped"]))})' if f["rows_skipped"] else "")),
         ("Exit rows", _e(exits_sentence(f)) + "; doors front and rear"),
@@ -517,7 +545,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     var_html = ""
     same = [v for v in p.variants if v["relation"] == "same_type"]
     swaps = [v for v in p.variants if v["relation"] == "swap"]
-    unmapped = [v for v in p.variants if v["relation"] == "unmapped"]
+    unmapped = [v for v in p.variants if v["relation"] in ("unmapped", "unquantified")]
     if len(same) > 1 or swaps or unmapped:
         items = []
         for v in same:
@@ -527,7 +555,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
             else:
                 items.append(f'<li><a href="/seat-maps/{_e(v["slug"])}/">{_e(v["label"])}</a>{share}</li>')
         for v in unmapped:
-            items.append(f'<li>{_e(v["label"])} — about {round(v["share"] * 100)}% of this fleet'
+            items.append(f'<li>{_e(v["label"])}' + (f' — about {round(v["share"] * 100)}% of this fleet' if v["share"] is not None else "")
                          + (f'. <span class="muted small">{_e(v["note"])}</span>' if v.get("note") else "") + '</li>')
         for v in swaps:
             items.append(f'<li><a href="/seat-maps/{v["slug"]}/">{_e(v["label"])}</a> — flies the same routes; '
@@ -805,7 +833,8 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
              f"- Licence: {s.data_license}; cite as \"{s.name}, {p.title} seat map, {s.url}{p.path}\"", "",
              "## Key facts", "",
              f"- Seats: {f['total_seats']} ({cfg['variant_label']})",
-             f"- Layout: {f['layout']} ({' '.join(cfg['letters'])})",
+             (f"- Cabins: " + "; ".join(f"{c['name']} rows {c['rows'][0]}–{c['rows'][1]}, {c['seats']} seats, {c['layout']}" for c in f["cabins"])
+              if len(f["cabins"]) > 1 else f"- Layout: {f['layout']} ({' '.join(cfg['letters'])})"),
              f"- Rows: {f['row_first']}–{f['row_last']}" + (f" (no row {', '.join(map(str, f['rows_skipped']))})" if f['rows_skipped'] else ""),
              f"- Exits: {exits_sentence(f)}; doors front and rear"]
     if f["missing_seats"]:
@@ -827,13 +856,14 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
     lines += ["", f"Pattern basis: {BASIS}. See {s.url}/research/", ""]
     same = [v for v in p.variants if v["relation"] == "same_type"]
     swaps = [v for v in p.variants if v["relation"] == "swap"]
-    if len(same) > 1 or swaps or any(x["relation"] == "unmapped" for x in p.variants):
+    if len(same) > 1 or swaps or any(x["relation"] in ("unmapped", "unquantified") for x in p.variants):
         lines += ["## Other versions", ""]
         for v in same:
             if not v["current"]:
                 lines.append(f"- {v['label']} (about {round(v['share'] * 100)}% of this fleet): {s.url}/seat-maps/{v['slug']}.md")
-        for v in [x for x in p.variants if x["relation"] == "unmapped"]:
-            lines.append(f"- {v['label']}: about {round(v['share'] * 100)}% of this fleet. {v.get('note', '')}".rstrip())
+        for v in [x for x in p.variants if x["relation"] in ("unmapped", "unquantified")]:
+            share = f"about {round(v['share'] * 100)}% of this fleet" if v["share"] is not None else "share unknown"
+            lines.append(f"- {v['label']}: {share}. {v.get('note', '')}".rstrip())
         for v in swaps:
             lines.append(f"- {v['label']} (swapped onto the same routes): {s.url}/seat-maps/{v['slug']}.md")
         lines.append("")
@@ -1102,12 +1132,13 @@ APP_JS = r"""(() => {
     if (current) { current.querySelector('rect').classList.remove('sel'); current.querySelector('text').classList.remove('sel'); }
     g.querySelector('rect').classList.add('sel'); g.querySelector('text').classList.add('sel'); current = g;
     const side = f.sd === 'L' ? 'left' : 'right';
+    const multiCabin = new Set(Object.values(data.seats).map(x => x.c)).size > 1;
     const secRaw = (data.sections || {})[f.z] || { rows: ['?', '?'], band: 'higher', band_label: '' };
     const sec = { ...secRaw, name: f.z.charAt(0).toUpperCase() + f.z.slice(1) };
     const exits = f.e.map(e => '<li>' + esc(e.id) + ' (' + words(e.k) + '): ' +
       (e.d === 'same_row' ? 'this row' : words(e.d) + ', ' + e.r + ' row' + (e.r === 1 ? '' : 's') + ' between') + '</li>').join('');
     panel.innerHTML = '<h2>Seat ' + esc(seat) + '</h2>' +
-      '<dl><dt>Position</dt><dd>' + esc(f.p) + ', ' + side + ' side</dd>' +
+      '<dl>' + (multiCabin ? '<dt>Cabin</dt><dd>' + esc(f.c) + '</dd>' : '') + '<dt>Position</dt><dd>' + esc(f.p) + ', ' + side + ' side</dd>' +
       '<dt>Seats to aisle</dt><dd>' + f.a + '</dd>' +
       '<dt>Pitch</dt><dd>' + (f.ps === 'range' ? esc(data.pitchRange) : (f.pi === null ? 'unknown' : f.pi + ' in')) + ' <span class="muted small">(' + words(f.ps) + ')</span></dd>' +
       '<dt>Exit row</dt><dd>' + (f.x ? 'yes' : 'no') + '</dd>' +
@@ -1368,7 +1399,8 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
         "configs": [{"id": p.cfg["id"], "label": p.title, "path": p.path, "status": p.cfg["provenance"]["status"],
                      "operator": p.cfg["operator"], "group_icao": p.cfg.get("group_operators_icao", []),
                      "group_iata": p.cfg.get("group_operators_iata", []), "aircraft_icao": p.cfg["aircraft"]["icao"],
-                     "share": p.cfg.get("fleet_share_prior", 1.0)} for p in pages],
+                     "share": p.cfg.get("fleet_share_prior", 1.0),
+                     "unquantified": bool(p.cfg.get("other_versions_unquantified"))} for p in pages],
         "tails": {reg: t.config_id for reg, t in load_tail_overrides().items()},
     }
     write("/api/v1/match-index.json", json.dumps(match_index, indent=1))

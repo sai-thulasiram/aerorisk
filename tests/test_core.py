@@ -179,3 +179,20 @@ def test_sections_and_near_exit():
     assert {s.section for s in c.seats} == {"front", "middle", "rear"}
     assert c.seat("16A").near_exit and c.seat("1A").near_exit
     assert not c.seat("8A").near_exit          # rows 7-10 are >5 rows from the front door and the wing exits
+
+
+def test_multi_cabin_air_india():
+    c = build_cabin(load_config("AI-A20N-164"))
+    assert len(c.seats) == 164
+    assert {s.seat for s in c.seats if s.cabin == "Business"} == {"1A", "1C", "1D", "1F", "2A", "2C", "2D", "2F"}
+    assert c.seat("1A").position == "window" and c.seat("1C").position == "aisle"
+    assert c.seat("1A").pitch_in == 40 and c.seat("4B").pitch_in == 32 and c.seat("4B").cabin == "Premium Economy"
+    assert c.seat("20B").cabin == "Economy" and c.seat("10A").in_exit_row
+    assert "1B" not in {s.seat for s in c.seats}
+
+
+def test_unquantified_versions_in_reason():
+    fi = FlightInstance("AI1", "2026-11-20", "AI", "AIC", "Air India", None, None, "Airbus A320neo",
+                        "A20N", None, True, None, "test")
+    m = match(fi, tails={})
+    assert m.candidates[0]["config_id"] == "AI-A20N-164" and "share unknown" in m.reason

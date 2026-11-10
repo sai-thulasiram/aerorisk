@@ -207,3 +207,12 @@ def test_every_aircraft_fact_has_a_source():
         keys = [a.get("final_assembly_source")] + [m["source"] for m in a["milestones"]] + \
                [e["source"] for e in a["engine_options"]] + [c["source"] for c in a["components"]]
         assert all(k in a["sources"] for k in keys if k), f.name
+
+
+def test_multi_cabin_page(site):
+    out, _ = site
+    page = (out / "seat-maps/air-india-airbus-a320neo-164-seats/index.html").read_text()
+    assert "8 Business in rows 1–2, 2-2" in page and "Premium Economy" in page and "cab-business" in page
+    assert "share unknown" in page
+    ix = (out / "seat-maps/air-india-express-boeing-737-max-8-189-seats/index.html").read_text()
+    assert "Section map" in ix

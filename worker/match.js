@@ -97,10 +97,11 @@ export function matchLeg(leg, index) {
   const ranked = cands.map((c) => ({ ...link(c), probability: Math.round((c.share ?? 1) * scale * 1000) / 1000 }))
     .sort((a, b) => b.probability - a.probability);
   const uncovered = Math.max(0, Math.round((1 - ranked.reduce((a, r) => a + r.probability, 0)) * 1000) / 1000);
-  let reason = ranked.length === 1 && !uncovered
+  let reason = ranked.length === 1 && !uncovered && !cands.some((c) => c.unquantified)
     ? `${opName} flies one known cabin version of this aircraft.`
     : `${opName} flies more than one cabin version of this aircraft; ranked by share of the fleet.`;
   if (uncovered) reason += ` About ${Math.round(uncovered * 100)}% of this fleet uses versions we haven't mapped yet.`;
+  if (cands.some((c) => c.unquantified)) reason += " Other versions of this aircraft may exist at this airline; their share is unknown.";
   reason += reg ? ` Registration ${reg} is not verified yet.` : " The registration is usually assigned close to departure.";
   return { tier: "likely", reason, candidates: ranked, uncovered_share: uncovered };
 }

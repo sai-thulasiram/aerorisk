@@ -1,0 +1,159 @@
+{
+  "id": "6E-A320-180Y",
+  "operator": {
+    "iata": "6E",
+    "icao": "IGO",
+    "name": "IndiGo"
+  },
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "group_operators_icao": [],
+  "aircraft": {
+    "icao": "A320",
+    "iata": "320",
+    "name": "Airbus A320"
+  },
+  "variant_label": "180Y all-economy",
+  "total_seats": 180,
+  "rows": {
+    "first": 1,
+    "last": 30,
+    "skip": []
+  },
+  "missing_seats": [],
+  "pitch_in": {
+    "default_range": [
+      28,
+      29
+    ]
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 12,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 13,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 30,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "misaligned_window": [
+      "2A",
+      "2F",
+      "7F",
+      "25A",
+      "25F",
+      "28A",
+      "28F"
+    ],
+    "no_recline": [
+      "11A",
+      "11B",
+      "11C",
+      "11D",
+      "11E",
+      "11F",
+      "12A",
+      "12B",
+      "12C",
+      "12D",
+      "12E",
+      "12F",
+      "30A",
+      "30B",
+      "30C",
+      "30D",
+      "30E",
+      "30F"
+    ]
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/indigo-a320ceo-seat-selection-guide-2026",
+      "https://seatmaps.com/airlines/6e-indigo/airbus-a320",
+      "https://seatmap.app/seat-map/indigo-a320?seat=12A",
+      "https://www.aerolopa.com/6e"
+    ],
+    "corroboration": {
+      "rows_1_30_total_180": [
+        "seatcompare.ai",
+        "seatmaps.com",
+        "seatmap.app"
+      ],
+      "overwing_exit_rows_12_13": [
+        "seatcompare.ai",
+        "seatmaps.com",
+        "seatmap.app (as extra-legroom rows)"
+      ],
+      "pitch_28_29": [
+        "seatmaps.com",
+        "seatmap.app (28 in)"
+      ],
+      "no_recline_rows_11_12_30": [
+        "seatmaps.com"
+      ],
+      "misaligned_windows": [
+        "seatcompare.ai only"
+      ]
+    },
+    "conflicts": [
+      "seatcompare.ai lists misaligned windows inconsistently (row 28 appears in one list but not another)."
+    ],
+    "fleet_share_note": "AeroLOPA lists about 27 IndiGo A320ceos, all 180 seats.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-10",
+    "verify_against": "IndiGo web check-in seat map"
+  },
+  "swap_risk": []
+}

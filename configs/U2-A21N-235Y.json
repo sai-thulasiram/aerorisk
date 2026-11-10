@@ -1,0 +1,178 @@
+{
+  "id": "U2-A21N-235Y",
+  "operator": {
+    "iata": "U2",
+    "icao": "EZY",
+    "name": "easyJet"
+  },
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "group_operators_icao": [
+    "EJU",
+    "EZS"
+  ],
+  "group_operators_iata": [
+    "EC",
+    "DS"
+  ],
+  "aircraft": {
+    "icao": "A21N",
+    "iata": "32Q",
+    "name": "Airbus A321neo"
+  },
+  "variant_label": "235Y all-economy",
+  "total_seats": 235,
+  "rows": {
+    "first": 1,
+    "last": 40,
+    "skip": []
+  },
+  "missing_seats": [
+    "1D",
+    "1E",
+    "1F",
+    "28A",
+    "28F"
+  ],
+  "pitch_in": {
+    "default_range": [
+      28,
+      29
+    ],
+    "rows": {
+      "18": 35,
+      "19": 35
+    }
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 18,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 19,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L3/R3",
+      "kind": "mid_aft_exit",
+      "at_row": 29,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L4/R4",
+      "kind": "door",
+      "after_row": 40,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [
+      "40A",
+      "40F"
+    ],
+    "window_disputed": [
+      "29A",
+      "29F"
+    ],
+    "no_recline": "all"
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front",
+      "side": "R"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/easyjet-a321neo-seat-selection-guide-2026",
+      "https://seatmap.app/seat-map/easyjet-a321neo",
+      "https://www.seatmaps.com/airlines/u2-easyjet-uk/airbus-a321neo/"
+    ],
+    "corroboration": {
+      "rows_1_40_total_235": [
+        "seatcompare.ai",
+        "seatmap.app",
+        "seatmaps.com (235 seats, row 40 last)"
+      ],
+      "missing_1DEF_28A_28F": [
+        "seatcompare.ai",
+        "seatmap.app"
+      ],
+      "exit_rows_18_19_29": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "no_window_40A_40F": [
+        "seatcompare.ai",
+        "seatmap.app",
+        "seatmaps.com"
+      ],
+      "exit_row_pitch_35": [
+        "seatcompare.ai only"
+      ],
+      "no_recline": [
+        "seatcompare.ai",
+        "seatmaps.com (pre-reclined seats)"
+      ]
+    },
+    "conflicts": [
+      "seatmap.app labels row 17 as the exit row and 18–19 as extra legroom; seatcompare.ai and seatmaps.com say 18–19. Using 18–19.",
+      "29A/29F: seatmaps.com says row 29 has no window; seatcompare.ai says 'no usable window'. Flagged window_disputed."
+    ],
+    "fleet_share_note": "Single known easyJet A321neo cabin.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-10",
+    "verify_against": "easyJet seat selection at booking"
+  },
+  "swap_risk": [],
+  "engine_on_this_fleet": {
+    "text": "CFM LEAP-1A (easyJet's A320neo-family engine order).",
+    "source": {
+      "label": "Safran: easyJet orders LEAP-1A (2024)",
+      "url": "https://www.safran-group.com/pressroom/easyjet-orders-cfm-leap-1a-engines-power-new-fleet-a320neo-family-aircraft-2024-01-24"
+    }
+  }
+}
