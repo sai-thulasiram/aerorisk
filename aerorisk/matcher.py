@@ -23,6 +23,7 @@ class MatchResult:
     candidates: list[dict[str, Any]] = field(default_factory=list)
     aircraft_icao: str | None = None
     registration: str | None = None
+    uncovered_share: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -31,7 +32,8 @@ class MatchResult:
 def _operator_matches(cfg: dict[str, Any], fi: FlightInstance) -> bool:
     op = cfg["operator"]
     icaos = {op["icao"], *cfg.get("group_operators_icao", [])}
-    return (fi.operator_icao in icaos) or (fi.operator_iata and fi.operator_iata == op["iata"])
+    iatas = {op["iata"], *cfg.get("group_operators_iata", [])}
+    return (fi.operator_icao in icaos) or bool(fi.operator_iata and fi.operator_iata in iatas)
 
 
 def match(fi: FlightInstance, *, configs: list[dict[str, Any]] | None = None,
@@ -69,13 +71,18 @@ def match(fi: FlightInstance, *, configs: list[dict[str, Any]] | None = None,
         return MatchResult("unavailable", f"{type_icao} for {fi.operator_name or fi.operator_iata} is not covered yet.",
                            aircraft_icao=type_icao, registration=reg)
 
+    # fleet_share_prior is the share of this operator's fleet of this type that uses the config.
+    # If the authored configs cover less than 100%, the remainder is reported, never redistributed.
     total = sum(c.get("fleet_share_prior", 1.0) for c in cands) or 1.0
+    scale = 1.0 / total if total > 1.0 else 1.0
     ranked = sorted(({"config_id": c["id"], "variant": c["variant_label"],
-                      "probability": round(c.get("fleet_share_prior", 1.0) / total, 3)} for c in cands),
+                      "probability": round(c.get("fleet_share_prior", 1.0) * scale, 3)} for c in cands),
                     key=lambda d: -d["probability"])
+    uncovered = round(max(0.0, 1.0 - sum(r["probability"] for r in ranked)), 3)
     why = (f"Type {type_icao} from {type_source}; "
-           + ("single known layout for this operator/type" if len(ranked) == 1
-              else f"{len(ranked)} known variants, ranked by fleet share")
+           + ("single known layout for this operator/type" if len(ranked) == 1 and not uncovered
+              else f"{len(ranked)} mapped variant(s), ranked by fleet share")
+           + (f"; {round(uncovered * 100)}% of this fleet uses layouts not mapped yet" if uncovered else "")
            + ("" if reg else "; registration not yet assigned")
            + ". Exact only once the tail is verified.")
-    return MatchResult("likely", why, ranked, type_icao, reg)
+    return MatchResult("likely", why, ranked, type_icao, reg, uncovered)

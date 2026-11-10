@@ -14,6 +14,22 @@ Why Cloudflare: free static hosting with Indian and European edge locations, AI-
 3. Set `SITE_URL=https://aerorisk.<sub>.workers.dev` and run the workflow.
 4. Don't submit this URL to Google or Bing. When you buy a domain, attach it (Worker → **Domains** tab), change `SITE_URL`, delete `CF_BEACON_TOKEN` (automatic setup takes over), add `INDEXNOW_KEY`, then submit the sitemap.
 
+## Flight lookup (AeroDataBox key)
+
+The home page's flight lookup calls `/api/lookup`, a small Worker (`worker/index.js`) that keeps the API key server-side. Until a key is set, the form shows "coming soon" and the rest of the site works normally.
+
+1. Create a RapidAPI account → search **AeroDataBox** → **Subscribe** to a plan. The free Basic plan has about 600 API units a month; Pro is about $5/month for 6,000 units.
+2. Copy your **X-RapidAPI-Key**.
+3. Cloudflare → **Workers & Pages** → `aerorisk` → **Settings** → **Variables and Secrets** → **Add** → Type **Secret**, name `AERODATABOX_RAPIDAPI_KEY`, paste the key → **Deploy**. (Or `npx wrangler secret put AERODATABOX_RAPIDAPI_KEY`.)
+4. Reload the home page: the lookup form becomes active.
+
+Quota protection built in:
+- Only airlines we have seat maps for reach the API.
+- Results are cached (30 minutes for flights in the next 2 days, 6 hours otherwise).
+- Rate limits: 6 lookups per minute per visitor and 30 per minute overall (`ratelimits` in `wrangler.jsonc`).
+
+Local test without a key: `npx wrangler dev --var ADB_MOCK:1`, which returns synthetic flights.
+
 ## 0. Decide before you start (your call, not technical)
 
 - **Name and domain.** "AeroRisk" implies risk scores, which the site deliberately does not publish, and it is the phrase most likely to draw airline or press scrutiny. Consider a neutral name before buying a domain. If you rename, set `SITE_NAME`, edit `tools/og.html`, and run `python tools/make_og.py`.

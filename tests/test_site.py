@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from aerorisk.layout import list_configs
 from aerorisk.site import Settings, build, robots_txt
 
 URL = "https://seatfacts.test"
@@ -59,7 +60,7 @@ def test_expected_files(site):
                 "openapi.json", ".well-known/api-catalog", "api/v1/index.json", "assets/app.js", "assets/site.css",
                 "assets/favicon.svg", "abc123def456.txt", "methodology/index.html", "methodology.md", "privacy.md"]:
         assert (out / rel).exists(), rel
-    assert res["seat_maps"] == 4 and not any("SITE_URL" in w for w in res["warnings"])
+    assert res["seat_maps"] == len(list_configs()) and not any("SITE_URL" in w for w in res["warnings"])
 
 
 def test_every_page_is_well_formed_for_crawlers(site):
@@ -94,7 +95,7 @@ def test_sitemap_and_robots(site):
     out, _ = site
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [e.text for e in ET.parse(out / "sitemap.xml").getroot().findall("s:url/s:loc", ns)]
-    assert len(locs) == 7 and all(l.startswith(URL) for l in locs)
+    assert len(locs) == len(list_configs()) + 3 and all(l.startswith(URL) for l in locs)
     for l in locs:
         rel = l[len(URL):].lstrip("/")
         assert (out / rel / "index.html").exists() or (out / "index.html").exists()
@@ -114,7 +115,7 @@ def test_llms_txt_links_exist(site):
 def test_api_and_openapi(site):
     out, _ = site
     cat = json.loads((out / "api/v1/index.json").read_text())
-    assert len(cat["seat_maps"]) == 4
+    assert len(cat["seat_maps"]) == len(list_configs())
     for sm in cat["seat_maps"]:
         full = json.loads((out / f"api/v1/seatmaps/{sm['id']}.json").read_text())
         assert len(full["seats"]) == full["facts"]["total_seats"]
@@ -146,3 +147,18 @@ def test_seatmap_page_states_facts_in_html(site):
     assert "no row 13" in page
     assert "Draft" in page
     assert "%" not in re.sub(r"<script.*?</script>|<style.*?</style>", "", page, flags=re.S).split("Which version")[0]
+
+
+def test_match_index_and_lucky_assets(site):
+    out, _ = site
+    mi = json.loads((out / "api/v1/match-index.json").read_text())
+    assert {c["id"] for c in mi["configs"]} == {c["id"] for c in list_configs()}
+    assert all(c["path"].startswith("/seat-maps/") for c in mi["configs"])
+    lucky = (out / "assets/lucky.js").read_text().lower()
+    for word in ("safe", "risk", "surviv", "danger"):
+        assert word not in lucky, word
+    page = (out / "seat-maps/indigo-airbus-a321neo-232-seats/index.html").read_text()
+    assert 'src="/assets/lucky.js"' in page and "Just for fun" in page
+    assert "not mapped yet" in page and "28–29 in" in page
+    home = (out / "index.html").read_text()
+    assert 'id="lookupform"' in home

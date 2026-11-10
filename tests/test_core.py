@@ -146,3 +146,26 @@ def test_every_config_records_corroboration_and_conflicts():
         p = c["provenance"]
         assert p.get("corroboration"), c["id"]
         assert "conflicts" in p and "primary_source_check" in p
+
+
+def test_new_configs():
+    a21 = build_cabin(load_config("6E-A21N-232Y"))
+    assert len(a21.seats) == 232 and "28A" not in {s.seat for s in a21.seats}
+    assert a21.seat("18C").in_exit_row and a21.seat("28B").in_exit_row
+    assert a21.seat("10A").pitch_in is None and a21.seat("10A").pitch_source == "range"
+    ezy = build_cabin(load_config("U2-A20N-186Y"))
+    assert len(ezy.seats) == 186 and ezy.seat("12A").pitch_in == 35 and "no_window" in ezy.seat("31F").flags
+
+
+def test_matcher_reports_unmapped_share():
+    fi = FlightInstance("6E1", "2026-11-20", "6E", "IGO", "IndiGo", None, None, "Airbus A321 NEO",
+                        "A21N", None, True, None, "test")
+    m = match(fi, tails={})
+    assert m.candidates[0]["config_id"] == "6E-A21N-232Y" and m.candidates[0]["probability"] == 0.64
+    assert m.uncovered_share == 0.36 and "not mapped" in m.reason
+
+
+def test_easyjet_group_iata():
+    fi = FlightInstance("EC1", "2026-11-20", "EC", None, "easyJet Europe", None, None, "Airbus A320neo",
+                        "A20N", None, True, None, "test")
+    assert match(fi, tails={}).candidates[0]["config_id"] == "U2-A20N-186Y"

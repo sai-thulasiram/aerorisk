@@ -10,6 +10,8 @@ Flight number + date → operating aircraft → cabin configuration (with honest
 |---|---|---|---|---|
 | `FR-B738-189Y` | Ryanair (+ group: RUK, MLT, RYS, LDA) | B738 | 189 | draft_unverified |
 | `FR-B38M-197Y` | Ryanair (+ group) | B38M (737 MAX 8-200) | 197 | draft_unverified |
+| `6E-A21N-232Y` | IndiGo | A21N | 232 (~64% of IndiGo A321neos) | draft_unverified |
+| `U2-A20N-186Y` | easyJet (+ EJU, EZS) | A20N | 186 | draft_unverified |
 | `6E-A20N-186Y` | IndiGo | A20N | 186 | draft_unverified |
 | `6E-A20N-180Y` | IndiGo | A20N | 180 | draft_unverified |
 
@@ -61,6 +63,13 @@ npx wrangler dev        # preview locally with production headers
 ```
 
 Builds static HTML seat-map pages, Markdown twins, a JSON API, `robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt`, `openapi.json`, `/.well-known/api-catalog`, JSON-LD, and `_headers` (CSP, content types). Deployment, analytics and indexing steps are in `DEPLOY.md`.
+
+## Research backlog (not published: sources conflict)
+
+- **IndiGo ATR 72-600**: 76 vs 77 vs 78 seats across sources; exits not documented.
+- **Akasa 737 MAX 8 (189)**: row 13 and exit rows unclear; one source shows a full row 1, another implies a partial row.
+- **IndiGoStretch A321neo (12C + 208Y)**: needs multi-cabin support; row counts don't reconcile.
+- **Air India / Air India Express**: multi-cabin layouts; needs a schema extension for per-cabin seat letters.
 
 ## Layout
 

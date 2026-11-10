@@ -29,6 +29,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .fleet import load_tail_overrides
 from .layout import Cabin, build_cabin, list_configs
 from .render import SVG_CSS, render_svg
 
@@ -178,6 +179,9 @@ def summarize(cabin: Cabin) -> dict[str, Any]:
         "misaligned_window": flags.get("misaligned_window", []),
         "window_disputed": flags.get("window_disputed", []),
         "pitch_default": pitch.get("default"),
+        "pitch_default_text": (f'{pitch["default"]:g} in' if pitch.get("default") is not None else
+                               (f'{pitch["default_range"][0]:g}–{pitch["default_range"][1]:g} in'
+                                if pitch.get("default_range") else None)),
         "pitch_specific": pitch_lines,
         "pitch_unknown_rows": pitch.get("unknown_rows", []),
         "no_recline": "all seats" if recline == "all" else (recline or []),
@@ -214,9 +218,15 @@ def variants_for(cfg: dict[str, Any], all_cfgs: list[dict[str, Any]]) -> list[di
     swap_ids = {s["config_hint"] for s in cfg.get("swap_risk", [])}
     swaps = [c for c in all_cfgs if c["id"] in swap_ids and c not in same]
     tot = sum(c.get("fleet_share_prior", 1.0) for c in same) or 1
+    scale = 1 / tot if tot > 1 else 1
     out = [{"id": c["id"], "slug": slug_for(c), "label": f'{c["aircraft"]["name"]} · {c["total_seats"]} seats',
-            "share": round(c.get("fleet_share_prior", 1.0) / tot, 2), "relation": "same_type",
+            "share": round(c.get("fleet_share_prior", 1.0) * scale, 2), "relation": "same_type",
             "current": c["id"] == cfg["id"]} for c in same]
+    uncovered = round(max(0.0, 1 - sum(v["share"] for v in out)), 2)
+    if uncovered >= 0.01:
+        out.append({"id": None, "slug": None, "label": "Other cabin versions (not mapped yet)",
+                    "share": uncovered, "relation": "unmapped", "current": False,
+                    "note": cfg["provenance"].get("fleet_share_note", "")})
     out += [{"id": c["id"], "slug": slug_for(c), "label": f'{c["aircraft"]["name"]} · {c["total_seats"]} seats',
              "share": None, "relation": "swap", "current": False} for c in swaps]
     return out
@@ -228,10 +238,12 @@ def faq(p: Page) -> list[tuple[str, str]]:
     same = [v for v in p.variants if v["relation"] == "same_type"]
     q = []
     count = f'This configuration has {f["total_seats"]} seats in a {f["layout"]} layout.'
-    if len(same) > 1:
-        count += " " + cfg["operator"]["name"] + " operates " + _join(
-            [f'{v["label"].split(" · ")[1]} (about {round(v["share"] * 100)}% of the fleet)' for v in same]) + \
-            " versions; the aircraft registration tells you which one you will get."
+    unmapped = [v for v in p.variants if v["relation"] == "unmapped"]
+    if len(same) > 1 or unmapped:
+        parts = [f'{v["label"].split(" · ")[1]} (about {round(v["share"] * 100)}% of the fleet)' for v in same]
+        parts += [f'other versions we have not mapped yet (about {round(v["share"] * 100)}%)' for v in unmapped]
+        count += (" " + cfg["operator"]["name"] + " operates " + _join(parts) +
+                  "; the aircraft registration tells you which one you will get.")
     q.append((f"How many seats does the {name} have?", count))
     q.append((f"Which rows are the exit rows on the {name}?",
               exits_sentence(f) + ". There are also doors at the front and rear of the cabin."))
@@ -357,7 +369,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
         rows.append(("Window offset", ", ".join(f["misaligned_window"])))
     if f["window_disputed"]:
         rows.append(("Window disputed by sources", ", ".join(f["window_disputed"])))
-    pitch = "; ".join(f["pitch_specific"] + ([f'other rows: {f["pitch_default"]:g} in'] if f["pitch_default"] else []))
+    pitch = "; ".join(f["pitch_specific"] + ([f'other rows: {f["pitch_default_text"]}'] if f["pitch_default_text"] else []))
     if f["pitch_unknown_rows"]:
         pitch += f'; row{"s" if len(f["pitch_unknown_rows"]) > 1 else ""} {_ranges(f["pitch_unknown_rows"])}: unknown'
     rows.append(("Seat pitch (approx.)", _e(pitch)))
@@ -387,7 +399,10 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
             for lab in flagmap.get(f"{r}{l}", []):
                 notes.append(f"{r}{l} {lab}")
         seat0 = p.cabin.seat(f"{r}{present[0]}") if present else None
-        pv = "unknown" if seat0 is None or seat0.pitch_in is None else f"{seat0.pitch_in:g} in"
+        if seat0 is not None and seat0.pitch_source == "range":
+            pv = f["pitch_default_text"]
+        else:
+            pv = "unknown" if seat0 is None or seat0.pitch_in is None else f"{seat0.pitch_in:g} in"
         row_html.append(f'<tr{" class=exit-row" if r in exit_by_row else ""}><th scope=row>{r}</th>'
                         f'<td>{"".join(present)}</td><td>{pv}</td><td>{_e("; ".join(notes))}</td></tr>')
 
@@ -395,7 +410,8 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     var_html = ""
     same = [v for v in p.variants if v["relation"] == "same_type"]
     swaps = [v for v in p.variants if v["relation"] == "swap"]
-    if len(same) > 1 or swaps:
+    unmapped = [v for v in p.variants if v["relation"] == "unmapped"]
+    if len(same) > 1 or swaps or unmapped:
         items = []
         for v in same:
             share = f' — about {round(v["share"] * 100)}% of this fleet' if v["share"] is not None else ""
@@ -403,6 +419,9 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
                 items.append(f'<li><strong>{_e(v["label"])}</strong> (this page){share}</li>')
             else:
                 items.append(f'<li><a href="/seat-maps/{_e(v["slug"])}/">{_e(v["label"])}</a>{share}</li>')
+        for v in unmapped:
+            items.append(f'<li>{_e(v["label"])} — about {round(v["share"] * 100)}% of this fleet'
+                         + (f'. <span class="muted small">{_e(v["note"])}</span>' if v.get("note") else "") + '</li>')
         for v in swaps:
             items.append(f'<li><a href="/seat-maps/{v["slug"]}/">{_e(v["label"])}</a> — flies the same routes; '
                          f'swaps happen</li>')
@@ -420,7 +439,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     faq_html = "".join(f"<details><summary>{_e(q)}</summary><p>{_e(a)}</p></details>" for q, a in faq(p))
 
     svg = render_svg(p.cabin, title=False, inline_style=False)
-    payload = json.dumps({"config": cfg["id"], "seats": seat_payload(p.cabin)},
+    payload = json.dumps({"config": cfg["id"], "pitchRange": f["pitch_default_text"], "seats": seat_payload(p.cabin)},
                          separators=(",", ":")).replace("</", "<\\/")
 
     body = f"""
@@ -446,6 +465,16 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <tbody>{"".join(row_html)}</tbody></table></details></section>
 <section><h2>Seat safety</h2><p>No validated occupant-level dataset supports a survival probability for individual seats, so we don't publish one. Distance to exits is shown as a layout fact, not a safety rating. <a href="/methodology/#no-scores">Why</a></p></section>
 <section><h2>Questions</h2>{faq_html}</section>
+<section class="lucky" id="lucky" aria-labelledby="lucky-h">
+<h2 id="lucky-h">Lucky seat <span class="badge badge-fun">Just for fun</span></h2>
+<p class="muted">Picks a seat from your birth date using your sun sign and numerology. It's entertainment: it says nothing about comfort, exits or anything else on this page. Your birth date stays in your browser.</p>
+<form id="luckyform" class="inline-form">
+<label>Date of birth <input type="date" id="dob" required></label>
+<label>Seat type <select id="pref"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
+<button type="submit">Find my lucky seat</button>
+</form>
+<div id="luckyout" aria-live="polite"></div>
+</section>
 <section><h2>Sources</h2>
 <p class="muted">{_e(prov["method"])}. First-party check: {_e(prov.get("primary_source_check", "not done"))}.</p>
 <ul>{src_html}</ul>
@@ -454,6 +483,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <p class="small"><a href="/api/v1/seatmaps/{_e(cfg["id"])}.json">JSON</a> · <a href="{_e(p.md_path)}">Markdown</a></p>
 </section>
 <script type="application/json" id="seatdata">{payload}</script>
+<script defer src="/assets/lucky.js"></script>
 """
     crumbs = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": s.url + "/"},
@@ -495,6 +525,17 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 <h1>{_e(s.tagline)}</h1>
 <p class="lede">Row-by-row aircraft seat maps showing exit rows, seats that don't exist, windowless seats and pitch. Every fact lists its sources and how well it has been checked. Where we don't know, we say so.</p>
 </section>
+<section class="lookup" id="lookup" aria-labelledby="lookup-h">
+<h2 id="lookup-h">Which cabin will my flight have?</h2>
+<p class="muted">Enter a flight number and date. We show which cabin versions the airline flies on that aircraft, how likely each is, and link the seat map.</p>
+<form id="lookupform" class="inline-form">
+<label>Flight number <input id="lf" required placeholder="6E 2134" autocomplete="off" maxlength="9" autocapitalize="characters"></label>
+<label>Date <input id="ld" type="date" required></label>
+<button type="submit">Look up</button>
+</form>
+<p class="muted small" id="lookupnote">Covers the airlines listed below. Flight data from AeroDataBox.</p>
+<div id="lookupout" aria-live="polite"></div>
+</section>
 <section id="seat-maps">
 <div class="searchrow"><h2>Seat maps</h2>
 <label class="sr" for="q">Filter by airline or aircraft</label>
@@ -507,7 +548,7 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 <div><h3>Honest about gaps</h3><p>Unknown pitch is shown as unknown. Drafts are labelled as drafts until checked against the airline's own seat map.</p></div>
 <div><h3>No invented safety scores</h3><p>We show exits and distances, not survival percentages that no dataset can support. <a href="/methodology/#no-scores">Why</a></p></div>
 </section>
-<section><h2>Coming next</h2><p>Look up a flight number and date to see which cabin version is likely, with the confidence stated.</p></section>
+
 """
     site_ld = {"@context": "https://schema.org", "@type": "WebSite", "name": s.name, "url": s.url + "/",
                "description": desc}
@@ -556,7 +597,13 @@ We measure how the site is used so we can improve it. We do not use cookies or a
 
 ## What is measured
 - Page views, referring site, country, device type and browser, aggregated.
-- Product events: seat map viewed, seat selected (seat number only), search text typed in the seat-map filter, source link clicked, and whether a visit came from an AI assistant such as ChatGPT or Perplexity.
+- Product events: seat map viewed, seat selected (seat number only), search text typed in the seat-map filter, source link clicked, flight lookups (airline code and result type only), lucky-seat use (sun sign and seat type only), and whether a visit came from an AI assistant such as ChatGPT or Perplexity.
+
+## Flight lookup
+- The flight number and date you enter are sent to our server and to AeroDataBox, our flight data provider, to find the aircraft. We keep results in a short-lived cache and do not link them to you.
+
+## Lucky seat
+- Your birth date never leaves your browser. Only the resulting sun sign and seat type are counted.
 
 ## Tools
 - Cloudflare Web Analytics (cookieless, aggregated).
@@ -627,18 +674,20 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
         lines.append(f"- Window offset: {', '.join(f['misaligned_window'])}")
     if f["window_disputed"]:
         lines.append(f"- Window disputed by sources: {', '.join(f['window_disputed'])}")
-    pitch = "; ".join(f["pitch_specific"] + ([f"other rows: {f['pitch_default']:g} in"] if f["pitch_default"] else []))
+    pitch = "; ".join(f["pitch_specific"] + ([f"other rows: {f['pitch_default_text']}"] if f["pitch_default_text"] else []))
     if f["pitch_unknown_rows"]:
         pitch += f"; row{'s' if len(f['pitch_unknown_rows']) > 1 else ''} {_ranges(f['pitch_unknown_rows'])}: unknown"
     lines.append(f"- Seat pitch (approx., see sources): {pitch}")
     lines += ["- Seat safety: not estimated. No validated per-seat survival data exists; exit distance is a layout fact only.", ""]
     same = [v for v in p.variants if v["relation"] == "same_type"]
     swaps = [v for v in p.variants if v["relation"] == "swap"]
-    if len(same) > 1 or swaps:
+    if len(same) > 1 or swaps or any(x["relation"] == "unmapped" for x in p.variants):
         lines += ["## Other versions", ""]
         for v in same:
             if not v["current"]:
                 lines.append(f"- {v['label']} (about {round(v['share'] * 100)}% of this fleet): {s.url}/seat-maps/{v['slug']}.md")
+        for v in [x for x in p.variants if x["relation"] == "unmapped"]:
+            lines.append(f"- {v['label']}: about {round(v['share'] * 100)}% of this fleet. {v.get('note', '')}".rstrip())
         for v in swaps:
             lines.append(f"- {v['label']} (swapped onto the same routes): {s.url}/seat-maps/{v['slug']}.md")
         lines.append("")
@@ -811,7 +860,50 @@ APP_JS = r"""(() => {
     });
   }
 
-  // 4. Seat inspector
+  // 4. Flight lookup (home page)
+  const lform = document.getElementById('lookupform');
+  if (lform) {
+    const lf = document.getElementById('lf'), ld = document.getElementById('ld');
+    const out = document.getElementById('lookupout'), note = document.getElementById('lookupnote');
+    const pad = n => String(n).padStart(2, '0');
+    const t = new Date(); ld.value = t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate());
+    const disable = (msg) => { lform.querySelectorAll('input,button').forEach(el => el.disabled = true); note.textContent = msg; };
+    fetch('/api/lookup?status=1').then(r => r.ok ? r.json() : { enabled: false })
+      .then(j => { if (!j.enabled) disable('Flight lookup is coming soon. Browse the seat maps below meanwhile.'); })
+      .catch(() => disable('Flight lookup is coming soon. Browse the seat maps below meanwhile.'));
+    const esc2 = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const TIER = { exact: 'Exact match', likely: 'Likely', unavailable: 'Not covered yet' };
+    lform.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const flight = lf.value.trim(), date = ld.value;
+      const carrier = (flight.toUpperCase().match(/^([A-Z0-9]{2,3}?)\s*\d/) || [])[1] || '';
+      out.innerHTML = '<p class="muted">Looking up…</p>';
+      track('lookup_submit', { carrier });
+      let j;
+      try {
+        const r = await fetch('/api/lookup?flight=' + encodeURIComponent(flight) + '&date=' + encodeURIComponent(date));
+        j = await r.json();
+        if (!r.ok) { out.innerHTML = '<p class="note">' + esc2(j.message || 'Something went wrong.') + '</p>'; track('lookup_result', { carrier, tier: j.error || 'error' }); return; }
+      } catch (_) { out.innerHTML = '<p class="note">Network error. Try again.</p>'; return; }
+      if (j.unsupported_airline) { out.innerHTML = '<p class="note">' + esc2(j.message) + '</p>'; track('lookup_result', { carrier, tier: 'unsupported_airline' }); return; }
+      if (!j.legs.length) { out.innerHTML = '<p class="note">No flight found for that number and date.</p>'; track('lookup_result', { carrier, tier: 'not_found' }); return; }
+      out.innerHTML = j.legs.map(l => {
+        const m = l.match;
+        const cands = m.candidates.map(c => '<li><a href="' + esc2(c.path) + '">' + esc2(c.label) + '</a>' +
+          (m.tier === 'exact' ? '' : (c.probability >= 0.995 && !m.uncovered_share ? ' — the only version we know of' : ' — about ' + Math.round(c.probability * 100) + '%')) + '</li>').join('') +
+          (m.uncovered_share ? '<li>Other versions we haven\'t mapped yet — about ' + Math.round(m.uncovered_share * 100) + '%</li>' : '');
+        return '<div class="result"><p class="result-head"><strong>' + esc2(j.query.flight.replace(/^([A-Z0-9]{2})(\d)/, '$1 $2')) + '</strong> ' +
+          esc2(l.origin || '?') + ' → ' + esc2(l.destination || '?') + (l.departure_local ? ' · ' + esc2(l.departure_local) : '') + '</p>' +
+          '<p>' + esc2((l.operator && l.operator.name) || '') + ' · ' + esc2(l.aircraft_model || 'aircraft not published yet') +
+          (l.registration ? ' · ' + esc2(l.registration) : '') + '</p>' +
+          '<p><span class="badge tier-' + esc2(m.tier) + '">' + esc2(TIER[m.tier] || m.tier) + '</span> ' + esc2(m.reason) + '</p>' +
+          (cands ? '<ul>' + cands + '</ul>' : '') + '</div>';
+      }).join('') + '<p class="muted small">Flight data: AeroDataBox. Cabin versions can change on the day; the airline\'s seat map at check-in is final.</p>';
+      track('lookup_result', { carrier, tier: j.legs[0].match.tier });
+    });
+  }
+
+  // 5. Seat inspector
   const dataEl = document.getElementById('seatdata');
   if (!dataEl) return;
   const data = JSON.parse(dataEl.textContent);
@@ -835,7 +927,7 @@ APP_JS = r"""(() => {
     panel.innerHTML = '<h2>Seat ' + esc(seat) + '</h2>' +
       '<dl><dt>Position</dt><dd>' + esc(f.p) + ', ' + side + ' side</dd>' +
       '<dt>Seats to aisle</dt><dd>' + f.a + '</dd>' +
-      '<dt>Pitch</dt><dd>' + (f.pi === null ? 'unknown' : f.pi + ' in') + ' <span class="muted small">(' + words(f.ps) + ')</span></dd>' +
+      '<dt>Pitch</dt><dd>' + (f.ps === 'range' ? esc(data.pitchRange) : (f.pi === null ? 'unknown' : f.pi + ' in')) + ' <span class="muted small">(' + words(f.ps) + ')</span></dd>' +
       '<dt>Exit row</dt><dd>' + (f.x ? 'yes' : 'no') + '</dd>' +
       '<dt>Notes</dt><dd>' + (f.f.length ? f.f.map(words).join(', ') : '—') + '</dd></dl>' +
       '<h3>Nearest exits</h3><ul>' + exits + '</ul>' +
@@ -849,14 +941,74 @@ APP_JS = r"""(() => {
 })();
 """
 
+LUCKY_JS = r"""(() => {
+  // Entertainment only. Sun sign + numerology pick among seats of the chosen type.
+  // Never describes a seat in terms of hazards or outcomes; the birth date never leaves the browser.
+  const form = document.getElementById('luckyform');
+  const dataEl = document.getElementById('seatdata');
+  if (!form || !dataEl) return;
+  const data = JSON.parse(dataEl.textContent);
+  const out = document.getElementById('luckyout');
+  const track = window.aeroTrack || (() => {});
+  const SIGNS = [ // [name, element, start month, start day]
+    ['Capricorn', 'Earth', 12, 22], ['Aquarius', 'Air', 1, 20], ['Pisces', 'Water', 2, 19], ['Aries', 'Fire', 3, 21],
+    ['Taurus', 'Earth', 4, 20], ['Gemini', 'Air', 5, 21], ['Cancer', 'Water', 6, 21], ['Leo', 'Fire', 7, 23],
+    ['Virgo', 'Earth', 8, 23], ['Libra', 'Air', 9, 23], ['Scorpio', 'Water', 10, 23], ['Sagittarius', 'Fire', 11, 22]];
+  const sunSign = (m, d) => {
+    let sign = SIGNS[0];
+    for (const s of SIGNS.slice(1)) if (m > s[2] || (m === s[2] && d >= s[3])) sign = s;
+    if (m === 12 && d >= 22) sign = SIGNS[0];
+    return { name: sign[0], element: sign[1] };
+  };
+  const digits = (s) => String(s).replace(/\D/g, '').split('').reduce((a, c) => a + Number(c), 0);
+  const reduce = (n) => { while (n > 9) n = digits(n); return n; };
+  const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+  form.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const dob = document.getElementById('dob').value, pref = document.getElementById('pref').value;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+    if (!m) { out.innerHTML = '<p class="note">Enter your date of birth.</p>'; return; }
+    const sign = sunSign(Number(m[2]), Number(m[3]));
+    const lifePath = reduce(digits(dob));
+    const side = (sign.element === 'Fire' || sign.element === 'Air') ? 'L' : 'R';
+    const sideName = side === 'L' ? 'left' : 'right';
+    const pool = Object.entries(data.seats).filter(([, f]) => pref === 'any' || f.p === pref);
+    const scored = pool.map(([seat, f]) => {
+      const row = parseInt(seat, 10), letter = seat.replace(/\d+/g, '');
+      const letterValue = letter.charCodeAt(0) - 64;
+      const seatNum = reduce(digits(row) + letterValue), rowNum = reduce(row);
+      let score = 0; const why = [];
+      if (seatNum === lifePath) { score += 3; why.push(seat + ' adds up to ' + seatNum + ', your life-path number'); }
+      if (rowNum === lifePath) { score += 2; why.push('row ' + row + ' reduces to ' + rowNum); }
+      if (f.sd === side) { score += 1; why.push(sign.name + ' is a ' + sign.element.toLowerCase() + ' sign, paired with the ' + sideName + ' side'); }
+      return { seat, score, why, tie: hash(dob + data.config + seat) };
+    }).sort((a, b) => b.score - a.score || a.tie - b.tie);
+    if (!scored.length) { out.innerHTML = '<p class="note">No seats of that type on this aircraft.</p>'; return; }
+    const [top, ...rest] = scored;
+    document.querySelectorAll('.seat.lucky').forEach(el => el.classList.remove('lucky'));
+    const g = document.querySelector('g[data-seat="' + top.seat + '"]');
+    if (g) { g.querySelector('rect').classList.add('lucky'); g.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    out.innerHTML = '<p class="lucky-pick">Your lucky seat: ' + esc(top.seat) + '</p>' +
+      '<p>Sun sign ' + esc(sign.name) + ' · life-path number ' + lifePath + '</p>' +
+      '<ul>' + top.why.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' +
+      '<p class="muted small">Also lucky for you: ' + rest.slice(0, 2).map(r => esc(r.seat)).join(', ') +
+      '. Moon sign needs your birth time and place, so it isn\'t used here.</p>' +
+      '<p class="muted small">For fun only. It isn\'t a rating of any kind; use the facts above to choose a seat.</p>';
+    track('lucky_seat', { config: data.config, sign: sign.name, pref });
+  });
+})();
+"""
+
 SITE_CSS = """
 :root{--bg:#f7f6f2;--card:#fff;--ink:#1d1c1a;--muted:#6b675f;--line:#c9c4b8;--accent:#1f5fbf;--fus:#efece5;--seat:#fff;
---exitrow:#dcefe1;--sel:#1f5fbf;--exit:#c0392b;--fac:#dcd8cf;--warn:#7a4f00;--warnbg:#fff1d6;--ok:#1d6b3a;--okbg:#ddf3e4}
+--exitrow:#dcefe1;--sel:#1f5fbf;--exit:#c0392b;--fac:#dcd8cf;--warn:#7a4f00;--warnbg:#fff1d6;--ok:#1d6b3a;--okbg:#ddf3e4;--lucky-bg:#f1e6ff;--lucky-ink:#5b2a9e}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1e1d1b;--ink:#ecebe6;--muted:#a19d94;
 --line:#4d4a43;--accent:#7aa7ff;--fus:#24231f;--seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;
---warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f}}
+--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff}}
 :root[data-theme="dark"]{--bg:#141413;--card:#1e1d1b;--ink:#ecebe6;--muted:#a19d94;--line:#4d4a43;--accent:#7aa7ff;--fus:#24231f;
---seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f}
+--seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 a{color:var(--accent)}a:hover{text-decoration-thickness:2px}
@@ -897,6 +1049,18 @@ th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);verti
 details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}
 details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x:auto}details.rows>summary{padding:12px 14px}
 .prose{max-width:70ch}.prose li{margin:4px 0}code{font-size:.92em;background:var(--fus);padding:1px 5px;border-radius:5px}
+.inline-form{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:12px 0}
+.inline-form label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted);min-width:0}
+.inline-form input,.inline-form select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0;max-width:100%}
+.inline-form button{font:inherit;font-weight:600;color:#fff;background:var(--accent);border:0;border-radius:10px;padding:10px 16px;cursor:pointer}
+.inline-form button:disabled,.inline-form input:disabled{opacity:.55;cursor:not-allowed}
+.lookup,.lucky{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:24px}
+.lookup h2,.lucky h2{margin-top:0}
+.result{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.result p{margin:4px 0}.result-head{font-size:17px}
+.badge.tier-exact{background:var(--okbg);color:var(--ok)}.badge.tier-unavailable{background:var(--fus);color:var(--muted)}
+.badge-fun{background:var(--lucky-bg);color:var(--lucky-ink);vertical-align:middle}
+.seat.lucky{fill:var(--lucky-bg);stroke:var(--lucky-ink);stroke-width:2}
+.lucky-pick{font-size:20px;font-weight:700}
 .foot{border-top:1px solid var(--line);padding:16px 0;font-size:14px;color:var(--muted)}.foot a{color:var(--muted)}
 """ + SVG_CSS
 
@@ -955,6 +1119,15 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
     catalog = {"name": s.name, "generated": s.build_date, "license": s.data_license,
                "seat_maps": [api_record(s, p, p.cfg["provenance"].get("authored_at", s.build_date), with_seats=False) for p in pages]}
     write("/api/v1/index.json", json.dumps(catalog, indent=1))
+    match_index = {
+        "generated": s.build_date,
+        "configs": [{"id": p.cfg["id"], "label": p.title, "path": p.path, "status": p.cfg["provenance"]["status"],
+                     "operator": p.cfg["operator"], "group_icao": p.cfg.get("group_operators_icao", []),
+                     "group_iata": p.cfg.get("group_operators_iata", []), "aircraft_icao": p.cfg["aircraft"]["icao"],
+                     "share": p.cfg.get("fleet_share_prior", 1.0)} for p in pages],
+        "tails": {reg: t.config_id for reg, t in load_tail_overrides().items()},
+    }
+    write("/api/v1/match-index.json", json.dumps(match_index, indent=1))
     write("/openapi.json", json.dumps(openapi(s), indent=1))
     write("/.well-known/api-catalog", json.dumps({"linkset": [{
         "anchor": s.url + "/api/v1/",
@@ -969,6 +1142,7 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
     write("/_headers", headers_file(s, md_paths))
     write("/assets/site.css", SITE_CSS)
     write("/assets/app.js", APP_JS.replace("__AI_REFERRERS__", json.dumps(AI_REFERRERS)))
+    write("/assets/lucky.js", LUCKY_JS)
     write("/assets/favicon.svg", FAVICON)
     if s.indexnow_key:
         write(f"/{s.indexnow_key}.txt", s.indexnow_key)

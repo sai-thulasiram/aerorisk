@@ -1,0 +1,152 @@
+{
+  "id": "6E-A21N-232Y",
+  "operator": {
+    "iata": "6E",
+    "icao": "IGO",
+    "name": "IndiGo"
+  },
+  "group_operators_icao": [],
+  "aircraft": {
+    "icao": "A21N",
+    "iata": "32Q",
+    "name": "Airbus A321neo"
+  },
+  "variant_label": "232Y all-economy",
+  "total_seats": 232,
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "rows": {
+    "first": 1,
+    "last": 39,
+    "skip": []
+  },
+  "missing_seats": [
+    "28A",
+    "28F"
+  ],
+  "pitch_in": {
+    "default_range": [
+      28,
+      29
+    ]
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 18,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 19,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L3/R3",
+      "kind": "mid_aft_exit",
+      "at_row": 28,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L4/R4",
+      "kind": "door",
+      "after_row": 39,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [
+      "39A",
+      "39F"
+    ]
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 0.64,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/indigo-a321neo-seat-selection-guide-2026",
+      "https://seatmaps.com/airlines/6e-indigo/airbus-a321neo/",
+      "https://www.aerolopa.com/6e-32q-2",
+      "https://happyfares.in/blog/indigo-seat-layout-a320-a321-atr-2026/"
+    ],
+    "corroboration": {
+      "rows_1_39_total_232": [
+        "AeroLOPA",
+        "seatcompare.ai"
+      ],
+      "overwing_exit_rows_18_19": [
+        "seatcompare.ai",
+        "seatmaps.com",
+        "happyfares.in"
+      ],
+      "rear_cabin_exit_row_28": [
+        "seatcompare.ai",
+        "seatmaps.com",
+        "happyfares.in"
+      ],
+      "missing_28A_28F": [
+        "seatcompare.ai (consistent with 39x6-2=232)"
+      ],
+      "no_window_39A_39F": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "pitch_28_29": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ]
+    },
+    "conflicts": [
+      "seatmaps.com places seats 29A and 29F 'at an exit' as well as row 28; seatcompare.ai says 28A/28F are absent because the door sits there. Using 28A/28F absent.",
+      "Fleet counts differ: AeroLOPA 122 of ~191 A321neos; seatcompare.ai ~104-120 of 183. Using ~64%."
+    ],
+    "fleet_share_note": "Share of IndiGo's A321neo fleet. Not yet mapped: IndiGoStretch 12C+208Y (~32%), 222Y (~2%), 236Y (~2%).",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-10",
+    "verify_against": "IndiGo web check-in seat map"
+  },
+  "swap_risk": []
+}

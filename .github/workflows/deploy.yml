@@ -40,11 +40,15 @@ jobs:
           test -n "$SITE_URL" || { echo "Set the SITE_URL repository variable"; exit 1; }
           python -m aerorisk site --out site
 
+      - name: Test Worker logic
+        run: node --test worker/*.test.mjs
+
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
           command: deploy
 
       - name: Ping IndexNow (Bing, Yandex, Seznam, Naver)

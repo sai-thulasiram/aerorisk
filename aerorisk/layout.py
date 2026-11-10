@@ -40,7 +40,7 @@ class Seat:
     side: str                          # L | R
     seats_to_aisle: int
     pitch_in: float | None
-    pitch_source: str                  # row_specific | cabin_default | unknown
+    pitch_source: str                  # row_specific | cabin_default | range | unknown
     y_in: float
     in_exit_row: bool
     nearest_exits: list[dict[str, Any]] = field(default_factory=list)
@@ -116,6 +116,8 @@ def _pitch(cfg: dict[str, Any], row: int) -> tuple[float | None, str]:
         return float(p["rows"][str(row)]), "row_specific"
     if "default" in p:
         return float(p["default"]), "cabin_default"
+    if "default_range" in p:
+        return None, "range"
     return None, "unknown"
 
 
@@ -156,7 +158,8 @@ def build_cabin(cfg: dict[str, Any]) -> Cabin:
     idx = {r: i for i, r in enumerate(rows)}
 
     # Longitudinal position: cumulative pitch. Unknown pitch -> cabin default for drawing only.
-    default = float(cfg.get("pitch_in", {}).get("default", 30))
+    pcfg = cfg.get("pitch_in", {})
+    default = float(pcfg.get("default") or (sum(pcfg["default_range"]) / 2 if "default_range" in pcfg else 30))
     y_of: dict[int, float] = {}
     y = 0.0
     for r in rows:

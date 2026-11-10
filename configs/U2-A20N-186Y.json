@@ -1,0 +1,158 @@
+{
+  "id": "U2-A20N-186Y",
+  "operator": {
+    "iata": "U2",
+    "icao": "EZY",
+    "name": "easyJet"
+  },
+  "group_operators_icao": [
+    "EJU",
+    "EZS"
+  ],
+  "aircraft": {
+    "icao": "A20N",
+    "iata": "32N",
+    "name": "Airbus A320neo"
+  },
+  "variant_label": "186Y all-economy",
+  "total_seats": 186,
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "rows": {
+    "first": 1,
+    "last": 31,
+    "skip": []
+  },
+  "missing_seats": [],
+  "pitch_in": {
+    "default_range": [
+      28,
+      29
+    ],
+    "rows": {
+      "12": 35,
+      "13": 35
+    }
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 12,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 13,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 31,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [
+      "31A",
+      "31F"
+    ],
+    "misaligned_window": [
+      "2A",
+      "2F",
+      "7A",
+      "7F",
+      "22A",
+      "22F",
+      "25A",
+      "25F"
+    ],
+    "no_recline": "all"
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 1.0,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/easyjet-a320neo-seat-selection-guide-2026",
+      "https://www.seatmaps.com/airlines/u2-easyjet-uk/airbus-a320neo/",
+      "https://seatmap.app/seat-map/easyjet-a320neo"
+    ],
+    "corroboration": {
+      "rows_1_31_total_186": [
+        "seatcompare.ai",
+        "seatmaps.com",
+        "seatmap.app"
+      ],
+      "overwing_exit_rows_12_13": [
+        "seatcompare.ai",
+        "seatmaps.com",
+        "seatmap.app (as extra-legroom rows)"
+      ],
+      "no_window_31A_31F": [
+        "seatmaps.com",
+        "seatmap.app"
+      ],
+      "misaligned_windows": [
+        "seatcompare.ai only"
+      ],
+      "exit_row_pitch_35": [
+        "seatcompare.ai only"
+      ],
+      "no_recline": [
+        "seatcompare.ai only"
+      ]
+    },
+    "conflicts": [
+      "31A/31F: seatmaps.com and seatmap.app say no window; seatcompare.ai says the window is set ahead of the seat. Using no window (2 vs 1)."
+    ],
+    "fleet_share_note": "Single known A320neo cabin at easyJet (UK, Europe and Switzerland AOCs).",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-10",
+    "verify_against": "easyJet seat selection at booking"
+  },
+  "swap_risk": [],
+  "group_operators_iata": [
+    "EC",
+    "DS"
+  ]
+}
