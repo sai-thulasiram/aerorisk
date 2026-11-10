@@ -158,7 +158,7 @@ def test_match_index_and_lucky_assets(site):
     for word in ("safe", "risk", "surviv", "danger"):
         assert word not in lucky, word
     page = (out / "seat-maps/indigo-airbus-a321neo-232-seats/index.html").read_text()
-    assert 'src="/assets/lucky.js"' in page and "Just for fun" in page
+    assert 'src="/assets/lucky.js?v=' in page and "Just for fun" in page
     assert "not mapped yet" in page and "28–29 in" in page
     home = (out / "index.html").read_text()
     assert 'id="lookupform"' in home
