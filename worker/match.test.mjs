@@ -77,3 +77,14 @@ test("codeshare legs are dropped in favour of the operating leg", () => {
   assert.equal(r.legs[0].registration, "VT-ABC");
   assert.equal(r.legs[0].match.tier, "likely");
 });
+
+test("only departures on the requested date are kept", () => {
+  const mk = (local, model) => ({ number: "6E 1234", codeshareStatus: "IsOperator", airline: { iata: "6E", icao: "IGO", name: "IndiGo" },
+    aircraft: { model }, departure: { airport: { iata: "KWI" }, scheduledTime: { local } }, arrival: { airport: { iata: "HYD" } } });
+  const r = buildResult({ flight: "6E1234", date: "2026-11-10" },
+    parseAdb([mk("2026-11-09 23:45+03:00", "Airbus A321 NEO"), mk("2026-11-10 23:45+03:00", "Airbus A320")]), index);
+  assert.equal(r.legs.length, 1);
+  assert.equal(r.legs[0].departure_local.slice(0, 10), "2026-11-10");
+  const none = buildResult({ flight: "6E1234", date: "2026-11-12" }, parseAdb([mk("2026-11-09 23:45+03:00", "Airbus A321 NEO")]), index);
+  assert.equal(none.legs.length, 1);
+});

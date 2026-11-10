@@ -107,7 +107,11 @@ export function matchLeg(leg, index) {
 
 export function buildResult(query, legs, index) {
   const operating = legs.filter((l) => l.is_operator_leg);
-  const use = operating.length ? operating : legs;
+  let use = operating.length ? operating : legs;
+  // The provider can return neighbouring days (e.g. a late-night departure the day before). Keep the
+  // departures on the requested local date; if none match, keep everything rather than show nothing.
+  const sameDay = use.filter((l) => String(l.departure_local || "").startsWith(query.date));
+  if (sameDay.length) use = sameDay;
   return {
     query,
     legs: use.map((leg) => ({
