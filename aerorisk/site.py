@@ -35,6 +35,74 @@ from .research import BAND_LABEL, BANDS, BASIS, CAVEATS, EXIT_STUDY, STUDIES
 from .render import SVG_CSS, render_svg
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+ASTRO_JS = (Path(__file__).resolve().parent / "assets" / "astro.js").read_text(encoding="utf-8")
+
+
+def _tz_options() -> str:
+    named = {330: "India, Sri Lanka", 345: "Nepal", 360: "Bangladesh", 240: "UAE, Oman", 180: "Gulf: Saudi, Kuwait, Qatar",
+             0: "UK, Ireland (winter)", 60: "Central Europe (winter), UK (summer)", 120: "Central Europe (summer)",
+             480: "Singapore, Malaysia, China", -300: "US East (winter)", -480: "US West (winter)", 600: "Sydney (winter)"}
+    mins = sorted(set(range(-720, 841, 30)) | {345})
+    out = []
+    for m in mins:
+        sign = "+" if m >= 0 else "-"
+        lab = f"UTC{sign}{abs(m) // 60}:{abs(m) % 60:02d}" + (f" {named[m]}" if m in named else "")
+        out.append(f'<option value="{m}"{" selected" if m == 330 else ""}>{lab}</option>')
+    return "".join(out)
+
+
+SPONSORS_FILE = Path(__file__).resolve().parent.parent / "sponsors.json"
+
+
+def load_sponsors(path: Path | None = None) -> list[dict[str, Any]]:
+    """Enabled affiliate links from sponsors.json. Entries without an https link are ignored."""
+    path = path or SPONSORS_FILE
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding="utf-8"))
+    out = []
+    for it in data.get("items", []):
+        if it.get("enabled") and str(it.get("url", "")).startswith("https://"):
+            out.append(it)
+    return out
+
+
+def sponsor_html(where: str, sponsors: list[dict[str, Any]]) -> str:
+    items = [it for it in sponsors if where in it.get("where", ["home", "seatmap"])][:3]
+    if not items:
+        return ""
+    cards = "".join(
+        f'<a class="sponsor-item" href="{_e(it["url"])}" target="_blank" rel="sponsored noopener" data-sponsor="{_e(it["id"])}">'
+        f'<strong>{_e(it["title"])}</strong><span class="muted small">{_e(it.get("text", ""))}</span>'
+        f'<span class="sponsor-cta">{_e(it.get("cta", "Open"))} →</span></a>' for it in items)
+    return (f'<aside class="sponsor" aria-label="Sponsored links"><p class="sponsor-tag">Sponsored · we may earn a commission, '
+            f'at no cost to you</p><div class="sponsor-items">{cards}</div></aside>')
+
+
+def ad_html(s: "Settings") -> str:
+    if not (s.adsense_client and s.adsense_slot):
+        return ""
+    return (f'<div class="adslot"><p class="sponsor-tag">Advertisement</p><ins class="adsbygoogle" '
+            f'data-ad-client="{_e(s.adsense_client)}" data-ad-slot="{_e(s.adsense_slot)}" data-ad-format="auto" '
+            f'data-full-width-responsive="true"></ins></div>')
+
+
+def lucky_fields(prefix: str) -> str:
+    """The lucky-seat inputs shared by the seat page (prefix "") and the home shortcut (prefix "lh-")."""
+    i = lambda name: prefix + name
+    return f"""<label>Date of birth <input type="date" id="{i('dob')}" required></label>
+<label>Astrology <select id="{i('sys')}"><option value="vedic">Vedic: moon sign, nakshatra</option><option value="western">Western: sun sign</option><option value="chinese">Chinese zodiac</option></select></label>
+<label>Seat type <select id="{i('pref')}"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
+<button type="submit">Find my lucky seat</button>
+<details class="more"><summary>Birth time and flight time (optional)</summary>
+<div class="more-grid">
+<label>Birth time <input type="time" id="{i('tob')}"></label>
+<label>Time zone at birth <select id="{i('tz')}">{_tz_options()}</select></label>
+<label>Flight date <input type="date" id="{i('fdate')}"></label>
+<label>Departure time <input type="time" id="{i('ftime')}"></label>
+</div>
+<p class="small muted">Birth time pins down your moon sign and nakshatra (the moon changes sign every two to three days). Flight date and time show that day's Rahu Kalam.</p>
+</details>"""
 AIRCRAFT_DIR = Path(__file__).resolve().parent.parent / "aircraft"
 
 
@@ -122,6 +190,8 @@ class Settings:
     allow_ai_training: bool = True
     data_license: str = "CC BY 4.0"
     indexnow_key: str | None = None
+    adsense_client: str | None = None      # ca-pub-...; loads AdSense, writes ads.txt
+    adsense_slot: str | None = None        # a display ad unit id; without it no manual ad units are placed
     build_date: str = field(default_factory=lambda: dt.date.today().isoformat())
 
     @classmethod
@@ -137,6 +207,14 @@ class Settings:
         s.allow_ai_training = (e("ALLOW_AI_TRAINING", "1") != "0")
         s.data_license = e("DATA_LICENSE") or s.data_license
         s.indexnow_key = e("INDEXNOW_KEY") or None
+        client = (e("ADSENSE_CLIENT") or "").strip()
+        if client and not re.fullmatch(r"ca-pub-\d{10,20}", client):
+            raise SystemExit(f"ADSENSE_CLIENT should look like ca-pub-1234567890123456, got {client!r}")
+        s.adsense_client = client or None
+        slot = (e("ADSENSE_SLOT") or "").strip()
+        if slot and not slot.isdigit():
+            raise SystemExit(f"ADSENSE_SLOT should be the numeric ad unit id, got {slot!r}")
+        s.adsense_slot = slot or None
         return s
 
     @property
@@ -410,6 +488,10 @@ def head(s: Settings, *, title: str, description: str, path: str, jsonld: list[d
     if s.cf_beacon_token:
         parts.append('<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
                      f'data-cf-beacon=\'{{"token":"{_e(s.cf_beacon_token)}"}}\'></script>')
+    if s.adsense_client:
+        parts.append(f'<meta name="google-adsense-account" content="{_e(s.adsense_client)}">')
+        parts.append(f'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={_e(s.adsense_client)}" '
+                     'crossorigin="anonymous"></script>')
     parts.append(f'<script defer src="/assets/app.js?v={ASSET_VERSION}"></script>')
     return "\n".join(parts)
 
@@ -605,14 +687,13 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 </div>
 <section class="lucky" id="lucky" aria-labelledby="lucky-h">
 <h2 id="lucky-h">Lucky seat <span class="badge badge-fun">Just for fun</span></h2>
-<p class="muted">Picks a lucky section and seat from your birth date using your sun sign's element (fire: front, air: middle, earth and water: rear) and numerology. It's entertainment: it says nothing about comfort, exits or anything else on this page. Your birth date stays in your browser.</p>
+<p class="muted">Picks a lucky section and seat from your birth date. Choose Vedic (moon sign and nakshatra), Western (sun sign) or Chinese zodiac: the element of your sign picks the section, numerology picks the seat. Add your flight date to see Rahu Kalam. It's entertainment: it says nothing about comfort, exits or anything else on this page. Your birth details stay in your browser.</p>
 <form id="luckyform" class="inline-form">
-<label>Date of birth <input type="date" id="dob" required></label>
-<label>Seat type <select id="pref"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
-<button type="submit">Find my lucky seat</button>
+{lucky_fields("")}
 </form>
 <div id="luckyout" aria-live="polite"></div>
 </section>
+{sponsor_html("seatmap", load_sponsors())}
 <section><h2>Key facts</h2><table class="facts">{facts_html}</table></section>
 <section><h2>Cabin sections and crash studies</h2>
 <p>{_e(safest_answer(p))}</p>
@@ -620,6 +701,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <p class="small muted">Pattern basis: {_e(BASIS)}. It describes past accidents, not your flight, and no individual seat is rated. <a href="/research/">Read the studies and their limits</a></p></section>
 {var_html}
 {aircraft_html(cfg)}
+{ad_html(s)}
 <section><h2>Row by row</h2>
 <details class="rows"><summary>Show all {f["row_count"]} rows</summary>
 <table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Legroom (pitch)</th><th>Notes</th></tr></thead>
@@ -632,6 +714,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 {f"<h3>Where sources disagree</h3><ul>{conf_html}</ul>" if conf_html else ""}
 </section>
 <script type="application/json" id="seatdata">{payload}</script>
+<script defer src="/assets/astro.js?v={ASSET_VERSION}"></script>
 <script defer src="/assets/lucky.js?v={ASSET_VERSION}"></script>
 """
     crumbs = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
@@ -690,12 +773,10 @@ def index_page(s: Settings, pages: list[Page]) -> str:
     body = f"""
 <section class="lucky lift" id="luckyhome" aria-labelledby="luckyhome-h">
 <h2 id="luckyhome-h">Find your lucky seat <span class="badge badge-fun">Just for fun</span></h2>
-<p class="muted">Pick your aircraft and birth date. We pick a lucky section and seat from your sun sign and numerology. Your birth date stays in your browser.</p>
+<p class="muted">Pick your aircraft and birth date. Your Vedic moon sign, Western sun sign or Chinese zodiac, plus numerology, picks a lucky section and seat. Your birth details stay in your browser.</p>
 <form id="luckyhomeform" class="inline-form">
 <label>Aircraft <select id="lh-ac" required>__LUCKY_OPTIONS__</select></label>
-<label>Date of birth <input type="date" id="lh-dob" required></label>
-<label>Seat type <select id="lh-pref"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
-<button type="submit">Find my lucky seat</button>
+__LUCKY_FIELDS__
 </form>
 </section>
 <section class="lookup" id="lookup" aria-labelledby="lookup-h">
@@ -718,6 +799,7 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 <p class="small muted">You get: the route and time, the aircraft type and its registration (when the airline has assigned it), how likely each cabin version is, and one tap to that seat map or your lucky seat on it.</p>
 </div></div>
 </section>
+{sponsor_html("home", load_sponsors())}
 <section id="seat-maps">
 <div class="searchrow"><h2>Seat maps</h2>
 <label class="sr" for="q">Filter by airline or aircraft</label>
@@ -725,6 +807,7 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 <ul class="cards" id="cards">{"".join(cards)}</ul>
 <p class="muted small" id="noresults" hidden>No seat map matches that yet.</p>
 </section>
+{ad_html(s)}
 <section class="three">
 <div><h3>Sourced, fact by fact</h3><p>Each layout records which sources back each fact and where they disagree.</p></div>
 <div><h3>Honest about gaps</h3><p>Unknown pitch is shown as unknown. Drafts are labelled as drafts until checked against the airline's own seat map.</p></div>
@@ -748,9 +831,9 @@ def index_page(s: Settings, pages: list[Page]) -> str:
             opts.append(f'<optgroup label="{_e(op)}">'); cur = op
         opts.append(f'<option value="{_e(p.path)}">{_e(op)} · {_e(p.cfg["aircraft"]["name"])} · {p.cfg["total_seats"]} seats</option>')
     opts.append("</optgroup>")
-    body = body.replace("__LUCKY_OPTIONS__", "".join(opts))
+    body = body.replace("__LUCKY_OPTIONS__", "".join(opts)).replace("__LUCKY_FIELDS__", lucky_fields("lh-"))
     band = """<h1>Find your <span>lucky seat</span>, and know the plane you're on</h1>
-<p class="lede">Your sun sign and numbers pick a lucky seat, just for fun. Then see the real thing: exit rows, cabin sections, what crash studies found, and the aircraft behind your flight, every fact sourced.</p>
+<p class="lede">Your moon sign, sun sign or zodiac animal picks a lucky seat, just for fun. Then see the real thing: exit rows, cabin sections, what crash studies found, and the aircraft behind your flight, every fact sourced.</p>
 <p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#lookup">Which plane is my flight?</a></p>"""
     return shell(s, head(s, title=f"{s.name}: {s.tagline}", description=desc, path="/",
                          jsonld=[site_ld, org_ld, catalog]), body, band=band, band_cls="band-home")
@@ -762,7 +845,7 @@ We measure how the site is used so we can improve it. We do not use cookies or a
 
 ## What is measured
 - Page views, referring site, country, device type and browser, aggregated.
-- Product events: seat map viewed, seat selected (seat number only), search text typed in the seat-map filter, source link clicked, flight lookups (airline code and result type only), lucky-seat use (sun sign and seat type only), and whether a visit came from an AI assistant such as ChatGPT or Perplexity.
+- Product events: seat map viewed, seat selected (seat number only), search text typed in the seat-map filter, source link clicked, flight lookups (airline code and result type only), lucky-seat use (astrology system, sign and seat type only; never your birth date or time), and whether a visit came from an AI assistant such as ChatGPT or Perplexity.
 
 ## Flight lookup
 - The flight number and date you enter are sent to our server and to AeroDataBox, our flight data provider, to find the aircraft. We keep results in a short-lived cache and do not link them to you.
@@ -771,7 +854,7 @@ We measure how the site is used so we can improve it. We do not use cookies or a
 - If you send feedback, we store your message, the page it was sent from, and your email only if you give it. We use it to fix seat maps and improve the site.
 
 ## Lucky seat
-- Your birth date never leaves your browser. Only the resulting sun sign and seat type are counted.
+- Your birth date, birth time and flight time never leave your browser. Only the astrology system, resulting sign and seat type are counted.
 
 ## Tools
 - Cloudflare Web Analytics (cookieless, aggregated).
@@ -780,6 +863,23 @@ We measure how the site is used so we can improve it. We do not use cookies or a
 ## Contact
 Questions about this policy: see the contact link in the footer.
 """
+
+
+def privacy_md(s: "Settings") -> str:
+    text = PRIVACY_MD
+    extra = []
+    if load_sponsors():
+        extra.append("## Sponsored links\n- Some links are marked Sponsored. If you book through them we may earn a commission. "
+                     "The partner may set its own cookies once you are on its site.")
+    if s.adsense_client:
+        text = text.replace("We do not use cookies or advertising trackers, and we do not collect",
+                            "Our own measurement uses no cookies. Ads are served by Google AdSense, which may use cookies; we do not collect")
+        extra.append("## Advertising\n- Ads are served by Google AdSense. Google may use cookies to show and measure ads. "
+                     "In the EEA, the UK and Switzerland you are asked for consent first. "
+                     "See [how Google uses information from sites that use its services](https://policies.google.com/technologies/partner-sites).")
+    if extra:
+        text = text.replace("## Tools", "\n\n".join(extra) + "\n\n## Tools")
+    return text
 
 
 def research_md(s: "Settings") -> str:
@@ -931,7 +1031,7 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
 
 def llms_txt(s: Settings, pages: list[Page]) -> str:
     lines = [f"# {s.name}", "",
-             f"> {s.name}: a just-for-fun lucky seat finder (sun sign and numerology) on top of sourced, row-by-row airline seat maps (exit rows, seats that don't exist, windowless seats, "
+             f"> {s.name}: a just-for-fun lucky seat finder (Vedic moon sign and nakshatra, Western sun sign or Chinese zodiac, with numerology and Rahu Kalam) on top of sourced, row-by-row airline seat maps (exit rows, seats that don't exist, windowless seats, "
              "approximate pitch), each fact with its sources and a verification status. "
              "Cabin sections are coloured by what two small crash studies found; no seat-level risk scores.", "",
              "Notes for agents:",
@@ -1041,9 +1141,23 @@ def headers_file(s: Settings, md_paths: list[str]) -> str:
         origin = re.match(r"^(https?://[^/]+)", s.umami_src).group(1)
         script_src.append(origin)
         connect_src += [origin, "https://api-gateway.umami.dev"]
+    img_src, style_src, frame_src = ["'self'", "data:"], ["'self'"], []
+    if s.adsense_client:
+        # AdSense and Google's consent message load from these hosts and inject styles; this loosens the policy.
+        g = ["https://pagead2.googlesyndication.com", "https://*.googlesyndication.com", "https://*.doubleclick.net",
+             "https://adservice.google.com", "https://*.google.com", "https://www.googletagservices.com",
+             "https://fundingchoicesmessages.google.com", "https://*.gstatic.com"]
+        script_src += g
+        connect_src += g
+        img_src.append("https:")
+        style_src.append("'unsafe-inline'")
+        frame_src = g + ["https://*.adtrafficquality.google"]
+        script_src.append("https://*.adtrafficquality.google")
+        connect_src.append("https://*.adtrafficquality.google")
     csp = (f"default-src 'self'; script-src {' '.join(script_src)}; connect-src {' '.join(connect_src)}; "
-           "img-src 'self' data:; style-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; "
-           "form-action 'self'; object-src 'none'")
+           f"img-src {' '.join(img_src)}; style-src {' '.join(style_src)}; font-src 'self'; "
+           + (f"frame-src {' '.join(frame_src)}; " if frame_src else "")
+           + "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'")
     blocks = [
         "/*", "  X-Content-Type-Options: nosniff", "  Referrer-Policy: strict-origin-when-cross-origin",
         "  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()",
@@ -1065,6 +1179,10 @@ APP_JS = r"""(() => {
     try { if (window.umami && typeof window.umami.track === 'function') window.umami.track(name, data || {}); } catch (_) {}
   };
   window.aeroTrack = track;
+
+  // Ads and sponsored links (both off unless configured at build time)
+  document.querySelectorAll('ins.adsbygoogle').forEach(() => { try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (_) {} });
+  document.querySelectorAll('[data-sponsor]').forEach(a => a.addEventListener('click', () => track('sponsor_click', { id: a.dataset.sponsor, page: location.pathname })));
 
   // 0. Feedback dialog (every page)
   const dlg = document.getElementById('feedback');
@@ -1134,11 +1252,13 @@ APP_JS = r"""(() => {
   const lhf = document.getElementById('luckyhomeform');
   if (lhf) lhf.addEventListener('submit', (ev) => {
     ev.preventDefault();
-    const path = document.getElementById('lh-ac').value, dob = document.getElementById('lh-dob').value;
-    const pref = document.getElementById('lh-pref').value;
+    const v = (id) => (document.getElementById('lh-' + id) || {}).value || '';
+    const path = v('ac'), dob = v('dob');
     if (!path || !dob) return;
-    track('lucky_shortcut', { path });
-    location.href = path + '#lucky=' + encodeURIComponent(dob) + '&pref=' + encodeURIComponent(pref);
+    track('lucky_shortcut', { path, system: v('sys') });
+    const q = new URLSearchParams({ lucky: dob, pref: v('pref'), sys: v('sys') });
+    for (const [k, id] of [['tob', 'tob'], ['tz', 'tz'], ['fd', 'fdate'], ['ft', 'ftime']]) if (v(id)) q.set(k, v(id));
+    location.href = path + '#' + q.toString();
   });
 
   // 4. Flight lookup (home page)
@@ -1238,14 +1358,16 @@ APP_JS = r"""(() => {
 """
 
 LUCKY_JS = r"""(() => {
-  // Entertainment only. Sun sign + numerology pick among seats of the chosen type.
-  // Never describes a seat in terms of hazards or outcomes; the birth date never leaves the browser.
+  // Entertainment only. An astrology sign's element picks a section; numerology picks the seat.
+  // Never describes a seat in terms of hazards or outcomes; birth details never leave the browser.
   const form = document.getElementById('luckyform');
   const dataEl = document.getElementById('seatdata');
   if (!form || !dataEl) return;
   const data = JSON.parse(dataEl.textContent);
   const out = document.getElementById('luckyout');
   const track = window.aeroTrack || (() => {});
+  const Astro = window.Astro;
+  const val = (id) => (document.getElementById(id) || {}).value || '';
   const SIGNS = [ // [name, element, start month, start day]
     ['Capricorn', 'Earth', 12, 22], ['Aquarius', 'Air', 1, 20], ['Pisces', 'Water', 2, 19], ['Aries', 'Fire', 3, 21],
     ['Taurus', 'Earth', 4, 20], ['Gemini', 'Air', 5, 21], ['Cancer', 'Water', 6, 21], ['Leo', 'Fire', 7, 23],
@@ -1256,36 +1378,73 @@ LUCKY_JS = r"""(() => {
     if (m === 12 && d >= 22) sign = SIGNS[0];
     return { name: sign[0], element: sign[1] };
   };
+  const SECTION_OF = { Fire: 'front', Wood: 'front', Air: 'middle', Metal: 'middle', Earth: 'rear', Water: 'rear' };
   const digits = (s) => String(s).replace(/\D/g, '').split('').reduce((a, c) => a + Number(c), 0);
   const reduce = (n) => { while (n > 9) n = digits(n); return n; };
   const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const niceDate = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' });
+
+  // Each system returns: the sign shown, its element, which side it favours, the lucky number and notes.
+  function reading(sys, dob, tob, tz) {
+    const [y, m, d] = dob.split('-').map(Number);
+    const lifePath = reduce(digits(dob));
+    if (sys === 'vedic' && Astro) {
+      const v = Astro.vedicMoon(dob, tob, tz);
+      const notes = [];
+      if (!v.exact && (v.rashiChanges || v.nakshatraChanges)) {
+        const ch = v.rashiChanges ? 'from ' + v.rashiChanges.join(' into ') : 'from ' + v.nakshatraChanges.join(' into ') + ' nakshatra';
+        notes.push('The moon moved ' + ch + ' on your birth date, so we used its noon position. Add your birth time to be sure.');
+      } else if (!v.exact) notes.push('Your moon sign and nakshatra are the same all day on your birth date, so birth time doesn\'t change them.');
+      return { key: v.rashi, title: 'Moon sign ' + v.rashi + ' (' + v.western + ') · ' + v.nakshatra + ' nakshatra, pada ' + v.pada,
+               element: v.element, side: (v.element === 'Fire' || v.element === 'Air') ? 'L' : 'R',
+               number: v.number, numberWhy: v.nakshatra + ' is ruled by ' + v.lord + ', whose number is ' + v.number,
+               notes: notes.concat(['Sidereal zodiac with the Lahiri ayanamsa, the one most Indian almanacs use.']) };
+    }
+    if (sys === 'chinese' && Astro) {
+      const z = Astro.chineseZodiac(dob);
+      const notes = z.beforeNewYear ? ['You were born before Lunar New Year (' + z.lunarNewYear + '), so your sign belongs to ' + z.year + '.'] : [];
+      return { key: z.element + ' ' + z.animal, title: z.element + ' ' + z.animal + ' (' + (z.yang ? 'yang' : 'yin') + ')',
+               element: z.element, side: z.yang ? 'L' : 'R', number: lifePath,
+               numberWhy: 'your life-path number is ' + lifePath, notes };
+    }
+    const sign = sunSign(m, d);
+    return { key: sign.name, title: 'Sun sign ' + sign.name, element: sign.element,
+             side: (sign.element === 'Fire' || sign.element === 'Air') ? 'L' : 'R', number: lifePath,
+             numberWhy: 'your life-path number is ' + lifePath, notes: [] };
+  }
+
+  function rahuHtml(fdate, ftime) {
+    if (!fdate || !Astro) return '';
+    const r = Astro.rahuKalam(fdate, ftime);
+    let line = '<p><strong>Rahu Kalam</strong> on ' + esc(niceDate(fdate)) + ': about ' + r.start + ' to ' + r.end + '.';
+    if (r.inside === true) line += ' Your ' + esc(ftime) + ' departure falls inside it. Those who follow it usually step out of home before it begins.';
+    else if (r.inside === false) line += ' Your ' + esc(ftime) + ' departure is outside it.';
+    else line += ' Add your departure time to check it.';
+    return line + '</p><p class="muted small">Standard times for a 6 am to 6 pm day. Almanacs shift them with local sunrise, often by up to an hour. Tradition only.</p>';
+  }
 
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
-    const dob = document.getElementById('dob').value, pref = document.getElementById('pref').value;
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
-    if (!m) { out.innerHTML = '<p class="note">Enter your date of birth.</p>'; return; }
-    const sign = sunSign(Number(m[2]), Number(m[3]));
-    const lifePath = reduce(digits(dob));
-    const side = (sign.element === 'Fire' || sign.element === 'Air') ? 'L' : 'R';
-    const sideName = side === 'L' ? 'left' : 'right';
-    const SECTION_OF = { Fire: 'front', Air: 'middle', Earth: 'rear', Water: 'rear' };
-    const luckySection = SECTION_OF[sign.element];
+    const dob = val('dob'), pref = val('pref') || 'any', sys = val('sys') || 'vedic';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) { out.innerHTML = '<p class="note">Enter your date of birth.</p>'; return; }
+    const r = reading(sys, dob, val('tob'), Number(val('tz') || 330));
+    const sideName = r.side === 'L' ? 'left' : 'right';
+    const luckySection = SECTION_OF[r.element];
     const byType = Object.entries(data.seats).filter(([, f]) => pref === 'any' || f.p === pref);
     const inSection = byType.filter(([, f]) => f.z === luckySection);
     const pool = inSection.length ? inSection : byType;
     const secRows = (data.sections && data.sections[luckySection] && data.sections[luckySection].rows) || ['?', '?'];
     const scored = pool.map(([seat, f]) => {
       const row = parseInt(seat, 10), letter = seat.replace(/\d+/g, '');
-      const letterValue = letter.charCodeAt(0) - 64;
-      const seatNum = reduce(digits(row) + letterValue), rowNum = reduce(row);
+      const seatNum = reduce(digits(row) + (letter.charCodeAt(0) - 64)), rowNum = reduce(row);
       let score = 0; const why = [];
-      if (seatNum === lifePath) { score += 3; why.push(seat + ' adds up to ' + seatNum + ', your life-path number'); }
-      if (rowNum === lifePath) { score += 2; why.push('row ' + row + ' reduces to ' + rowNum); }
-      if (f.sd === side) { score += 1; why.push(sign.name + ' is a ' + sign.element.toLowerCase() + ' sign, paired with the ' + sideName + ' side'); }
+      if (seatNum === r.number) { score += 3; why.push(seat + ' adds up to ' + seatNum + ': ' + r.numberWhy); }
+      if (rowNum === r.number) { score += 2; why.push('row ' + row + ' reduces to ' + rowNum); }
+      if (f.sd === r.side) { score += 1; why.push(r.element.toLowerCase() + ' signs pair with the ' + sideName + ' side'); }
       if (f.z === luckySection) why.unshift('in your lucky ' + luckySection + ' section');
-      return { seat, score, why, tie: hash(dob + data.config + seat) };
+      return { seat, score, why, tie: hash(dob + sys + data.config + seat) };
     }).sort((a, b) => b.score - a.score || a.tie - b.tie);
     if (!scored.length) { out.innerHTML = '<p class="note">No seats of that type on this aircraft.</p>'; return; }
     const [top, ...rest] = scored;
@@ -1293,33 +1452,36 @@ LUCKY_JS = r"""(() => {
     const g = document.querySelector('g[data-seat="' + top.seat + '"]');
     if (g) { g.querySelector('rect').classList.add('lucky'); g.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
     out.innerHTML = '<p class="lucky-pick">Your lucky seat: ' + esc(top.seat) + '</p>' +
-      '<p>Lucky section: <strong>' + luckySection.charAt(0).toUpperCase() + luckySection.slice(1) + '</strong> (rows ' + secRows[0] + '–' + secRows[1] + '), the ' +
-      sign.element.toLowerCase() + ' section</p>' +
-      '<p>Sun sign ' + esc(sign.name) + ' · life-path number ' + lifePath + '</p>' +
+      '<p>' + esc(r.title) + ' · lucky number ' + r.number + '</p>' +
+      '<p>Lucky section: <strong>' + cap(luckySection) + '</strong> (rows ' + secRows[0] + '–' + secRows[1] + '), the ' +
+      r.element.toLowerCase() + ' section</p>' +
       '<ul>' + top.why.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' +
-      '<p class="muted small">Also lucky for you: ' + rest.slice(0, 2).map(r => esc(r.seat)).join(', ') +
-      '. Moon sign needs your birth time and place, so it isn\'t used here.</p>' +
+      r.notes.map(n => '<p class="muted small">' + esc(n) + '</p>').join('') +
+      rahuHtml(val('fdate'), val('ftime')) +
+      '<p class="muted small">Also lucky for you: ' + rest.slice(0, 2).map(x => esc(x.seat)).join(', ') + '.</p>' +
       '<p class="muted small">For fun only. It isn\'t a rating of any kind; use the facts above to choose a seat.</p>';
     const pageUrl = location.origin + location.pathname;
     const msg = 'My lucky seat on the ' + document.querySelector('h1').textContent.replace(/ seat map$/, '') + ' is ' + top.seat +
-      ' (' + sign.name + ', ' + luckySection + ' section) on MyLuckySeat. Find yours: ' + pageUrl + '#lucky';
+      ' (' + r.key + ', ' + luckySection + ' section) on MyLuckySeat. Find yours: ' + pageUrl + '#lucky';
     out.insertAdjacentHTML('beforeend', '<div class="sharebar">' +
       (navigator.share ? '<button type="button" class="share-native">Share</button>' : '') +
       '<a class="share-wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(msg) + '">Share on WhatsApp</a></div>');
     const nb = out.querySelector('.share-native');
     if (nb) nb.addEventListener('click', () => { navigator.share({ title: 'My lucky seat', text: msg, url: pageUrl + '#lucky' }).catch(() => {}); track('lucky_share', { via: 'native' }); });
     out.querySelector('.share-wa').addEventListener('click', () => track('lucky_share', { via: 'whatsapp' }));
-    track('lucky_seat', { config: data.config, sign: sign.name, pref });
+    track('lucky_seat', { config: data.config, system: sys, sign: r.key, pref, rahu: Boolean(val('fdate')) });
   });
 
-  // Arriving from the home-page shortcut or a shared link: #lucky=YYYY-MM-DD&pref=window
+  // Arriving from the home-page shortcut: #lucky=YYYY-MM-DD&pref=..&sys=..&tob=..&tz=..&fd=..&ft=..
   const h = new URLSearchParams(location.hash.replace(/^#/, ''));
   if (location.hash.startsWith('#lucky')) {
     const sec = document.getElementById('lucky');
     if (h.get('lucky')) {
-      document.getElementById('dob').value = h.get('lucky');
-      if (h.get('pref')) document.getElementById('pref').value = h.get('pref');
-      history.replaceState(null, '', location.pathname + '#lucky');   // drop the birth date from the address bar
+      const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+      set('dob', h.get('lucky')); set('pref', h.get('pref')); set('sys', h.get('sys'));
+      set('tob', h.get('tob')); set('tz', h.get('tz')); set('fdate', h.get('fd')); set('ftime', h.get('ft'));
+      if (h.get('tob') || h.get('fd')) { const det = form.querySelector('details'); if (det) det.open = true; }
+      history.replaceState(null, '', location.pathname + '#lucky');   // drop birth details from the address bar
       form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit'));
     }
     if (sec) setTimeout(() => sec.scrollIntoView({ block: 'start' }), 50);
@@ -1422,6 +1584,8 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 @media(max-width:700px){.mapcard{overflow-x:hidden}.mapcard svg{width:150%;max-width:none;margin-left:-25%}}
 .tablewrap{overflow-x:auto}main a{overflow-wrap:anywhere}.cite{font-size:12px;margin-left:4px;color:var(--muted)}.aircraft{border-top:4px solid var(--navy);background:var(--card);border-radius:14px;padding:16px;margin-top:24px}.aircraft h2{margin-top:0}.suppliers td:first-child{font-weight:600}.sections td{white-space:normal}
 .lucky .inline-form button{background:var(--yellow);color:var(--yellow-ink)}
+.sponsor,.adslot{margin-top:24px;background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px 16px}.sponsor-tag{margin:0 0 8px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}.sponsor-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.sponsor-item{display:flex;flex-direction:column;gap:4px;padding:12px;border:1px solid var(--line);border-radius:10px;text-decoration:none;color:var(--ink)}.sponsor-item:hover{border-color:var(--accent)}.sponsor-cta{color:var(--accent);font-weight:600;font-size:14px}ins.adsbygoogle{display:block;min-height:90px}
+.inline-form details.more{flex-basis:100%;width:100%}.inline-form details.more summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}.more-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}.more-grid label{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .lucky{border-top:4px solid var(--yellow)}.lookup{border-top:4px solid var(--accent)}
 .badge-fun{background:var(--lucky-bg);color:var(--lucky-ink)}
 .linkbtn{font:inherit;color:inherit;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
@@ -1484,7 +1648,7 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
     write("/index.html", index_page(s, pages))
     for path, md, title, desc in [
         ("/research/", research_md(s), "Where you sit and crash outcomes", "What crash studies found about front, middle and rear seats, how small they are, and why there is no safest seat."),
-        ("/privacy/", PRIVACY_MD, "Privacy", "What we measure, with which cookieless tools, and what we never collect."),
+        ("/privacy/", privacy_md(s), "Privacy", "What we measure, with which cookieless tools, and what we never collect."),
     ]:
         write(path + "index.html", text_page(s, md, path, title, desc))
         write(path.rstrip("/") + ".md", strip_anchors(md))
@@ -1523,6 +1687,9 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
     write("/assets/site.css", SITE_CSS)
     write("/assets/app.js", APP_JS.replace("__AI_REFERRERS__", json.dumps(AI_REFERRERS)))
     write("/assets/lucky.js", LUCKY_JS)
+    write("/assets/astro.js", ASTRO_JS)
+    if s.adsense_client:
+        write("/ads.txt", f"google.com, {s.adsense_client.replace('ca-', '', 1)}, DIRECT, f08c47fec0942fa0\n")
     write("/assets/favicon.svg", FAVICON)
     if s.indexnow_key:
         write(f"/{s.indexnow_key}.txt", s.indexnow_key)
@@ -1563,4 +1730,4 @@ def indexnow(site_dir: str | Path, settings: Settings | None = None) -> int:
 
 # Content hash of the CSS/JS so every change gets a new URL (assets are cached for a day).
 import hashlib as _hashlib
-ASSET_VERSION = _hashlib.sha256((SITE_CSS + APP_JS + LUCKY_JS).encode()).hexdigest()[:10]
+ASSET_VERSION = _hashlib.sha256((SITE_CSS + APP_JS + LUCKY_JS + ASTRO_JS).encode()).hexdigest()[:10]

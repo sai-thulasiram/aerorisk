@@ -42,6 +42,24 @@ Quota protection built in:
 
 Local test without a key: `npx wrangler dev --var ADB_MOCK:1`, which returns synthetic flights.
 
+## Ads and sponsored links
+
+Both are off until you configure them.
+
+**Sponsored (affiliate) links.** Edit `sponsors.json` in the repo: paste your tracking link into `url`, set `enabled` to `true`, commit. They show as one card labelled "Sponsored" on the home page and under the lucky seat on seat maps, never inside the crash-study section. Clicks are counted in Umami as `sponsor_click`.
+- India: Cuelinks or vCommission give one account for MakeMyTrip, Goibibo, Skyscanner India and hotel sites.
+- Worldwide: Travelpayouts (Aviasales, Kiwi.com, hotels).
+- Avoid anything selling on fear of flying or crashes next to this site's content.
+
+**Google AdSense.**
+1. Apply at adsense.google.com with `myluckyseat.in`. Approval usually needs a privacy page (you have one) and some real traffic.
+2. Add repository variable `ADSENSE_CLIENT` = your `ca-pub-…` id and re-run the workflow. This adds the AdSense tag, the verification meta tag and `/ads.txt`.
+3. In AdSense, create one **display ad unit** and add its numeric id as `ADSENSE_SLOT`. One ad shows on the home page below the seat maps and on seat maps below "About the aircraft".
+4. Keep **Auto ads off**, so Google doesn't place ads beside the crash-study colours.
+5. In AdSense → Privacy & messaging, publish a **European regulations (GDPR) message**. Google requires a certified consent message for visitors from the EEA, UK and Switzerland, and you get those from the Ryanair, easyJet and Wizz pages.
+
+Trade-off: turning AdSense on loosens the site's security policy (Google's scripts need inline styles and several Google domains) and adds cookies. Leave `ADSENSE_CLIENT` empty to switch it all off again.
+
 ## Reading feedback
 
 Visitors' feedback (the yellow **Feedback** button) is stored in a small database inside the Worker; nothing to set up.

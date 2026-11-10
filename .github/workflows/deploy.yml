@@ -36,6 +36,8 @@ jobs:
           CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
           ALLOW_AI_TRAINING: ${{ vars.ALLOW_AI_TRAINING }}
           INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+          ADSENSE_CLIENT: ${{ vars.ADSENSE_CLIENT }}
+          ADSENSE_SLOT: ${{ vars.ADSENSE_SLOT }}
         run: |
           test -n "$SITE_URL" || { echo "Set the SITE_URL repository variable"; exit 1; }
           python -m aerorisk site --out site

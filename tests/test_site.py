@@ -154,11 +154,14 @@ def test_match_index_and_lucky_assets(site):
     mi = json.loads((out / "api/v1/match-index.json").read_text())
     assert {c["id"] for c in mi["configs"]} == {c["id"] for c in list_configs()}
     assert all(c["path"].startswith("/seat-maps/") for c in mi["configs"])
-    lucky = (out / "assets/lucky.js").read_text().lower()
-    for word in ("safe", "risk", "surviv", "danger"):
-        assert word not in lucky, word
+    for asset in ("assets/lucky.js", "assets/astro.js"):
+        lucky = (out / asset).read_text().lower()
+        for word in ("safe", "risk", "surviv", "danger"):
+            assert word not in lucky, (asset, word)
     page = (out / "seat-maps/indigo-airbus-a321neo-232-seats/index.html").read_text()
-    assert 'src="/assets/lucky.js?v=' in page and "Just for fun" in page
+    assert 'src="/assets/lucky.js?v=' in page and 'src="/assets/astro.js?v=' in page and "Just for fun" in page
+    for fid in ('id="sys"', 'id="tob"', 'id="tz"', 'id="fdate"', 'id="ftime"', 'value="vedic"', 'value="chinese"'):
+        assert fid in page, fid
     assert "not mapped yet" in page and "28–29 in" in page
     home = (out / "index.html").read_text()
     assert 'id="lookupform"' in home
@@ -216,3 +219,41 @@ def test_multi_cabin_page(site):
     assert "share unknown" in page
     ix = (out / "seat-maps/air-india-express-boeing-737-max-8-189-seats/index.html").read_text()
     assert "Rows &amp; exits only" in ix
+
+
+def test_ads_off_by_default(site):
+    out, _ = site
+    assert not (out / "ads.txt").exists()
+    home = (out / "index.html").read_text()
+    assert "adsbygoogle" not in home and "Sponsored" not in home
+    assert "unsafe-inline" not in (out / "_headers").read_text()
+
+
+def test_adsense_and_sponsors_when_configured(tmp_path, monkeypatch):
+    import aerorisk.site as site_mod
+    sp = tmp_path / "sponsors.json"
+    sp.write_text(json.dumps({"items": [
+        {"id": "flights", "enabled": True, "title": "Compare fares", "url": "https://partner.example/x?aff=1", "where": ["home"]},
+        {"id": "off", "enabled": False, "title": "Hidden", "url": "https://partner.example/y"},
+        {"id": "nourl", "enabled": True, "title": "No link", "url": ""}]}))
+    monkeypatch.setattr(site_mod, "SPONSORS_FILE", sp)
+    out = tmp_path / "out"
+    build(out, Settings(url=URL, adsense_client="ca-pub-1234567890123456", adsense_slot="9876543210"))
+    assert (out / "ads.txt").read_text().strip() == "google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0"
+    home = (out / "index.html").read_text()
+    assert 'data-ad-slot="9876543210"' in home and "adsbygoogle.js?client=ca-pub-1234567890123456" in home
+    assert 'rel="sponsored noopener"' in home and "Compare fares" in home
+    assert "Hidden" not in home and "No link" not in home
+    seat = (out / "seat-maps/ryanair-boeing-737-800-189-seats/index.html").read_text()
+    assert "Compare fares" not in seat          # placed on home only
+    assert seat.index("adslot") > seat.index("Cabin sections and crash studies")   # never above the crash-study section
+    headers = (out / "_headers").read_text()
+    assert "pagead2.googlesyndication.com" in headers and "frame-src" in headers
+    privacy = (out / "privacy/index.html").read_text()
+    assert "Google AdSense" in privacy and "Sponsored" in privacy
+
+
+def test_bad_adsense_client_is_rejected(monkeypatch):
+    monkeypatch.setenv("ADSENSE_CLIENT", "pub-123")
+    with pytest.raises(SystemExit):
+        Settings.from_env()

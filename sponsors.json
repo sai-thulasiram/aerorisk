@@ -1,0 +1,32 @@
+{
+  "_readme": "Affiliate links shown in one card labelled 'Sponsored'. Paste your own tracking link into url and set enabled to true. Links without https:// stay hidden. 'where' is home and/or seatmap. At most 3 show at a time.",
+  "items": [
+    {
+      "id": "flights",
+      "enabled": false,
+      "title": "Compare fares",
+      "text": "Search fares across airlines for your next trip.",
+      "cta": "Search flights",
+      "url": "",
+      "where": ["home", "seatmap"]
+    },
+    {
+      "id": "hotels",
+      "enabled": false,
+      "title": "Stay near the airport",
+      "text": "Hotels for early departures and late arrivals.",
+      "cta": "Find a hotel",
+      "url": "",
+      "where": ["home", "seatmap"]
+    },
+    {
+      "id": "insurance",
+      "enabled": false,
+      "title": "Travel insurance",
+      "text": "Cover for delays, missed connections and lost bags.",
+      "cta": "Get a quote",
+      "url": "",
+      "where": ["home"]
+    }
+  ]
+}
