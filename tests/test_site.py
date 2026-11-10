@@ -58,7 +58,7 @@ def test_expected_files(site):
     out, res = site
     for rel in ["index.html", "404.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "_headers",
                 "openapi.json", ".well-known/api-catalog", "api/v1/index.json", "assets/app.js", "assets/site.css",
-                "assets/favicon.svg", "abc123def456.txt", "methodology/index.html", "methodology.md", "privacy.md"]:
+                "assets/favicon.svg", "abc123def456.txt", "research/index.html", "research.md", "privacy.md"]:
         assert (out / rel).exists(), rel
     assert res["seat_maps"] == len(list_configs()) and not any("SITE_URL" in w for w in res["warnings"])
 
@@ -95,7 +95,7 @@ def test_sitemap_and_robots(site):
     out, _ = site
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [e.text for e in ET.parse(out / "sitemap.xml").getroot().findall("s:url/s:loc", ns)]
-    assert len(locs) == len(list_configs()) + 4 and all(l.startswith(URL) for l in locs)
+    assert len(locs) == len(list_configs()) + 3 and all(l.startswith(URL) for l in locs)
     for l in locs:
         rel = l[len(URL):].lstrip("/")
         assert (out / rel / "index.html").exists() or (out / "index.html").exists()
@@ -171,9 +171,9 @@ def test_research_page_and_pattern_view(site):
         assert needle in research or needle in (out / "research.md").read_text(), needle
     page = (out / "seat-maps/ryanair-boeing-737-800-189-seats/index.html").read_text()
     assert 'data-view="pattern"' in page and "sec-rear" in page and "low confidence" in page
-    faq = [b for b in Collect_jsonld(page) if b.get("@type") == "FAQPage"][0]
-    safest = [q for q in faq["mainEntity"] if "safest" in q["name"]][0]["acceptedAnswer"]["text"]
-    assert "No seat is reliably safest" in safest and "rows 23–33" in safest
+    assert "No seat is reliably safest" in page and "rows 23–33" in page
+    assert not any(b.get("@type") == "FAQPage" for b in Collect_jsonld(page))
+    assert "/api/v1/" not in page.split("</head>")[1] and "llms.txt" not in page.split("</head>")[1]
     api = json.loads((out / "api/v1/seatmaps/FR-B738-189Y.json").read_text())
     assert api["sections"]["rear"]["band"] == "lower" and api["seat_safety"]["estimable"] is False
 

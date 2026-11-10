@@ -30,6 +30,15 @@ Quota protection built in:
 
 Local test without a key: `npx wrangler dev --var ADB_MOCK:1`, which returns synthetic flights.
 
+## Reading feedback
+
+Visitors' feedback (the yellow **Feedback** button) is stored in a small database inside the Worker; nothing to set up.
+
+1. Cloudflare → Workers & Pages → `aerorisk` → Settings → Variables and Secrets → **Add** → Type **Secret**, name `FEEDBACK_ADMIN_TOKEN`, value = a long random string you make up → **Deploy**.
+2. Read it at `https://<your-site>/api/feedback?token=<that string>`, or add `&format=csv` to download a spreadsheet.
+
+Without the secret, the read address returns "not found". Don't share the token: anyone with it can read emails people left.
+
 ## 0. Decide before you start (your call, not technical)
 
 - **Name and domain.** "AeroRisk" implies risk scores, which the site deliberately does not publish, and it is the phrase most likely to draw airline or press scrutiny. Consider a neutral name before buying a domain. If you rename, set `SITE_NAME`, edit `tools/og.html`, and run `python tools/make_og.py`.

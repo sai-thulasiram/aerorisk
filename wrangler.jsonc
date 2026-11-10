@@ -9,13 +9,17 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
-    "run_worker_first": ["/api/lookup"]
+    "run_worker_first": ["/api/lookup", "/api/feedback"]
   },
   // Protect the API quota (AeroDataBox free tier is small). Only cache misses count.
   "ratelimits": [
     { "name": "LOOKUP_PER_IP", "namespace_id": "1001", "simple": { "limit": 6, "period": 60 } },
-    { "name": "LOOKUP_GLOBAL", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }
+    { "name": "LOOKUP_GLOBAL", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } },
+    { "name": "FEEDBACK_PER_IP", "namespace_id": "1003", "simple": { "limit": 5, "period": 60 } }
   ],
+  // Feedback storage. Read it at /api/feedback?token=<FEEDBACK_ADMIN_TOKEN> (secret; add &format=csv for a spreadsheet).
+  "durable_objects": { "bindings": [{ "name": "FEEDBACK", "class_name": "FeedbackStore" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["FeedbackStore"] }],
   // Uncomment once your domain is on Cloudflare (or add it in the dashboard instead):
   // "routes": [
   //   { "pattern": "yourdomain.com", "custom_domain": true },

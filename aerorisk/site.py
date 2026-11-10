@@ -306,8 +306,8 @@ def head(s: Settings, *, title: str, description: str, path: str, jsonld: list[d
         f'<meta property="og:image" content="{_e(s.url)}/assets/og.png">',
         '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">',
         '<meta name="twitter:card" content="summary_large_image">',
-        '<meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)">',
-        '<meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">',
+        '<meta name="theme-color" content="#0b2545" media="(prefers-color-scheme: light)">',
+        '<meta name="theme-color" content="#07101f" media="(prefers-color-scheme: dark)">',
         '<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">',
         f'<link rel="stylesheet" href="/assets/site.css?v={ASSET_VERSION}">',
         f'<link rel="alternate" type="text/plain" title="LLM summary" href="/llms.txt">',
@@ -339,15 +339,30 @@ def shell(s: Settings, head_html: str, body: str) -> str:
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="brand" href="/"><img src="/assets/favicon.svg" alt="" width="22" height="22">{_e(s.name)}</a>
-<nav><a href="/#seat-maps">Seat maps</a><a href="/research/">Research</a><a href="/methodology/">Methodology</a></nav>
+<nav><a href="/#lookup">Find my cabin</a><a href="/#seat-maps">Seat maps</a><a href="/research/">Safest seats?</a></nav>
 </div></header>
 <main id="main" class="wrap">
 {body}
 </main>
 <footer class="foot"><div class="wrap">
 <p>{_e(s.name)} publishes sourced layout facts. Section colours summarise two small crash studies and are not a rating of any seat. Data: {_e(s.data_license)}{contact}.</p>
-<p><a href="/methodology/">Methodology</a> · <a href="/privacy/">Privacy</a> · <a href="/api/v1/index.json">JSON API</a> · <a href="/llms.txt">llms.txt</a></p>
+<p><a href="/research/">Where you sit and crash outcomes</a> · <a href="/privacy/">Privacy</a> · <button type="button" class="linkbtn" data-feedback-open>Send feedback</button></p>
 </div></footer>
+<button type="button" class="fab" data-feedback-open aria-haspopup="dialog">Feedback</button>
+<dialog id="feedback" aria-labelledby="fb-h">
+<form id="fbform" class="fbform">
+<div class="fbhead"><h2 id="fb-h">Tell us what you think</h2><button type="button" class="fbclose" data-feedback-close aria-label="Close">×</button></div>
+<fieldset class="chips"><legend>Was this page useful?</legend>
+<label><input type="radio" name="rating" value="up"> <span>Yes</span></label>
+<label><input type="radio" name="rating" value="down"> <span>Not really</span></label></fieldset>
+<label>What's it about?
+<select name="kind"><option value="idea">An idea or request</option><option value="wrong">Something is wrong on a seat map</option><option value="airline">Add my airline or aircraft</option><option value="other">Something else</option></select></label>
+<label>Your message <textarea name="message" rows="4" maxlength="1500" placeholder="For a wrong seat map, tell us the flight, date and what was different."></textarea></label>
+<label>Email (optional, only if you want a reply) <input name="email" type="email" maxlength="200" autocomplete="email"></label>
+<label class="hp" aria-hidden="true">Leave empty <input name="website" tabindex="-1" autocomplete="off"></label>
+<div class="fbactions"><button type="submit">Send</button><span class="muted small" id="fbstatus" aria-live="polite"></span></div>
+</form>
+</dialog>
 </body>
 </html>
 """
@@ -465,7 +480,6 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     src_html = "".join(f'<li><a href="{_e(u)}" rel="nofollow noopener" data-track="source_click">'
                        f'{_e(re.sub(r"^https?://(www[.])?", "", u))}</a></li>' for u in prov["sources"])
     conf_html = "".join(f"<li>{_e(c)}</li>" for c in prov.get("conflicts", []))
-    faq_html = "".join(f"<details><summary>{_e(q)}</summary><p>{_e(a)}</p></details>" for q, a in faq(p))
 
     svg = render_svg(p.cabin, title=False, inline_style=False, sections=True)
     secinfo = sections_info(p)
@@ -501,17 +515,6 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     <p class="muted">Select a seat on the map to see its position, pitch, exit row status and distance to the nearest exits.</p>
   </aside>
 </div>
-<section><h2>Key facts</h2><table class="facts">{facts_html}</table></section>
-{var_html}
-<section><h2>Row by row</h2>
-<details class="rows"><summary>Show all {f["row_count"]} rows</summary>
-<table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Pitch</th><th>Notes</th></tr></thead>
-<tbody>{"".join(row_html)}</tbody></table></details></section>
-<section><h2>Cabin sections and crash studies</h2>
-<p>{_e(safest_answer(p))}</p>
-<table class="facts sections"><thead><tr><th>Section</th><th>Rows</th><th>Crash-study pattern</th><th>Seats within 5 rows of an exit</th></tr></thead><tbody>{sec_rows}</tbody></table>
-<p class="small muted">Pattern basis: {_e(BASIS)}. It describes past accidents, not your flight, and no individual seat is rated. <a href="/research/">Read the studies and their limits</a></p></section>
-<section><h2>Questions</h2>{faq_html}</section>
 <section class="lucky" id="lucky" aria-labelledby="lucky-h">
 <h2 id="lucky-h">Lucky seat <span class="badge badge-fun">Just for fun</span></h2>
 <p class="muted">Picks a lucky section and seat from your birth date using your sun sign's element (fire: front, air: middle, earth and water: rear) and numerology. It's entertainment: it says nothing about comfort, exits or anything else on this page. Your birth date stays in your browser.</p>
@@ -522,12 +525,21 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 </form>
 <div id="luckyout" aria-live="polite"></div>
 </section>
+<section><h2>Key facts</h2><table class="facts">{facts_html}</table></section>
+<section><h2>Cabin sections and crash studies</h2>
+<p>{_e(safest_answer(p))}</p>
+<table class="facts sections"><thead><tr><th>Section</th><th>Rows</th><th>Crash-study pattern</th><th>Seats within 5 rows of an exit</th></tr></thead><tbody>{sec_rows}</tbody></table>
+<p class="small muted">Pattern basis: {_e(BASIS)}. It describes past accidents, not your flight, and no individual seat is rated. <a href="/research/">Read the studies and their limits</a></p></section>
+{var_html}
+<section><h2>Row by row</h2>
+<details class="rows"><summary>Show all {f["row_count"]} rows</summary>
+<table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Pitch</th><th>Notes</th></tr></thead>
+<tbody>{"".join(row_html)}</tbody></table></details></section>
 <section><h2>Sources</h2>
 <p class="muted">{_e(prov["method"])}. First-party check: {_e(prov.get("primary_source_check", "not done"))}.</p>
 <ul>{src_html}</ul>
 <h3>How each fact is corroborated</h3><ul>{corr_html}</ul>
 {f"<h3>Where sources disagree</h3><ul>{conf_html}</ul>" if conf_html else ""}
-<p class="small"><a href="/api/v1/seatmaps/{_e(cfg["id"])}.json">JSON</a> · <a href="{_e(p.md_path)}">Markdown</a></p>
 </section>
 <script type="application/json" id="seatdata">{payload}</script>
 <script defer src="/assets/lucky.js?v={ASSET_VERSION}"></script>
@@ -550,9 +562,7 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     }
     if s.license_url:
         dataset["license"] = s.license_url
-    faqld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
-        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq(p)]}
-    return shell(s, head(s, title=title, description=desc, path=p.path, jsonld=[crumbs, dataset, faqld],
+    return shell(s, head(s, title=title, description=desc, path=p.path, jsonld=[crumbs, dataset],
                          md_path=p.md_path, og_type="article"), body)
 
 
@@ -569,7 +579,7 @@ def index_page(s: Settings, pages: list[Page]) -> str:
             f"each fact sourced and marked with how well it is verified.")
     body = f"""
 <section class="hero">
-<h1>{_e(s.tagline)}</h1>
+<h1>Aircraft seat maps where <span>every fact has a source</span></h1>
 <p class="lede">Row-by-row aircraft seat maps showing exit rows, seats that don't exist, windowless seats and pitch. Every fact lists its sources and how well it has been checked. Where we don't know, we say so.</p>
 </section>
 <section class="lookup" id="lookup" aria-labelledby="lookup-h">
@@ -593,7 +603,7 @@ def index_page(s: Settings, pages: list[Page]) -> str:
 <section class="three">
 <div><h3>Sourced, fact by fact</h3><p>Each layout records which sources back each fact and where they disagree.</p></div>
 <div><h3>Honest about gaps</h3><p>Unknown pitch is shown as unknown. Drafts are labelled as drafts until checked against the airline's own seat map.</p></div>
-<div><h3>No invented safety scores</h3><p>We show exits and distances, not survival percentages that no dataset can support. <a href="/methodology/#no-scores">Why</a></p></div>
+<div><h3>Crash studies, with their limits</h3><p>Colour the cabin by what published crash studies found, and see how small those studies are. <a href="/research/">Read more</a></p></div>
 </section>
 
 """
@@ -608,38 +618,6 @@ def index_page(s: Settings, pages: list[Page]) -> str:
                          jsonld=[site_ld, org_ld, catalog]), body)
 
 
-METHODOLOGY_MD = """# Methodology
-
-## What we publish
-Cabin layout facts for specific airline and aircraft configurations: seat count, row numbering, which seats exist, exit rows, windowless seats, approximate seat pitch, and how many rows each seat is from the nearest exits.
-
-## Where the data comes from
-Each configuration is hand-authored from public sources such as airline fee and fleet pages and seat-map reference sites. It is not licensed airline layout (LOPA) data. Every configuration lists its sources, which sources back each fact, and where sources disagree.
-
-## Verification status
-- **Draft**: built from public sources, not yet checked against the airline's live seat map.
-- **Verified**: checked against the airline's live seat map or the aircraft's safety card for at least one aircraft of that configuration.
-
-## Which version will I get?
-Airlines often fly more than one cabin version of the same aircraft type, and swap aircraft on a route. A flight number gives the aircraft type; only the registration identifies the exact cabin. We state this as a confidence level:
-- **Exact**: registration matched to a verified configuration.
-- **Likely**: airline and type known; versions ranked by their share of the fleet.
-- **Unavailable**: type unknown or not covered yet.
-
-## Seat safety and section colours {#no-scores}
-Seat-level survival outcomes are recorded for only a small number of survivable accidents, and outcomes depend mostly on accident type, fire, smoke and evacuation conditions rather than seat number. That data cannot support a reliable survival probability for an individual seat, so we don't publish one.
-Each cabin is split into thirds (front, middle, rear). The optional "Crash-study pattern" view colours the sections by what two published studies found: the rear third had the lowest fatality figure in both, while front and middle did not differ consistently, so they share a colour. The legend states the basis next to the colours. See **Where you sit and crash outcomes** (`/research/`) for the numbers and their limits.
-The "Near an exit" view marks seats within five rows of an exit, the most consistent finding in evacuation research.
-
-## Corrections
-If a seat map is wrong for your flight, tell us the airline, flight date, aircraft registration (shown on many airline apps and flight trackers) and what differs.
-
-## API and licence {#api}
-- Catalog: `/api/v1/index.json`
-- One configuration with every seat: `/api/v1/seatmaps/{id}.json`
-- OpenAPI description: `/openapi.json`
-"""
-
 PRIVACY_MD = """# Privacy
 
 We measure how the site is used so we can improve it. We do not use cookies or advertising trackers, and we do not collect names, emails or flight bookings.
@@ -650,6 +628,9 @@ We measure how the site is used so we can improve it. We do not use cookies or a
 
 ## Flight lookup
 - The flight number and date you enter are sent to our server and to AeroDataBox, our flight data provider, to find the aircraft. We keep results in a short-lived cache and do not link them to you.
+
+## Feedback
+- If you send feedback, we store your message, the page it was sent from, and your email only if you give it. We use it to fix seat maps and improve the site.
 
 ## Lucky seat
 - Your birth date never leaves your browser. Only the resulting sun sign and seat type are counted.
@@ -821,7 +802,7 @@ def llms_txt(s: Settings, pages: list[Page]) -> str:
               f"- [Full text]({s.url}/llms-full.txt): all seat maps in one Markdown file", "",
               "## Docs", "",
               f"- [Where you sit and crash outcomes]({s.url}/research.md): the studies, their samples and limits, and how the section colours are derived",
-              f"- [Methodology]({s.url}/methodology.md): sources, verification status, confidence levels, why there are no safety scores", "",
+              "",
               "## Optional", "",
               f"- [Privacy]({s.url}/privacy.md)"]
     return "\n".join(lines) + "\n"
@@ -924,6 +905,32 @@ APP_JS = r"""(() => {
     try { if (window.umami && typeof window.umami.track === 'function') window.umami.track(name, data || {}); } catch (_) {}
   };
   window.aeroTrack = track;
+
+  // 0. Feedback dialog (every page)
+  const dlg = document.getElementById('feedback');
+  if (dlg) {
+    const open = () => { try { dlg.showModal(); } catch (_) { dlg.setAttribute('open', ''); } track('feedback_open', { page: location.pathname }); };
+    document.querySelectorAll('[data-feedback-open]').forEach(b => b.addEventListener('click', open));
+    dlg.querySelectorAll('[data-feedback-close]').forEach(b => b.addEventListener('click', () => dlg.close()));
+    dlg.addEventListener('click', ev => { if (ev.target === dlg) dlg.close(); });
+    const fb = document.getElementById('fbform'), st = document.getElementById('fbstatus'), btn = fb.querySelector('button[type=submit]');
+    let cfgId = null; try { cfgId = JSON.parse(document.getElementById('seatdata').textContent).config; } catch (_) {}
+    fb.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const fd = new FormData(fb);
+      const body = { page: location.pathname, config: cfgId, rating: fd.get('rating') || null, kind: fd.get('kind'),
+                     message: String(fd.get('message') || '').trim(), email: String(fd.get('email') || '').trim(), website: fd.get('website') || '' };
+      if (!body.rating && !body.message) { st.textContent = 'Choose Yes or Not really, or write a message.'; return; }
+      st.textContent = 'Sending…'; btn.disabled = true;
+      try {
+        const r = await fetch('/api/feedback', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok) { st.textContent = 'Thanks, got it.'; fb.reset(); track('feedback_submit', { kind: body.kind, rating: body.rating || 'none' }); setTimeout(() => { dlg.close(); st.textContent = ''; }, 1400); }
+        else st.textContent = j.message || 'Could not send. Please try again.';
+      } catch (_) { st.textContent = 'Network error. Please try again.'; }
+      btn.disabled = false;
+    });
+  }
 
   // 1. Visits referred by AI assistants (referrer, or utm_source such as chatgpt.com)
   try {
@@ -1126,12 +1133,9 @@ LUCKY_JS = r"""(() => {
 """
 
 SITE_CSS = """
-:root{--bg:#f7f6f2;--card:#fff;--ink:#1d1c1a;--muted:#6b675f;--line:#c9c4b8;--accent:#1f5fbf;--fus:#efece5;--seat:#fff;
---exitrow:#dcefe1;--sel:#1f5fbf;--exit:#c0392b;--fac:#dcd8cf;--warn:#7a4f00;--warnbg:#fff1d6;--ok:#1d6b3a;--okbg:#ddf3e4;--lucky-bg:#f1e6ff;--lucky-ink:#5b2a9e;--band-lower:#cfe9e4;--band-higher:#f6dcc4}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1e1d1b;--ink:#ecebe6;--muted:#a19d94;
---line:#4d4a43;--accent:#7aa7ff;--fus:#24231f;--seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;
---warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff;--band-lower:#1d3d39;--band-higher:#4a3220}}
-:root[data-theme="dark"]{--bg:#141413;--card:#1e1d1b;--ink:#ecebe6;--muted:#a19d94;--line:#4d4a43;--accent:#7aa7ff;--fus:#24231f;
+:root{--bg:#f3f6fb;--card:#fff;--ink:#0f1b2d;--muted:#5a6578;--line:#d2d9e5;--accent:#1d4ed8;--navy:#0b2545;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#eaf0f8;--seat:#fff;--exitrow:#fff1bf;--sel:#1d4ed8;--exit:#d92d20;--fac:#d7deea;--warn:#7a4f00;--warnbg:#fff3cd;--ok:#146c43;--okbg:#d9f2e4;--lucky-bg:#ffe28a;--lucky-ink:#5c4300;--band-lower:#cdebdc;--band-higher:#fbd8c6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1120;--card:#121b2d;--ink:#e8edf6;--muted:#9aa6bb;--line:#26324a;--accent:#7aa8ff;--navy:#07101f;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#16213a;--seat:#1c2944;--exitrow:#3b3212;--sel:#5b8ff0;--exit:#f2705f;--fac:#2a3650;--warn:#ffd36b;--warnbg:#33290e;--ok:#7fd8a6;--okbg:#123224;--lucky-bg:#4a3a08;--lucky-ink:#ffd866;--band-lower:#173a2c;--band-higher:#4a2a1c}}
+:root[data-theme="dark"]{--bg:#0a1120;--card:#121b2d;--ink:#e8edf6;--muted:#9aa6bb;--line:#26324a;--accent:#7aa8ff;--navy:#07101f;--navy-ink:#fff;--yellow:#ffc72c;--yellow-ink:#0b2545;--fus:#16213a;--seat:#1c2944;--exitrow:#3b3212;--sel:#5b8ff0;--exit:#f2705f;--fac:#2a3650;--warn:#ffd36b;--warnbg:#33290e;--ok:#7fd8a6;--okbg:#123224;--lucky-bg:#4a3a08;--lucky-ink:#ffd866;--band-lower:#173a2c;--band-higher:#4a2a1c}
 --seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff;--band-lower:#1d3d39;--band-higher:#4a3220}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -1139,10 +1143,10 @@ a{color:var(--accent)}a:hover{text-decoration-thickness:2px}
 .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
 .skip{position:absolute;left:-999px}.skip:focus{left:16px;top:8px;background:var(--card);padding:8px;z-index:9}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.top{border-bottom:1px solid var(--line);background:var(--card)}
+.top{background:var(--navy);color:var(--navy-ink)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;flex-wrap:wrap}
-.brand{display:flex;gap:8px;align-items:center;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
-nav a{margin-left:16px;color:var(--ink);text-decoration:none;font-size:15px}nav a:first-child{margin-left:0}
+.brand{display:flex;gap:8px;align-items:center;font-weight:800;color:var(--navy-ink);text-decoration:none;letter-spacing:-.01em;font-size:18px}
+nav{display:flex;flex-wrap:wrap;gap:4px 18px}nav a{color:var(--navy-ink);opacity:.88;text-decoration:none;font-size:15px}nav a:hover{opacity:1;color:var(--yellow)}
 main{padding:24px 16px 48px}
 h1{font-size:clamp(26px,4.5vw,40px);line-height:1.15;letter-spacing:-.02em;margin:8px 0 12px}
 h2{font-size:22px;letter-spacing:-.01em;margin:36px 0 12px}h3{font-size:17px;margin:20px 0 8px}
@@ -1150,12 +1154,12 @@ h2{font-size:22px;letter-spacing:-.01em;margin:36px 0 12px}h3{font-size:17px;mar
 .crumbs{font-size:14px;color:var(--muted)}.crumbs a{color:var(--muted);margin:0}
 .badge{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--warnbg);color:var(--warn);margin-right:8px}
 .badge-verified{background:var(--okbg);color:var(--ok)}
-.hero{padding:24px 0 8px}
+.hero{padding:28px 0 8px}.hero h1 span{background:linear-gradient(transparent 62%,var(--yellow) 62%);padding:0 2px}
 .searchrow{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px}
 input[type=search]{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);min-width:0;width:min(100%,320px)}
 .cards{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 .card a{display:flex;flex-direction:column;gap:2px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);text-decoration:none;height:100%}
-.card a:hover{border-color:var(--accent)}.card .op{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.card a:hover{border-color:var(--accent);box-shadow:0 4px 14px rgba(15,27,45,.08)}.card a{border-left:4px solid var(--yellow)}.card .op{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .card .ac{font-size:19px;font-weight:650}
 .three{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:32px}
 .three>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}.three h3{margin-top:0}
@@ -1176,7 +1180,7 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .inline-form{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:12px 0}
 .inline-form label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted);min-width:0}
 .inline-form input,.inline-form select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0;max-width:100%}
-.inline-form button{font:inherit;font-weight:600;color:#fff;background:var(--accent);border:0;border-radius:10px;padding:10px 16px;cursor:pointer}
+.inline-form button{font:inherit;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:10px;padding:10px 16px;cursor:pointer}
 .inline-form button:disabled,.inline-form input:disabled{opacity:.55;cursor:not-allowed}
 .lookup,.lucky{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:24px}
 .lookup h2,.lucky h2{margin-top:0}
@@ -1188,7 +1192,7 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .viewbar{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
 .viewbtn{font:inherit;font-size:14px;padding:6px 10px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 .viewbtn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.legend{font-size:13px;color:var(--muted);margin:0 0 8px;display:block}.legend p{margin:4px 0 0}
+.legend{font-size:13px;color:var(--muted);margin:0 0 8px;display:block}.legend[hidden]{display:none}.legend p{margin:4px 0 0}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin:0 5px 0 8px;border:1px solid var(--line)}
 .sw:first-child{margin-left:0}td .sw,dd .sw{margin-left:0}
 .sw-exit{background:var(--exitrow)}.sw-door{background:var(--exit);border-color:var(--exit)}
@@ -1199,11 +1203,30 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .view-near .seat.exitrow{fill:var(--seat)}.view-near .seat.near-exit{stroke:var(--accent);stroke-width:2.2}
 .view-pattern .seat.sel,.view-near .seat.sel{fill:var(--sel)}
 .tablewrap{overflow-x:auto}.sections td{white-space:normal}
+.lucky .inline-form button{background:var(--yellow);color:var(--yellow-ink)}
+.lucky{border-top:4px solid var(--yellow)}.lookup{border-top:4px solid var(--accent)}
+.badge-fun{background:var(--lucky-bg);color:var(--lucky-ink)}
+.linkbtn{font:inherit;color:inherit;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.fab{position:fixed;right:16px;bottom:16px;z-index:20;font:inherit;font-weight:700;font-size:15px;color:var(--yellow-ink);background:var(--yellow);border:0;border-radius:99px;padding:10px 16px;box-shadow:0 6px 18px rgba(11,37,69,.25);cursor:pointer}
+dialog#feedback{border:0;border-radius:16px;padding:0;width:min(480px,calc(100vw - 32px));background:var(--card);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+dialog#feedback::backdrop{background:rgba(7,16,31,.55)}
+.fbform{display:flex;flex-direction:column;gap:12px;padding:18px}
+.fbhead{display:flex;justify-content:space-between;align-items:center}.fbhead h2{margin:0;font-size:20px}
+.fbclose{font-size:26px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:0 4px}
+.fbform label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted);min-width:0}.fbform textarea{resize:vertical}
+.fbform input,.fbform select,.fbform textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%;min-width:0;max-width:100%}
+.chips{border:0;padding:0;margin:0;display:flex;gap:8px;flex-wrap:wrap}.chips legend{font-size:14px;color:var(--muted);margin-bottom:6px;padding:0}
+.chips label{flex-direction:row;align-items:center}.chips input{position:absolute;opacity:0;width:1px}
+.chips span{display:inline-block;padding:7px 14px;border:1px solid var(--line);border-radius:99px;color:var(--ink);cursor:pointer}
+.chips input:checked+span{background:var(--accent);border-color:var(--accent);color:#fff}.chips input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.fbactions{display:flex;align-items:center;gap:12px}.fbactions button{font:inherit;font-weight:700;color:var(--yellow-ink);background:var(--yellow);border:0;border-radius:10px;padding:10px 18px;cursor:pointer}
+.hp{position:absolute!important;left:-9999px}
+main{padding-bottom:80px}
 .foot{border-top:1px solid var(--line);padding:16px 0;font-size:14px;color:var(--muted)}.foot a{color:var(--muted)}
 """ + SVG_CSS
 
-FAVICON = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1f5fbf"/>'
-           '<rect x="9" y="7" width="14" height="13" rx="4" fill="#fff"/><rect x="7" y="21" width="18" height="4" rx="2" fill="#fff"/></svg>')
+FAVICON = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0b2545"/>'
+           '<rect x="9" y="7" width="14" height="13" rx="4" fill="#ffc72c"/><rect x="7" y="21" width="18" height="4" rx="2" fill="#ffc72c"/></svg>')
 
 
 # --------------------------------------------------------------------------- build
@@ -1242,7 +1265,6 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
 
     write("/index.html", index_page(s, pages))
     for path, md, title, desc in [
-        ("/methodology/", METHODOLOGY_MD, "Methodology", "How seat maps are sourced and verified, confidence levels, and how section colours are derived."),
         ("/research/", research_md(s), "Where you sit and crash outcomes", "What crash studies found about front, middle and rear seats, how small they are, and why there is no safest seat."),
         ("/privacy/", PRIVACY_MD, "Privacy", "What we measure, with which cookieless tools, and what we never collect."),
     ]:
@@ -1271,11 +1293,11 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
     write("/.well-known/api-catalog", json.dumps({"linkset": [{
         "anchor": s.url + "/api/v1/",
         "service-desc": [{"href": s.url + "/openapi.json", "type": "application/openapi+json"}],
-        "service-doc": [{"href": s.url + "/methodology/#api", "type": "text/html"}]}]}, indent=1))
+        "service-doc": [{"href": s.url + "/llms.txt", "type": "text/plain"}]}]}, indent=1))
     write("/llms.txt", llms_txt(s, pages))
     write("/llms-full.txt", "\n\n---\n\n".join(
         [llms_txt(s, pages)] + [seatmap_md(s, p, p.cfg["provenance"].get("authored_at", s.build_date)) for p in pages]
-        + [strip_anchors(METHODOLOGY_MD)]))
+        + [strip_anchors(research_md(s))]))
     write("/robots.txt", robots_txt(s))
     write("/sitemap.xml", sitemap_xml(s, sitemap))
     write("/_headers", headers_file(s, md_paths))
