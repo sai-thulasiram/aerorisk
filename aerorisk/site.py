@@ -30,7 +30,8 @@ from pathlib import Path
 from typing import Any
 
 from .fleet import load_tail_overrides
-from .layout import Cabin, build_cabin, list_configs
+from .layout import Cabin, build_cabin, list_configs, section_bounds
+from .research import BAND_LABEL, BANDS, BASIS, CAVEATS, EXIT_STUDY, STUDIES
 from .render import SVG_CSS, render_svg
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
@@ -232,6 +233,29 @@ def variants_for(cfg: dict[str, Any], all_cfgs: list[dict[str, Any]]) -> list[di
     return out
 
 
+def sections_info(p: Page) -> dict[str, dict[str, Any]]:
+    bounds = section_bounds(p.cfg, p.cabin.rows)
+    info = {}
+    for name, (lo, hi) in bounds.items():
+        seats = [x for x in p.cabin.seats if x.section == name]
+        info[name] = {"rows": [lo, hi], "seats": len(seats), "near_exit_seats": sum(x.near_exit for x in seats),
+                      "band": BANDS[name], "band_label": BAND_LABEL[BANDS[name]]}
+    return info
+
+
+def safest_answer(p: Page) -> str:
+    sec = sections_info(p)
+    r = sec["rear"]["rows"]
+    far = sorted({x.row for x in p.cabin.seats if not x.near_exit})
+    ans = (f"No seat is reliably safest. In two small US studies (37 crashes, 1971–2007), passengers in the rear third "
+           f"of the cabin died less often than those further forward; on this aircraft that is rows {r[0]}–{r[1]}. "
+           "Results depend heavily on the type of accident, and the FAA says there is no safest seat. "
+           "The most consistent finding is sitting within about five rows of an exit")
+    ans += (f"; rows {_ranges(far)} are more than five rows from any exit." if far else
+            "; every row on this aircraft is within five rows of an exit.")
+    return ans
+
+
 def faq(p: Page) -> list[tuple[str, str]]:
     f, cfg = p.facts, p.cfg
     name = f'{cfg["operator"]["name"]} {cfg["aircraft"]["name"]}'
@@ -254,9 +278,7 @@ def faq(p: Page) -> list[tuple[str, str]]:
         q.append((f"Which seats on the {name} have no window?",
                   f'{_join(f["no_window"])} have no window.' +
                   (f' Windows are offset at {", ".join(f["misaligned_window"])}.' if f["misaligned_window"] else "")))
-    q.append((f"Which seat is safest on the {name}?",
-              "No validated dataset supports a per-seat survival probability, so we do not rank seats by safety. "
-              "We show verifiable facts instead: exit rows and how many rows each seat is from the nearest exits."))
+    q.append((f"Which seat is safest on the {name}?", safest_answer(p)))
     return q
 
 
@@ -317,13 +339,13 @@ def shell(s: Settings, head_html: str, body: str) -> str:
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="brand" href="/"><img src="/assets/favicon.svg" alt="" width="22" height="22">{_e(s.name)}</a>
-<nav><a href="/#seat-maps">Seat maps</a><a href="/methodology/">Methodology</a></nav>
+<nav><a href="/#seat-maps">Seat maps</a><a href="/research/">Research</a><a href="/methodology/">Methodology</a></nav>
 </div></header>
 <main id="main" class="wrap">
 {body}
 </main>
 <footer class="foot"><div class="wrap">
-<p>{_e(s.name)} publishes layout facts, not safety ratings. Data: {_e(s.data_license)}{contact}.</p>
+<p>{_e(s.name)} publishes sourced layout facts. Section colours summarise two small crash studies and are not a rating of any seat. Data: {_e(s.data_license)}{contact}.</p>
 <p><a href="/methodology/">Methodology</a> · <a href="/privacy/">Privacy</a> · <a href="/api/v1/index.json">JSON API</a> · <a href="/llms.txt">llms.txt</a></p>
 </div></footer>
 </body>
@@ -332,6 +354,13 @@ def shell(s: Settings, head_html: str, body: str) -> str:
 
 
 def status_badge(cfg: dict[str, Any]) -> str:
+    if cfg.get("detail") == "sections_only":
+        return ('<span class="badge">Section map · rows and exits only; seat-level details not mapped</span>' +
+                _status_badge(cfg))
+    return _status_badge(cfg)
+
+
+def _status_badge(cfg: dict[str, Any]) -> str:
     st = cfg["provenance"]["status"]
     label = {"draft_unverified": "Draft · not yet checked against the airline's live seat map",
              "verified": "Verified against the airline's live seat map"}.get(st, st.replace("_", " "))
@@ -340,7 +369,7 @@ def status_badge(cfg: dict[str, Any]) -> str:
 
 def seat_payload(cabin: Cabin) -> dict[str, Any]:
     return {s.seat: {"p": s.position, "sd": s.side, "a": s.seats_to_aisle, "pi": s.pitch_in, "ps": s.pitch_source,
-                     "x": s.in_exit_row, "f": s.flags,
+                     "x": s.in_exit_row, "f": s.flags, "z": s.section, "ne": s.near_exit,
                      "e": [{"id": e["exit"], "k": e["kind"], "d": e["direction"], "r": e["rows_between"]}
                            for e in s.nearest_exits]}
             for s in cabin.seats}
@@ -438,8 +467,14 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
     conf_html = "".join(f"<li>{_e(c)}</li>" for c in prov.get("conflicts", []))
     faq_html = "".join(f"<details><summary>{_e(q)}</summary><p>{_e(a)}</p></details>" for q, a in faq(p))
 
-    svg = render_svg(p.cabin, title=False, inline_style=False)
-    payload = json.dumps({"config": cfg["id"], "pitchRange": f["pitch_default_text"], "seats": seat_payload(p.cabin)},
+    svg = render_svg(p.cabin, title=False, inline_style=False, sections=True)
+    secinfo = sections_info(p)
+    sec_rows = "".join(
+        f'<tr><th scope=row>{name.capitalize()}</th><td>{v["rows"][0]}–{v["rows"][1]}</td>'
+        f'<td><span class="sw sw-{v["band"]}"></span>{_e(v["band_label"])}</td>'
+        f'<td>{v["near_exit_seats"]} of {v["seats"]}</td></tr>' for name, v in secinfo.items())
+    payload = json.dumps({"config": cfg["id"], "pitchRange": f["pitch_default_text"],
+                          "sections": secinfo, "seats": seat_payload(p.cabin)},
                          separators=(",", ":")).replace("</", "<\\/")
 
     body = f"""
@@ -449,8 +484,17 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <p>{status_badge(cfg)} <span class="muted">Updated {_e(updated)}</span></p>
 <div class="grid">
   <section class="mapcard" aria-label="Interactive seat map">
-    <p class="muted small">Tap a seat. Exit rows are shaded; red marks are exits.</p>
-    {svg}
+    <div class="viewbar" role="group" aria-label="Map view">
+      <button type="button" class="viewbtn on" data-view="facts" aria-pressed="true">Seat facts</button>
+      <button type="button" class="viewbtn" data-view="pattern" aria-pressed="false">Crash-study pattern</button>
+      <button type="button" class="viewbtn" data-view="near" aria-pressed="false">Near an exit</button>
+    </div>
+    <div class="legend" data-for="facts"><span class="sw sw-exit"></span>Exit row <span class="sw sw-door"></span>Exit</div>
+    <div class="legend" data-for="pattern" hidden><span class="sw sw-lower"></span>Lower in both studies <span class="sw sw-higher"></span>Higher
+      <p class="small muted">{_e(BASIS)}. Front and middle don't differ consistently, so they share a colour. <a href="/research/">What the studies found</a></p></div>
+    <div class="legend" data-for="near" hidden><span class="sw sw-near"></span>Within 5 rows of an exit
+      <p class="small muted">The most consistent finding in evacuation research (University of Greenwich). <a href="/research/#exits">Source</a></p></div>
+    <div class="mapwrap view-facts" id="mapwrap">{svg}</div>
   </section>
   <aside class="panel" id="panel" aria-live="polite">
     <h2>Seat details</h2>
@@ -463,11 +507,14 @@ def seatmap_page(s: Settings, p: Page, updated: str) -> str:
 <details class="rows"><summary>Show all {f["row_count"]} rows</summary>
 <table class="rowtable"><thead><tr><th>Row</th><th>Seats</th><th>Pitch</th><th>Notes</th></tr></thead>
 <tbody>{"".join(row_html)}</tbody></table></details></section>
-<section><h2>Seat safety</h2><p>No validated occupant-level dataset supports a survival probability for individual seats, so we don't publish one. Distance to exits is shown as a layout fact, not a safety rating. <a href="/methodology/#no-scores">Why</a></p></section>
+<section><h2>Cabin sections and crash studies</h2>
+<p>{_e(safest_answer(p))}</p>
+<table class="facts sections"><thead><tr><th>Section</th><th>Rows</th><th>Crash-study pattern</th><th>Seats within 5 rows of an exit</th></tr></thead><tbody>{sec_rows}</tbody></table>
+<p class="small muted">Pattern basis: {_e(BASIS)}. It describes past accidents, not your flight, and no individual seat is rated. <a href="/research/">Read the studies and their limits</a></p></section>
 <section><h2>Questions</h2>{faq_html}</section>
 <section class="lucky" id="lucky" aria-labelledby="lucky-h">
 <h2 id="lucky-h">Lucky seat <span class="badge badge-fun">Just for fun</span></h2>
-<p class="muted">Picks a seat from your birth date using your sun sign and numerology. It's entertainment: it says nothing about comfort, exits or anything else on this page. Your birth date stays in your browser.</p>
+<p class="muted">Picks a lucky section and seat from your birth date using your sun sign's element (fire: front, air: middle, earth and water: rear) and numerology. It's entertainment: it says nothing about comfort, exits or anything else on this page. Your birth date stays in your browser.</p>
 <form id="luckyform" class="inline-form">
 <label>Date of birth <input type="date" id="dob" required></label>
 <label>Seat type <select id="pref"><option value="any">Any</option><option value="window">Window</option><option value="aisle">Aisle</option><option value="middle">Middle</option></select></label>
@@ -579,8 +626,10 @@ Airlines often fly more than one cabin version of the same aircraft type, and sw
 - **Likely**: airline and type known; versions ranked by their share of the fleet.
 - **Unavailable**: type unknown or not covered yet.
 
-## Why there are no seat safety scores {#no-scores}
-Seat-level survival outcomes are recorded for only a small number of survivable accidents, and outcomes depend mostly on accident type, fire, smoke and evacuation conditions rather than seat number. That data cannot support a reliable survival probability for an individual seat, so we don't publish one. Exit distance is shown as a layout fact only.
+## Seat safety and section colours {#no-scores}
+Seat-level survival outcomes are recorded for only a small number of survivable accidents, and outcomes depend mostly on accident type, fire, smoke and evacuation conditions rather than seat number. That data cannot support a reliable survival probability for an individual seat, so we don't publish one.
+Each cabin is split into thirds (front, middle, rear). The optional "Crash-study pattern" view colours the sections by what two published studies found: the rear third had the lowest fatality figure in both, while front and middle did not differ consistently, so they share a colour. The legend states the basis next to the colours. See **Where you sit and crash outcomes** (`/research/`) for the numbers and their limits.
+The "Near an exit" view marks seats within five rows of an exit, the most consistent finding in evacuation research.
 
 ## Corrections
 If a seat map is wrong for your flight, tell us the airline, flight date, aircraft registration (shown on many airline apps and flight trackers) and what differs.
@@ -614,17 +663,61 @@ Questions about this policy: see the contact link in the footer.
 """
 
 
+def research_md(s: "Settings") -> str:
+    lines = ["# Where you sit and crash outcomes", "",
+             "No seat is reliably safest. Two small US studies found that passengers in the rear of the cabin died less "
+             "often in crashes that had both survivors and fatalities, and evacuation research found that sitting within "
+             "about five rows of an exit matters most. Both findings come with large caveats, listed below.", "",
+             "## What the studies found", "",
+             "Share of passengers who died, by section, in crashes that had both survivors and fatalities:", "",
+             "| Study | Sample | Front | Middle | Rear |", "|---|---|---|---|---|"]
+    for st in STUDIES:
+        d = st["died_pct"]
+        lines.append(f"| {st['name']} | {st['short']} | {d['front']}% | {d['middle']}% | {d['rear']}% |")
+    lines += [""]
+    for st in STUDIES:
+        lines += [f"**{st['name']}.** {st['data']}. Sections: {st['definition']}. {st['notes']}", ""]
+    lines += ["## Exits {#exits}", "",
+              f"**{EXIT_STUDY['name']}.** {EXIT_STUDY['sample']}. {EXIT_STUDY['finding']} {EXIT_STUDY['caveat']}", "",
+              "## How the section colours are derived", "",
+              "- Each cabin is split into thirds by row: front, middle, rear.",
+              f"- Basis shown next to the colours: {BASIS}.",
+              "- **Lower:** the rear third, which had the lowest fatality figure in both studies.",
+              "- **Higher:** the front and middle thirds. They swap order between the two studies, so they share one colour.",
+              "- The colours describe past accidents in two studies. They are not a prediction for any flight, and no individual seat is rated.", "",
+              "## Limits", ""]
+    lines += [f"- {c}" for c in CAVEATS]
+    lines += ["", "## Sources", ""]
+    lines += [f"- {st['url_label']}: {st['url']}" for st in STUDIES]
+    lines += [f"- {EXIT_STUDY['url_label']}: {EXIT_STUDY['url']}"]
+    return "\n".join(lines) + "\n"
+
+
 def md_to_html(md: str) -> str:
     """Tiny Markdown subset: headings (with optional {#id}), paragraphs, bullet lists, **bold**, `code`."""
-    out, in_list = [], False
+    out, in_list, in_table = [], False, False
 
     def inline(t: str) -> str:
         t = _e(t)
         t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
-        return re.sub(r"`(.+?)`", r"<code>\1</code>", t)
+        t = re.sub(r"`(.+?)`", r"<code>\1</code>", t)
+        return re.sub(r"(https://[^\s<]+)", r'<a href="\1" rel="nofollow noopener" data-track="source_click">\1</a>', t)
 
     for block in md.strip().split("\n"):
         line = block.rstrip()
+        if line.startswith("|"):
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            if all(re.fullmatch(r"-{3,}", c) for c in cells):
+                continue
+            if not in_table:
+                out.append('<div class="tablewrap"><table class="facts"><thead><tr>' +
+                           "".join(f"<th>{inline(c)}</th>" for c in cells) + "</tr></thead><tbody>")
+                in_table = True
+            else:
+                out.append("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in cells) + "</tr>")
+            continue
+        if in_table:
+            out.append("</tbody></table></div>"); in_table = False
         if line.startswith("- "):
             if not in_list:
                 out.append("<ul>"); in_list = True
@@ -640,6 +733,8 @@ def md_to_html(md: str) -> str:
             out.append(f"<p>{inline(line)}</p>")
     if in_list:
         out.append("</ul>")
+    if in_table:
+        out.append("</tbody></table></div>")
     return "\n".join(out)
 
 
@@ -678,7 +773,11 @@ def seatmap_md(s: Settings, p: Page, updated: str) -> str:
     if f["pitch_unknown_rows"]:
         pitch += f"; row{'s' if len(f['pitch_unknown_rows']) > 1 else ''} {_ranges(f['pitch_unknown_rows'])}: unknown"
     lines.append(f"- Seat pitch (approx., see sources): {pitch}")
-    lines += ["- Seat safety: not estimated. No validated per-seat survival data exists; exit distance is a layout fact only.", ""]
+    lines += [f"- Seat safety: {safest_answer(p)}", ""]
+    lines += ["## Cabin sections", "", "| Section | Rows | Crash-study pattern | Seats within 5 rows of an exit |", "|---|---|---|---|"]
+    for name, v in sections_info(p).items():
+        lines.append(f"| {name.capitalize()} | {v['rows'][0]}–{v['rows'][1]} | {v['band_label']} | {v['near_exit_seats']} of {v['seats']} |")
+    lines += ["", f"Pattern basis: {BASIS}. See {s.url}/research/", ""]
     same = [v for v in p.variants if v["relation"] == "same_type"]
     swaps = [v for v in p.variants if v["relation"] == "swap"]
     if len(same) > 1 or swaps or any(x["relation"] == "unmapped" for x in p.variants):
@@ -708,7 +807,7 @@ def llms_txt(s: Settings, pages: list[Page]) -> str:
     lines = [f"# {s.name}", "",
              f"> {s.tagline}. Row-by-row airline seat maps (exit rows, seats that don't exist, windowless seats, "
              "approximate pitch), each fact with its sources and a verification status. "
-             "We do not publish seat safety scores.", "",
+             "Cabin sections are coloured by what two small crash studies found; no seat-level risk scores.", "",
              "Notes for agents:",
              "- Status matters: \"draft\" layouts are from public sources and not yet checked against the airline's live seat map. Say so when citing.",
              "- One airline + aircraft type can have several cabin versions; the aircraft registration decides which. Each page lists the versions and fleet shares.",
@@ -721,6 +820,7 @@ def llms_txt(s: Settings, pages: list[Page]) -> str:
               f"- [OpenAPI]({s.url}/openapi.json): static JSON endpoints",
               f"- [Full text]({s.url}/llms-full.txt): all seat maps in one Markdown file", "",
               "## Docs", "",
+              f"- [Where you sit and crash outcomes]({s.url}/research.md): the studies, their samples and limits, and how the section colours are derived",
               f"- [Methodology]({s.url}/methodology.md): sources, verification status, confidence levels, why there are no safety scores", "",
               "## Optional", "",
               f"- [Privacy]({s.url}/privacy.md)"]
@@ -761,6 +861,9 @@ def api_record(s: Settings, p: Page, updated: str, *, with_seats: bool) -> dict[
         "variants": [{k: v for k, v in x.items() if k != "current"} for x in p.variants if not x["current"]],
         "seat_safety": {"estimable": False,
                         "reason": "No validated occupant-level dataset supports a per-seat survival probability."},
+        "sections": sections_info(p),
+        "section_pattern": {"basis": BASIS, "studies": [x["id"] for x in STUDIES], "research": s.url + "/research/",
+                            "caveat": "Describes past US accidents; not a prediction for any flight or seat."},
     }
     if with_seats:
         rec["provenance"] = cfg["provenance"]
@@ -922,6 +1025,8 @@ APP_JS = r"""(() => {
     if (current) { current.querySelector('rect').classList.remove('sel'); current.querySelector('text').classList.remove('sel'); }
     g.querySelector('rect').classList.add('sel'); g.querySelector('text').classList.add('sel'); current = g;
     const side = f.sd === 'L' ? 'left' : 'right';
+    const secRaw = (data.sections || {})[f.z] || { rows: ['?', '?'], band: 'higher', band_label: '' };
+    const sec = { ...secRaw, name: f.z.charAt(0).toUpperCase() + f.z.slice(1) };
     const exits = f.e.map(e => '<li>' + esc(e.id) + ' (' + words(e.k) + '): ' +
       (e.d === 'same_row' ? 'this row' : words(e.d) + ', ' + e.r + ' row' + (e.r === 1 ? '' : 's') + ' between') + '</li>').join('');
     panel.innerHTML = '<h2>Seat ' + esc(seat) + '</h2>' +
@@ -929,11 +1034,22 @@ APP_JS = r"""(() => {
       '<dt>Seats to aisle</dt><dd>' + f.a + '</dd>' +
       '<dt>Pitch</dt><dd>' + (f.ps === 'range' ? esc(data.pitchRange) : (f.pi === null ? 'unknown' : f.pi + ' in')) + ' <span class="muted small">(' + words(f.ps) + ')</span></dd>' +
       '<dt>Exit row</dt><dd>' + (f.x ? 'yes' : 'no') + '</dd>' +
+      '<dt>Section</dt><dd>' + esc(sec.name) + ' (rows ' + sec.rows[0] + '–' + sec.rows[1] + ')</dd>' +
+      '<dt>Crash studies</dt><dd><span class="sw sw-' + esc(sec.band) + '"></span>' + esc(sec.band_label) + ' <a href="/research/">why</a></dd>' +
+      '<dt>Exit within 5 rows</dt><dd>' + (f.ne ? 'yes' : 'no') + '</dd>' +
       '<dt>Notes</dt><dd>' + (f.f.length ? f.f.map(words).join(', ') : '—') + '</dd></dl>' +
       '<h3>Nearest exits</h3><ul>' + exits + '</ul>' +
-      '<p class="note">Layout facts only. We don\'t rate seat safety: no validated per-seat survival data exists.</p>';
+      '<p class="note">The section pattern comes from two small studies of past US crashes. It isn\'t a rating of this seat or a prediction for your flight.</p>';
     track('seat_click', { config: data.config, seat, position: f.p, exit_row: f.x });
   };
+  const wrap = document.getElementById('mapwrap');
+  document.querySelectorAll('.viewbtn').forEach(b => b.addEventListener('click', () => {
+    const v = b.dataset.view;
+    document.querySelectorAll('.viewbtn').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+    document.querySelectorAll('.legend').forEach(l => { l.hidden = l.dataset.for !== v; });
+    if (wrap) wrap.className = 'mapwrap view-' + v;
+    track('map_view', { config: data.config, view: v });
+  }));
   document.querySelectorAll('g[data-seat]').forEach(g => {
     g.addEventListener('click', () => pick(g));
     g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(g); } });
@@ -974,7 +1090,12 @@ LUCKY_JS = r"""(() => {
     const lifePath = reduce(digits(dob));
     const side = (sign.element === 'Fire' || sign.element === 'Air') ? 'L' : 'R';
     const sideName = side === 'L' ? 'left' : 'right';
-    const pool = Object.entries(data.seats).filter(([, f]) => pref === 'any' || f.p === pref);
+    const SECTION_OF = { Fire: 'front', Air: 'middle', Earth: 'rear', Water: 'rear' };
+    const luckySection = SECTION_OF[sign.element];
+    const byType = Object.entries(data.seats).filter(([, f]) => pref === 'any' || f.p === pref);
+    const inSection = byType.filter(([, f]) => f.z === luckySection);
+    const pool = inSection.length ? inSection : byType;
+    const secRows = (data.sections && data.sections[luckySection] && data.sections[luckySection].rows) || ['?', '?'];
     const scored = pool.map(([seat, f]) => {
       const row = parseInt(seat, 10), letter = seat.replace(/\d+/g, '');
       const letterValue = letter.charCodeAt(0) - 64;
@@ -983,6 +1104,7 @@ LUCKY_JS = r"""(() => {
       if (seatNum === lifePath) { score += 3; why.push(seat + ' adds up to ' + seatNum + ', your life-path number'); }
       if (rowNum === lifePath) { score += 2; why.push('row ' + row + ' reduces to ' + rowNum); }
       if (f.sd === side) { score += 1; why.push(sign.name + ' is a ' + sign.element.toLowerCase() + ' sign, paired with the ' + sideName + ' side'); }
+      if (f.z === luckySection) why.unshift('in your lucky ' + luckySection + ' section');
       return { seat, score, why, tie: hash(dob + data.config + seat) };
     }).sort((a, b) => b.score - a.score || a.tie - b.tie);
     if (!scored.length) { out.innerHTML = '<p class="note">No seats of that type on this aircraft.</p>'; return; }
@@ -991,6 +1113,8 @@ LUCKY_JS = r"""(() => {
     const g = document.querySelector('g[data-seat="' + top.seat + '"]');
     if (g) { g.querySelector('rect').classList.add('lucky'); g.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
     out.innerHTML = '<p class="lucky-pick">Your lucky seat: ' + esc(top.seat) + '</p>' +
+      '<p>Lucky section: <strong>' + luckySection.charAt(0).toUpperCase() + luckySection.slice(1) + '</strong> (rows ' + secRows[0] + '–' + secRows[1] + '), the ' +
+      sign.element.toLowerCase() + ' section</p>' +
       '<p>Sun sign ' + esc(sign.name) + ' · life-path number ' + lifePath + '</p>' +
       '<ul>' + top.why.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>' +
       '<p class="muted small">Also lucky for you: ' + rest.slice(0, 2).map(r => esc(r.seat)).join(', ') +
@@ -1003,12 +1127,12 @@ LUCKY_JS = r"""(() => {
 
 SITE_CSS = """
 :root{--bg:#f7f6f2;--card:#fff;--ink:#1d1c1a;--muted:#6b675f;--line:#c9c4b8;--accent:#1f5fbf;--fus:#efece5;--seat:#fff;
---exitrow:#dcefe1;--sel:#1f5fbf;--exit:#c0392b;--fac:#dcd8cf;--warn:#7a4f00;--warnbg:#fff1d6;--ok:#1d6b3a;--okbg:#ddf3e4;--lucky-bg:#f1e6ff;--lucky-ink:#5b2a9e}
+--exitrow:#dcefe1;--sel:#1f5fbf;--exit:#c0392b;--fac:#dcd8cf;--warn:#7a4f00;--warnbg:#fff1d6;--ok:#1d6b3a;--okbg:#ddf3e4;--lucky-bg:#f1e6ff;--lucky-ink:#5b2a9e;--band-lower:#cfe9e4;--band-higher:#f6dcc4}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1e1d1b;--ink:#ecebe6;--muted:#a19d94;
 --line:#4d4a43;--accent:#7aa7ff;--fus:#24231f;--seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;
---warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff}}
+--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff;--band-lower:#1d3d39;--band-higher:#4a3220}}
 :root[data-theme="dark"]{--bg:#141413;--card:#1e1d1b;--ink:#ecebe6;--muted:#a19d94;--line:#4d4a43;--accent:#7aa7ff;--fus:#24231f;
---seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff}
+--seat:#2d2c28;--exitrow:#1f3a28;--sel:#5b8ff0;--exit:#f07062;--fac:#3a3832;--warn:#f0c46b;--warnbg:#2e2614;--ok:#7fd69e;--okbg:#16301f;--lucky-bg:#2e2140;--lucky-ink:#cfa8ff;--band-lower:#1d3d39;--band-higher:#4a3220}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 a{color:var(--accent)}a:hover{text-decoration-thickness:2px}
@@ -1061,6 +1185,20 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .badge-fun{background:var(--lucky-bg);color:var(--lucky-ink);vertical-align:middle}
 .seat.lucky{fill:var(--lucky-bg);stroke:var(--lucky-ink);stroke-width:2}
 .lucky-pick{font-size:20px;font-weight:700}
+.viewbar{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.viewbtn{font:inherit;font-size:14px;padding:6px 10px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.viewbtn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.legend{font-size:13px;color:var(--muted);margin:0 0 8px;display:block}.legend p{margin:4px 0 0}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin:0 5px 0 8px;border:1px solid var(--line)}
+.sw:first-child{margin-left:0}td .sw,dd .sw{margin-left:0}
+.sw-exit{background:var(--exitrow)}.sw-door{background:var(--exit);border-color:var(--exit)}
+.sw-lower{background:var(--band-lower)}.sw-higher{background:var(--band-higher)}.sw-near{background:var(--card);border:2px solid var(--accent)}
+.view-pattern .seat.sec-rear{fill:var(--band-lower)}
+.view-pattern .seat.sec-front,.view-pattern .seat.sec-middle{fill:var(--band-higher)}
+.view-pattern .seat.exitrow{stroke:var(--line)}
+.view-near .seat.exitrow{fill:var(--seat)}.view-near .seat.near-exit{stroke:var(--accent);stroke-width:2.2}
+.view-pattern .seat.sel,.view-near .seat.sel{fill:var(--sel)}
+.tablewrap{overflow-x:auto}.sections td{white-space:normal}
 .foot{border-top:1px solid var(--line);padding:16px 0;font-size:14px;color:var(--muted)}.foot a{color:var(--muted)}
 """ + SVG_CSS
 
@@ -1104,7 +1242,8 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
 
     write("/index.html", index_page(s, pages))
     for path, md, title, desc in [
-        ("/methodology/", METHODOLOGY_MD, "Methodology", "How seat maps are sourced and verified, confidence levels, and why we publish no seat safety scores."),
+        ("/methodology/", METHODOLOGY_MD, "Methodology", "How seat maps are sourced and verified, confidence levels, and how section colours are derived."),
+        ("/research/", research_md(s), "Where you sit and crash outcomes", "What crash studies found about front, middle and rear seats, how small they are, and why there is no safest seat."),
         ("/privacy/", PRIVACY_MD, "Privacy", "What we measure, with which cookieless tools, and what we never collect."),
     ]:
         write(path + "index.html", text_page(s, md, path, title, desc))

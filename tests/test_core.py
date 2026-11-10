@@ -169,3 +169,13 @@ def test_easyjet_group_iata():
     fi = FlightInstance("EC1", "2026-11-20", "EC", None, "easyJet Europe", None, None, "Airbus A320neo",
                         "A20N", None, True, None, "test")
     assert match(fi, tails={}).candidates[0]["config_id"] == "U2-A20N-186Y"
+
+
+def test_sections_and_near_exit():
+    from aerorisk.layout import section_bounds
+    c = build_cabin(load_config("FR-B738-189Y"))
+    b = section_bounds(c.config, c.rows)
+    assert b["front"][0] == 1 and b["rear"][1] == 33
+    assert {s.section for s in c.seats} == {"front", "middle", "rear"}
+    assert c.seat("16A").near_exit and c.seat("1A").near_exit
+    assert not c.seat("8A").near_exit          # rows 7-10 are >5 rows from the front door and the wing exits

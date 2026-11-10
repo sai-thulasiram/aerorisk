@@ -1,0 +1,141 @@
+{
+  "id": "U2-A320-186Y",
+  "operator": {
+    "iata": "U2",
+    "icao": "EZY",
+    "name": "easyJet"
+  },
+  "group_operators_icao": [
+    "EJU",
+    "EZS"
+  ],
+  "aircraft": {
+    "icao": "A320",
+    "iata": "320",
+    "name": "Airbus A320"
+  },
+  "variant_label": "186Y all-economy (SpaceFlex)",
+  "total_seats": 186,
+  "letters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "aisles_after": [
+    "C"
+  ],
+  "rows": {
+    "first": 1,
+    "last": 31,
+    "skip": []
+  },
+  "missing_seats": [],
+  "pitch_in": {
+    "default_range": [
+      28,
+      29
+    ],
+    "rows": {
+      "12": 35,
+      "13": 35
+    }
+  },
+  "exits": [
+    {
+      "id": "L1/R1",
+      "kind": "door",
+      "before_row": 1,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW1",
+      "kind": "overwing",
+      "at_row": 12,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "OW2",
+      "kind": "overwing",
+      "at_row": 13,
+      "sides": [
+        "L",
+        "R"
+      ]
+    },
+    {
+      "id": "L2/R2",
+      "kind": "door",
+      "after_row": 31,
+      "sides": [
+        "L",
+        "R"
+      ]
+    }
+  ],
+  "seat_flags": {
+    "no_window": [
+      "31A",
+      "31F"
+    ],
+    "no_recline": "all"
+  },
+  "facilities": [
+    {
+      "kind": "galley_lav",
+      "position": "front"
+    },
+    {
+      "kind": "galley_lav",
+      "position": "rear"
+    }
+  ],
+  "fleet_share_prior": 0.83,
+  "provenance": {
+    "status": "draft_unverified",
+    "method": "hand-authored from public secondary sources; not a licensed LOPA",
+    "sources": [
+      "https://seatcompare.ai/insights/easyjet-a320-seat-selection-guide-2026",
+      "https://seatmaps.com/airlines/u2-easyjet-uk/airbus-a320"
+    ],
+    "corroboration": {
+      "rows_1_31_total_186": [
+        "seatcompare.ai",
+        "seatmaps.com (186 seats, extra rear row)"
+      ],
+      "overwing_exit_rows_12_13": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "no_window_31A_31F": [
+        "seatcompare.ai",
+        "seatmaps.com"
+      ],
+      "pitch_28_29": [
+        "seatmaps.com",
+        "seatcompare.ai (29 in)"
+      ],
+      "exit_row_pitch_35": [
+        "seatcompare.ai only"
+      ]
+    },
+    "conflicts": [],
+    "fleet_share_note": "About 132 of easyJet's ~159 A320ceos. Not yet mapped: about 27 ex-Peach 180-seat aircraft, which easyJet is converting to this layout.",
+    "primary_source_check": "not done",
+    "authored_at": "2026-11-10",
+    "verify_against": "easyJet seat selection at booking"
+  },
+  "swap_risk": [],
+  "group_operators_iata": [
+    "EC",
+    "DS"
+  ]
+}

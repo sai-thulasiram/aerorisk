@@ -45,6 +45,8 @@ class Seat:
     in_exit_row: bool
     nearest_exits: list[dict[str, Any]] = field(default_factory=list)
     flags: list[str] = field(default_factory=list)
+    section: str = "middle"            # front | middle | rear (cabin thirds by row)
+    near_exit: bool = False            # an exit within 5 rows (the Galea / Greenwich finding)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -153,6 +155,26 @@ def _column_info(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return info
 
 
+SECTIONS = ("front", "middle", "rear")
+NEAR_EXIT_ROWS = 5
+
+
+def section_bounds(cfg: dict[str, Any], rows: list[int]) -> dict[str, tuple[int, int]]:
+    """Cabin thirds by row (the split used by the TIME 2015 review). A config may override with "sections"."""
+    if cfg.get("sections"):
+        return {k: tuple(v) for k, v in cfg["sections"].items()}
+    n = len(rows)
+    a, b = round(n / 3), round(2 * n / 3)
+    return {"front": (rows[0], rows[a - 1]), "middle": (rows[a], rows[b - 1]), "rear": (rows[b], rows[-1])}
+
+
+def section_of(cfg: dict[str, Any], rows: list[int], row: int) -> str:
+    for name, (lo, hi) in section_bounds(cfg, rows).items():
+        if lo <= row <= hi:
+            return name
+    return "middle"
+
+
 def build_cabin(cfg: dict[str, Any]) -> Cabin:
     rows = _row_numbers(cfg)
     idx = {r: i for i, r in enumerate(rows)}
@@ -236,6 +258,8 @@ def build_cabin(cfg: dict[str, Any]) -> Cabin:
                 seats_to_aisle=c["seats_to_aisle"], pitch_in=pitch, pitch_source=psrc,
                 y_in=round(y_of[r], 1), in_exit_row=r in exit_rows,
                 nearest_exits=near[:2], flags=sorted(set(flags)),
+                section=section_of(cfg, rows, r),
+                near_exit=any(abs(ri - e.pos) <= NEAR_EXIT_ROWS for e in exits),
             ))
 
     if len(seats) != cfg["total_seats"]:

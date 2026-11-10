@@ -95,7 +95,7 @@ def test_sitemap_and_robots(site):
     out, _ = site
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [e.text for e in ET.parse(out / "sitemap.xml").getroot().findall("s:url/s:loc", ns)]
-    assert len(locs) == len(list_configs()) + 3 and all(l.startswith(URL) for l in locs)
+    assert len(locs) == len(list_configs()) + 4 and all(l.startswith(URL) for l in locs)
     for l in locs:
         rel = l[len(URL):].lstrip("/")
         assert (out / rel / "index.html").exists() or (out / "index.html").exists()
@@ -162,3 +162,21 @@ def test_match_index_and_lucky_assets(site):
     assert "not mapped yet" in page and "28–29 in" in page
     home = (out / "index.html").read_text()
     assert 'id="lookupform"' in home
+
+
+def test_research_page_and_pattern_view(site):
+    out, _ = site
+    research = (out / "research/index.html").read_text()
+    for needle in ("Popular Mechanics", "TIME (2015)", "Greenwich", "no safest seat", "37 crashes"):
+        assert needle in research or needle in (out / "research.md").read_text(), needle
+    page = (out / "seat-maps/ryanair-boeing-737-800-189-seats/index.html").read_text()
+    assert 'data-view="pattern"' in page and "sec-rear" in page and "low confidence" in page
+    faq = [b for b in Collect_jsonld(page) if b.get("@type") == "FAQPage"][0]
+    safest = [q for q in faq["mainEntity"] if "safest" in q["name"]][0]["acceptedAnswer"]["text"]
+    assert "No seat is reliably safest" in safest and "rows 23–33" in safest
+    api = json.loads((out / "api/v1/seatmaps/FR-B738-189Y.json").read_text())
+    assert api["sections"]["rear"]["band"] == "lower" and api["seat_safety"]["estimable"] is False
+
+
+def Collect_jsonld(html):
+    c = Collect(); c.feed(html); return c.jsonld

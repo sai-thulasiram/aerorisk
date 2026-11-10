@@ -36,11 +36,12 @@ SVG_CSS = (".fus{fill:var(--fus,#f3f1ec);stroke:var(--line,#9a968c);stroke-width
            ".rown{font:500 9px system-ui,sans-serif;fill:var(--muted,#777)}"
            ".exit{fill:var(--exit,#c0392b)}.exittxt{font:700 8px system-ui,sans-serif;fill:var(--exit,#c0392b)}"
            ".fac{fill:var(--fac,#dcd8cf)}.factxt{font:500 8px system-ui,sans-serif;fill:var(--muted,#777)}"
+           ".secmark line{stroke:var(--muted,#777);stroke-width:1.5}.secmark text{font:700 8px system-ui,sans-serif;fill:var(--muted,#777);letter-spacing:.08em}"
            "g[data-seat]:focus{outline:none}g[data-seat]:focus .seat{stroke:var(--sel,#1f5fbf);stroke-width:2.5}")
 
 
 def render_svg(cabin: Cabin, highlight: str | None = None, *, title: bool = True,
-               inline_style: bool = True) -> str:
+               inline_style: bool = True, sections: bool = False) -> str:
     """inline_style=False omits the <style> element (for pages with a strict CSP; use SVG_CSS in a stylesheet)."""
     xs = _x_positions(cabin)
     width = _width(cabin)
@@ -80,11 +81,23 @@ def render_svg(cabin: Cabin, highlight: str | None = None, *, title: bool = True
         if s.row not in seen_rows:
             seen_rows.add(s.row)
             out.append(f'<text class="rown" x="{aisle_x:.0f}" y="{y+SEAT_H/2+3:.0f}" text-anchor="middle">{s.row}</text>')
-        cls = "seat" + (" exitrow" if s.in_exit_row else "") + (" sel" if s.seat == highlight else "")
+        cls = ("seat" + (" exitrow" if s.in_exit_row else "") + (" sel" if s.seat == highlight else "")
+               + (f" sec-{s.section}" + (" near-exit" if s.near_exit else "") if sections else ""))
         out.append(f'<g data-seat="{s.seat}" tabindex="0" role="button" aria-label="Seat {s.seat}"><rect class="{cls}" x="{xs[s.letter]:.0f}" y="{y:.0f}" '
                    f'width="{SEAT_W}" height="{SEAT_H}" rx="5"/>'
                    f'<text class="lbl{" sel" if s.seat == highlight else ""}" x="{xs[s.letter]+SEAT_W/2:.0f}" '
                    f'y="{y+SEAT_H/2+3:.0f}" text-anchor="middle">{s.seat}</text></g>')
+    if sections:
+        spans: dict[str, list[float]] = {}
+        for st in cabin.seats:
+            y0 = TOP + st.y_in * PX_PER_IN
+            lo, hi = spans.get(st.section, [y0, y0])
+            spans[st.section] = [min(lo, y0), max(hi, y0 + SEAT_H)]
+        for name, (y0, y1) in spans.items():
+            mid = (y0 + y1) / 2
+            out.append(f'<g class="secmark sec-{name}"><line x1="22" y1="{y0:.0f}" x2="22" y2="{y1:.0f}"/>'
+                       f'<text x="14" y="{mid:.0f}" transform="rotate(-90 14 {mid:.0f})" text-anchor="middle">'
+                       f'{name.upper()}</text></g>')
     out.append("</svg>")
     return "".join(out)
 
