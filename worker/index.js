@@ -4,6 +4,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { buildResult, knownCarrier, parseAdb, parseFlight, validDate } from "./match.js";
 import { cleanFeedback } from "./feedback.js";
+import { forwardSend, UMAMI_SCRIPT } from "./umami.js";
 import { parseSlug, renderFlightPage, sitemapXml, slugFor, todayFor } from "./flightpage.js";
 
 // Feedback storage: one SQLite-backed Durable Object (free plan, no setup needed).
@@ -272,6 +273,27 @@ export default {
     if (pathname === "/api/feedback") {
       try { return await feedback(request, env); }
       catch (e) { return json({ error: "internal_error", message: "Could not save that. Please try again." }, 500); }
+    }
+    if (pathname === "/u/s.js") {
+      const cache = caches.default, key = new Request("https://umami-cache.internal/script.js");
+      let res = await cache.match(key);
+      if (!res) {
+        const up = await fetch(env.UMAMI_SCRIPT_URL || UMAMI_SCRIPT);
+        if (!up.ok) return new Response("", { status: 502 });
+        res = new Response(await up.text(), { headers: { "content-type": "application/javascript; charset=utf-8",
+                                                         "cache-control": "public, max-age=21600" } });
+        ctx.waitUntil(cache.put(key, res.clone()));
+      }
+      return res;
+    }
+    if (pathname === "/u/api/send") {
+      try {
+        const f = await forwardSend(request, env.UMAMI_SEND_URL || undefined);
+        if (!f.request) return new Response("", { status: f.status });
+        const up = await fetch(f.request);
+        return new Response(up.body, { status: up.status, headers: { "content-type": up.headers.get("content-type") || "text/plain",
+                                                                       "cache-control": "no-store" } });
+      } catch (e) { return new Response("", { status: 502 }); }
     }
     if (pathname.startsWith("/flights/")) {
       try { return await flightPage(request, env, ctx); }

@@ -139,6 +139,7 @@ Workers & Pages → `aerorisk` → **Domains** tab → **Add custom domain**. Ad
 **Umami Cloud** handles product events:
 1. Sign up at umami.is and add the website with your domain.
 2. Copy the Website ID into the `UMAMI_WEBSITE_ID` variable and redeploy. The script only counts visits on `SITE_URL`'s host, so local previews don't pollute the data.
+   The tracker is served from your own domain (`/u/s.js`, sending to `/u/api/send`) and the Worker forwards to Umami Cloud. Ad blockers that block cloud.umami.is don't stop it, and the security policy stays first-party. For self-hosted Umami, set Worker variables `UMAMI_SCRIPT_URL` and `UMAMI_SEND_URL`.
 3. Events the site already sends:
 
 | Event | When | Data |

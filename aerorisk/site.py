@@ -483,8 +483,10 @@ def head(s: Settings, *, title: str, description: str, path: str, jsonld: list[d
         parts.append('<script type="application/ld+json">' +
                      json.dumps(block, ensure_ascii=False).replace("</", "<\\/") + "</script>")
     if s.umami_website_id:
-        parts.append(f'<script defer src="{_e(s.umami_src)}" data-website-id="{_e(s.umami_website_id)}" '
-                     f'data-domains="{_e(s.host)}"></script>')
+        # Served through our Worker (/u/*) so ad blockers and the CSP don't stop it; counts apex and www.
+        domains = s.host if s.host.startswith("www.") or s.host.endswith("workers.dev") else f"{s.host},www.{s.host}"
+        parts.append(f'<script defer src="/u/s.js" data-website-id="{_e(s.umami_website_id)}" '
+                     f'data-host-url="{_e(s.url)}/u" data-domains="{_e(domains)}"></script>')
     if s.cf_beacon_token:
         parts.append('<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
                      f'data-cf-beacon=\'{{"token":"{_e(s.cf_beacon_token)}"}}\'></script>')
@@ -1146,10 +1148,6 @@ def openapi(s: Settings) -> dict[str, Any]:
 def headers_file(s: Settings, md_paths: list[str]) -> str:
     script_src = ["'self'", "https://static.cloudflareinsights.com"]
     connect_src = ["'self'", "https://cloudflareinsights.com"]
-    if s.umami_website_id:
-        origin = re.match(r"^(https?://[^/]+)", s.umami_src).group(1)
-        script_src.append(origin)
-        connect_src += [origin, "https://api-gateway.umami.dev"]
     img_src, style_src, frame_src = ["'self'", "data:"], ["'self'"], []
     if s.adsense_client:
         # AdSense and Google's consent message load from these hosts and inject styles; this loosens the policy.

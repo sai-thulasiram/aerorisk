@@ -127,9 +127,12 @@ def test_api_and_openapi(site):
 def test_analytics_wiring(site):
     out, _ = site
     page = (out / "index.html").read_text()
-    assert 'data-website-id="00000000-0000-0000-0000-000000000000"' in page and 'data-domains="seatfacts.test"' in page
+    assert 'data-website-id="00000000-0000-0000-0000-000000000000"' in page
     headers = (out / "_headers").read_text()
-    assert "https://cloud.umami.is" in headers and "static.cloudflareinsights.com" in headers
+    assert "umami" not in headers and "static.cloudflareinsights.com" in headers   # Umami is proxied, first-party
+    home = (out / "index.html").read_text()
+    assert 'src="/u/s.js"' in home and 'data-host-url="https://seatfacts.test/u"' in home
+    assert 'data-domains="seatfacts.test,www.seatfacts.test"' in home
     js = (out / "assets/app.js").read_text()
     for ev in ["ai_referral", "seat_click", "seatmap_view", "seatmap_filter"]:
         assert ev in js
