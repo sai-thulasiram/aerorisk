@@ -511,7 +511,7 @@ def shell(s: Settings, head_html: str, body: str, band: str = "", band_cls: str 
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="brand" href="/"><img src="/assets/favicon.svg" alt="" width="22" height="22">{_e(s.name)}</a>
-<nav><a href="/#lookup">Which plane is my flight?</a><a href="/#seat-maps">Seat maps</a><a href="/research/">Safest seats?</a></nav>
+<nav><a href="/#lookup">Which plane is my flight?</a><a href="/#seat-maps">Seat maps</a><a href="/incidents/">Incident stats</a><a href="/research/">Safest seats?</a></nav>
 </div></header>
 {band_html}
 <main id="main" class="wrap">
@@ -519,7 +519,7 @@ def shell(s: Settings, head_html: str, body: str, band: str = "", band_cls: str 
 </main>
 <footer class="foot"><div class="wrap">
 <p>{_e(s.name)} publishes sourced layout facts. Section colours summarise two small crash studies and are not a rating of any seat. Data: {_e(s.data_license)}{contact}.</p>
-<p><a href="/research/">Where you sit and crash outcomes</a> · <a href="/privacy/">Privacy</a> · <button type="button" class="linkbtn" data-feedback-open>Send feedback</button></p>
+<p><a href="/incidents/">Incident stats</a> · <a href="/research/">Where you sit and crash outcomes</a> · <a href="/privacy/">Privacy</a> · <button type="button" class="linkbtn" data-feedback-open>Send feedback</button></p>
 </div></footer>
 <button type="button" class="fab" data-feedback-open aria-haspopup="dialog">Feedback</button>
 <dialog id="feedback" aria-labelledby="fb-h">
@@ -1059,6 +1059,7 @@ def llms_txt(s: Settings, pages: list[Page]) -> str:
               f"- Live flight lookup: GET {s.url}/api/lookup?flight=6E1234&date=YYYY-MM-DD returns the scheduled aircraft, registration if assigned, and the likely seat maps with probabilities (rate-limited; covered airlines only)",
               f"- [Full text]({s.url}/llms-full.txt): all seat maps in one Markdown file", "",
               "## Docs", "",
+              f"- [Airline incident stats]({s.url}/incidents.md): declared emergencies, landing gear, engine shutdowns (Transport Canada CADORS, UK AAIB, refreshed daily), Indian technical faults per 10,000 flights, IATA global rates; JSON at {s.url}/api/v1/incidents.json",
               f"- [Where you sit and crash outcomes]({s.url}/research.md): the studies, their samples and limits, and how the section colours are derived",
               "",
               "## Optional", "",
@@ -1593,6 +1594,7 @@ details>summary{cursor:pointer;font-weight:600}details.rows{padding:0;overflow-x
 .tablewrap{overflow-x:auto}main a{overflow-wrap:anywhere}.cite{font-size:12px;margin-left:4px;color:var(--muted)}.aircraft{border-top:4px solid var(--navy);background:var(--card);border-radius:14px;padding:16px;margin-top:24px}.aircraft h2{margin-top:0}.suppliers td:first-child{font-weight:600}.sections td{white-space:normal}
 .lucky .inline-form button{background:var(--yellow);color:var(--yellow-ink)}
 .sponsor,.adslot{margin-top:24px;background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px 16px}.sponsor-tag{margin:0 0 8px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}.sponsor-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.sponsor-item{display:flex;flex-direction:column;gap:4px;padding:12px;border:1px solid var(--line);border-radius:10px;text-decoration:none;color:var(--ink)}.sponsor-item:hover{border-color:var(--accent)}.sponsor-cta{color:var(--accent);font-weight:600;font-size:14px}ins.adsbygoogle{display:block;min-height:90px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}.tile.ok{background:var(--okbg);border-color:transparent}.tile.ok .tile-n{color:var(--ok)}.tile-n{font-size:28px;font-weight:800;line-height:1.1;color:var(--navy)}.tile-l{font-size:14px;color:var(--muted)}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tile-n{color:var(--ink)}}:root[data-theme="dark"] .tile-n{color:var(--ink)}svg.hbars,svg.trend{width:100%;height:auto;max-width:720px;display:block;margin:8px 0}.ch-label,.ch-val,.ch-axis{font:13px system-ui,sans-serif;fill:var(--ink)}.ch-axis{fill:var(--muted);font-size:11px}.ch-bar{fill:var(--accent)}.ch-grid{stroke:var(--line);stroke-width:1}.ch-line{fill:none;stroke-width:2.2;stroke-linejoin:round}.ch-line.ch-s0{stroke:var(--accent)}.ch-line.ch-s1{stroke:#d97706}.ch-line.ch-s2{stroke:var(--exit)}.legend-row{display:flex;gap:16px;flex-wrap:wrap}.lg{display:inline-flex;align-items:center;gap:6px}.lg-sw{width:14px;height:4px;border-radius:2px;display:inline-block}.lg-sw.ch-s0{background:var(--accent)}.lg-sw.ch-s1{background:#d97706}.lg-sw.ch-s2{background:var(--exit)}.srcbadge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:1px 7px;border-radius:999px;margin-right:4px}.src-official{background:var(--okbg);color:var(--ok)}.src-press{background:var(--warnbg);color:var(--warn)}.evlist{list-style:none;padding:0;margin:8px 0}.evlist li{padding:10px 0;border-bottom:1px solid var(--line)}.chip-s{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--seat);color:var(--ink);margin-left:4px}table.num td{text-align:right;font-variant-numeric:tabular-nums}tr.hl{background:var(--lucky-bg)}tr.total{font-weight:700}.toc{margin:4px 0 8px}.toc a{color:var(--accent)}h3.h4{font-size:17px;margin-top:22px}
 .tablewrap{overflow-x:auto}.hist{min-width:560px}.hist a{overflow-wrap:normal}.hist td:last-child{min-width:13em}
 .inline-form details.more{flex-basis:100%;width:100%}.inline-form details.more summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}.more-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}.more-grid label{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .lucky{border-top:4px solid var(--yellow)}.lookup{border-top:4px solid var(--accent)}
@@ -1663,6 +1665,28 @@ def build(out: str | Path, settings: Settings | None = None, configs: list[dict[
         write(path.rstrip("/") + ".md", strip_anchors(md))
         md_paths.append(path.rstrip("/") + ".md")
         sitemap.append((path, s.build_date))
+    # Incident stats (data refreshed daily by `python -m aerorisk incidents` in the deploy workflow)
+    from . import incidents as _inc, incidents_page as _incp
+    inc_data = _inc.load()
+    by_iata: dict[str, str] = {}
+    for p in pages:
+        by_iata.setdefault(p.cfg["operator"]["iata"], p.path)
+    inc_band, inc_body = _incp.render(inc_data, by_iata)
+    write("/incidents/index.html", shell(s, head(s, title=f"Airline incidents: emergencies, landing gear, engine shutdowns — {s.name}",
+                                                  description="Declared emergencies, landing-gear problems and engine shutdowns from official and open sources, refreshed daily, with technical faults per 10,000 flights for Indian airlines.",
+                                                  path="/incidents/", md_path="/incidents.md",
+                                                  jsonld=[{"@context": "https://schema.org", "@type": "Dataset",
+                                                           "name": "Airline incident statistics", "url": s.url + "/incidents/",
+                                                           "description": "Daily summary of Transport Canada CADORS and UK AAIB data, plus official Indian figures and IATA's annual safety report.",
+                                                           "isAccessibleForFree": True, "creator": {"@type": "Organization", "name": s.name},
+                                                           "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json",
+                                                                             "contentUrl": s.url + "/api/v1/incidents.json"}]}]),
+                                         inc_body, band=inc_band))
+    inc_md = _incp.markdown(inc_data, s.url)
+    write("/incidents.md", inc_md); md_paths.append("/incidents.md")
+    write("/api/v1/incidents.json", json.dumps({k: v for k, v in inc_data.items()}, indent=1, ensure_ascii=False))
+    inc_updated = max([(v.get("last_success") or "")[:10] for v in inc_data["status"].values()] + [s.build_date])
+    sitemap.append(("/incidents/", inc_updated))
     write("/404.html", shell(s, head(s, title=f"Not found — {s.name}", description="Page not found", path="/404.html"),
                              '<p>That page does not exist. <a href="/#seat-maps">Browse seat maps</a>.</p>', band="<h1>Not found</h1>")
           .replace('<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">',

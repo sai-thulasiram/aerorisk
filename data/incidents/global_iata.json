@@ -1,0 +1,25 @@
+{
+  "year": 2025,
+  "flights_million": 38.7,
+  "accidents": 51,
+  "fatal_accidents": 8,
+  "onboard_fatalities": 394,
+  "accident_rate_per_million": 1.32,
+  "one_in_flights": 759646,
+  "five_year_avg_rate": 1.27,
+  "jet_rate": 1.03,
+  "turboprop_rate": 4.08,
+  "regions": [
+    {"region": "North Asia", "rate": 0.16},
+    {"region": "Middle East and North Africa", "rate": 0.53},
+    {"region": "Asia-Pacific", "rate": 0.91},
+    {"region": "Europe", "rate": 1.30},
+    {"region": "North America", "rate": 1.68},
+    {"region": "Latin America and Caribbean", "rate": 1.77},
+    {"region": "CIS", "rate": 2.74},
+    {"region": "Africa", "rate": 7.86}
+  ],
+  "common_types": ["tail strikes", "landing gear events", "runway excursions", "ground damage"],
+  "no_loc_i": true,
+  "source": {"kind": "official", "label": "IATA, 2025 Safety Report (9 Mar 2026)", "url": "https://www.iata.org/en/pressroom/2026-releases/2026-03-09-01/"}
+}

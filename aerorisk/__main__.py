@@ -7,6 +7,7 @@
   python -m aerorisk fleet  --opensky aircraftDatabase.csv --operators RYR,IGO
   python -m aerorisk site   --out site          (reads SITE_URL, UMAMI_WEBSITE_ID, ... from env)
   python -m aerorisk indexnow --site-dir site   (after deploy; needs INDEXNOW_KEY)
+  python -m aerorisk incidents [--only cadors,uk_aaib]   (refresh data/incidents/*.json; keeps old data on failure)
 """
 from __future__ import annotations
 
@@ -41,8 +42,14 @@ def main(argv: list[str] | None = None) -> int:
     fl = sub.add_parser("fleet"); fl.add_argument("--opensky", required=True); fl.add_argument("--operators", default="")
     st = sub.add_parser("site"); st.add_argument("--out", default="site")
     ix = sub.add_parser("indexnow"); ix.add_argument("--site-dir", default="site")
+    inc = sub.add_parser("incidents"); inc.add_argument("--only", default="")
     a = ap.parse_args(argv)
 
+    if a.cmd == "incidents":
+        from .incidents import collect_all
+        status = collect_all(only=[x for x in a.only.split(",") if x] or None)
+        print(json.dumps(status, indent=1))
+        return 0
     if a.cmd == "configs":
         for c in list_configs():
             print(f'{c["id"]:16} {c["operator"]["name"]:8} {c["aircraft"]["icao"]} {c["total_seats"]:>3}  '

@@ -42,6 +42,15 @@ Quota protection built in:
 
 Local test without a key: `npx wrangler dev --var ADB_MOCK:1`, which returns synthetic flights.
 
+## Incident stats (/incidents/)
+
+Refreshed every day at 01:17 UTC by the deploy workflow: `python -m aerorisk incidents` downloads Transport Canada's CADORS open data (about 220 MB, roughly 20 seconds) and the UK AAIB report list from the GOV.UK API, writes small summaries to `data/incidents/`, commits them, rebuilds and deploys.
+
+- A source that is down keeps its previous snapshot; `data/incidents/status.json` records the error and the page says the data is from the last good run.
+- To refresh right away: Actions → build-and-deploy → Run workflow, or push a commit whose message contains `[collect]`.
+- `india_official.json` and `global_iata.json` are edited by hand. Add new Parliament answers or the next IATA report there, with the source link; tests check that the Indian totals add up.
+- Sources are open-licensed (Open Government Licence – Canada; UK OGL v3). Aviation Herald and ASN are deliberately not scraped: they're copyrighted and have no open licence.
+
 ## Flight pages (/flights/6e-1234/)
 
 Every covered flight number has a page, rendered by the Worker: today's aircraft, the likely seat map, and the aircraft seen on that flight on earlier days (from lookups on the site). Pages that get looked up are listed in `/sitemap-flights.xml`, so search engines find them as usage grows.

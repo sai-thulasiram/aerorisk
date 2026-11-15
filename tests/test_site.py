@@ -95,7 +95,7 @@ def test_sitemap_and_robots(site):
     out, _ = site
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [e.text for e in ET.parse(out / "sitemap.xml").getroot().findall("s:url/s:loc", ns)]
-    assert len(locs) == len(list_configs()) + 3 and all(l.startswith(URL) for l in locs)
+    assert len(locs) == len(list_configs()) + 4 and all(l.startswith(URL) for l in locs)
     for l in locs:
         rel = l[len(URL):].lstrip("/")
         assert (out / rel / "index.html").exists() or (out / "index.html").exists()
@@ -270,3 +270,15 @@ def test_flight_page_template_and_sitemap_hint(site):
     assert "Sitemap: https://seatfacts.test/sitemap-flights.xml" in (out / "robots.txt").read_text()
     assert "/_tpl/*" in (out / "_headers").read_text()
     assert "/flights/6e-1234/" in (out / "llms.txt").read_text()
+
+
+def test_incidents_page(site):
+    out, _ = site
+    page = (out / "incidents/index.html").read_text()
+    assert page.count("<h1") == 1 and "per 10,000 flights" in page
+    assert "IndiGo" in page and "Lok Sabha unstarred question 1411" in page
+    assert ' style="' not in page                      # CSP: no inline styles
+    assert '<a href="/incidents/">Incident stats</a>' in page
+    data = json.loads((out / "api/v1/incidents.json").read_text())
+    assert data["india"]["fault_rates"]["totals"]["2023"]["faults"] == 384
+    assert "incidents.md" in (out / "llms.txt").read_text()
