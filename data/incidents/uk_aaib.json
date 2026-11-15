@@ -1,0 +1,479 @@
+{
+ "source": {
+  "label": "UK Air Accidents Investigation Branch, via GOV.UK",
+  "url": "https://www.gov.uk/aaib-reports",
+  "licence": "Open Government Licence v3.0"
+ },
+ "scope": "Reports on commercial fixed-wing aircraft (airliners and cargo), newest first.",
+ "reports": [
+  {
+   "title": "AAIB investigation to Sikorsky S-92A, G-CIJC",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-sikorsky-s-92a-g-cijc",
+   "published": "2026-11-12",
+   "occurred": "2026-03-05",
+   "aircraft": "Sikorsky S-92A",
+   "location": "Aberdeen Airport",
+   "summary": "Excessive vibration due to main rotor damper component failure, Aberdeen Airport, 5 March 2026",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Airbus A300-600F, D-AEAG",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a300-600f-d-aeag",
+   "published": "2026-11-12",
+   "occurred": "2025-10-12",
+   "aircraft": "Airbus A300-600F",
+   "location": "London Heathrow Airport",
+   "summary": "Tailstrike followed by a rejected landing, London Heathrow Airport, 12 October 2025",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "tail strike"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Airbus A319-131, G-EUPS",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a319-131-g-eups",
+   "published": "2026-10-08",
+   "occurred": "2025-10-30",
+   "aircraft": "Airbus A319-131",
+   "location": "In the climb after takeoff from Edinburgh Airport",
+   "summary": "Inertial reference drift following shock loading to nose landing gear, in the climb after takeoff from Edinburgh Airport, 30 October 2025",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "landing gear"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Boeing 737-800, 9H-QBD",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-737-800-9h-qbd",
+   "published": "2026-09-24",
+   "occurred": "2025-10-03",
+   "aircraft": "Boeing 737-800",
+   "location": "Manchester Airport",
+   "summary": "Landing below final reserve fuel, Manchester Airport, 3 October 2025",
+   "report_type": "field-investigation",
+   "tags": [
+    "fuel"
+   ]
+  },
+  {
+   "title": "AAIB investigation to ATR 72-212 A, G-OASB",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-atr-72-212-a-g-oasb",
+   "published": "2026-09-17",
+   "occurred": "2025-11-14",
+   "aircraft": "ATR 72-212 A",
+   "location": "East Midlands Airport",
+   "summary": "Touchdown on the nose landing gear, East Midlands Airport, 14 November 2025",
+   "report_type": "field-investigation",
+   "tags": [
+    "landing gear"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Cessna Citation CJ2+, D-ISCV",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-cessna-citation-cj2-plus-d-iscv",
+   "published": "2026-09-10",
+   "occurred": "2026-01-06",
+   "aircraft": "Cessna Citation CJ2+",
+   "location": "London Biggin Hill Airport\r\n",
+   "summary": "Runway excursion following rejected takeoff, London Biggin Hill Airport, 6 January 2026\r\n",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "runway"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Boeing 747-433, G-ONEE",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-747-433-g-onee",
+   "published": "2026-09-03",
+   "occurred": "2024-02-08",
+   "aircraft": "Boeing 747-433",
+   "location": "After departure from London Heathrow Airport",
+   "summary": "Water ingress leading to loss of two AC buses, and ice leading to unreliable airspeed, after departure from London Heathrow Airport, 8 February 2024 ",
+   "report_type": "field-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Embraer 190AR, ZS-YAD",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-embraer-190ar-zs-yad",
+   "published": "2026-07-16",
+   "occurred": "2023-06-17",
+   "aircraft": "Embraer 190AR",
+   "location": "St Helena Airport",
+   "summary": "Multiple go-arounds after entering windshear, St Helena Airport, 17 June 2023",
+   "report_type": "field-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Boeing 737-8, G-CRUX",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-737-8-g-crux",
+   "published": "2026-07-09",
+   "occurred": "2025-04-22",
+   "aircraft": "Boeing 737-8",
+   "location": "London Luton Airport",
+   "summary": "Incorrect takeoff performance, London Luton Airport, 22 April 2025",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to De Havilland Aircraft of Canada Limited DHC-8, 9H-LWB",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-de-havilland-aircraft-of-canada-limited-dhc-8-9h-lwb",
+   "published": "2026-07-02",
+   "occurred": "2024-04-23",
+   "aircraft": "De Havilland Aircraft of Canada Limited DHC-8",
+   "location": "Runway 27, Guernsey Airport",
+   "summary": "Runway excursion, Runway 27, Guernsey Airport, 23 April 2024",
+   "report_type": "field-investigation",
+   "tags": [
+    "runway"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Dyn Aero MCR-01, G-TOMX",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-dyn-aero-mcr-01-g-tomx",
+   "published": "2026-06-18",
+   "occurred": "2025-05-04",
+   "aircraft": "Dyn Aero MCR-01",
+   "location": "Shenstone Hall Airfield, Staffordshire",
+   "summary": "Loss of control in-flight after possible power loss and attempted return to departure airfield, Shenstone Hall Airfield, Staffordshire, 4 May 2025",
+   "report_type": "field-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Airbus A320-214, G-EZUK",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a320-214-g-ezuk",
+   "published": "2026-06-11",
+   "occurred": "2025-06-13",
+   "aircraft": "Airbus A320-214",
+   "location": "London Luton Airport",
+   "summary": "Incorrect thrust used during takeoff, London Luton Airport, 13 June 2025",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Boeing 767-316F, G-DHLS",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-767-316f-g-dhls",
+   "published": "2026-06-04",
+   "occurred": "2025-10-09",
+   "aircraft": "Boeing 767-316F",
+   "location": "Scottish Flight Information Region",
+   "summary": "Roll control jam, Scottish Flight Information Region, 9 October 2025",
+   "report_type": "field-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Bellanca (American Champion) Decathlon 8KCAB, G-TALX",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-bellanca-american-champion-decathlon-8kcab-g-talx",
+   "published": "2026-05-14",
+   "occurred": "2025-06-30",
+   "aircraft": "Bellanca (American Champion) Decathlon 8KCAB",
+   "location": "Tatenhill Aerodrome, Staffordshire",
+   "summary": "Landing gear leg failure on touchdown due to corrosion induced fatigue cracking, Tatenhill Aerodrome, Staffordshire, 30 June 2025",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "landing gear"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Boeing 737-8200 MAX, EI-HEZ",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-737-8200-max-ei-hez",
+   "published": "2026-04-09",
+   "occurred": "2025-04-24",
+   "aircraft": "Boeing 737-8200 MAX",
+   "location": "London Stansted Airport",
+   "summary": "Fuel leak, London Stansted Airport, 24 April 2025",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "fuel"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Britten-Norman Islander, VP-MNI, 16 August 2025",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-britten-norman-islander-vp-mni-16-august-2025",
+   "published": "2026-03-12",
+   "occurred": "2025-08-16",
+   "aircraft": "Britten-Norman Islander",
+   "location": "John A Osborne Airport, Montserrat",
+   "summary": "Sustained damage during a go-around, John A Osborne Airport, Montserrat, 16 August 2025",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to ATR 42-500, G-LMRC",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-atr-42-500-g-lmrc",
+   "published": "2026-03-05",
+   "occurred": "2022-08-27",
+   "aircraft": "ATR 42-500",
+   "location": "During climb 14 nm north-east of Aberdeen Airport",
+   "summary": "ATR 42-500 (G-LMRC), loss of multiple flight deck displays, during climb 14 nm north-east of Aberdeen Airport, 27 August 2022",
+   "report_type": "field-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Airbus A320-251N, G-UZEF",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a320-251n-g-uzef",
+   "published": "2026-01-08",
+   "occurred": "2025-04-20",
+   "aircraft": "Airbus A320-251N",
+   "location": "South-western UK airspace",
+   "summary": "Aircraft did not pressurise, south-western UK airspace, 20 April 2025",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Airbus A380-841, G-XLEI",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a380-841-g-xlei",
+   "published": "2026-01-08",
+   "occurred": "2024-12-06",
+   "aircraft": "Airbus A380-841",
+   "location": "Over the Atlantic Ocean, south of Greenland",
+   "summary": "Turbulence encounter over the Atlantic Ocean, south of Greenland, 6 December 2024\r\n",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "turbulence"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Boeing 737-8AS, 9H-QAA",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-737-8as-9h-qaa",
+   "published": "2025-12-11",
+   "occurred": "2024-08-21",
+   "aircraft": "Boeing 737-8AS",
+   "location": "London Stansted Airport",
+   "summary": "Aircraft pushed back into blast fence at London Stansted Airport, 21 August 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Boeing 737-86N, G-NPTA",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-737-86n-g-npta",
+   "published": "2025-11-13",
+   "occurred": "2025-05-17",
+   "aircraft": "Boeing 737-86N",
+   "location": "Approaching Edinburgh Airport",
+   "summary": "Loss of cabin pressurisation, approaching Edinburgh Airport, 17 May 2025",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to ATR 72-212 A, G-IACZ",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-atr-72-212-a-g-iacz",
+   "published": "2025-11-13",
+   "occurred": "2025-04-15",
+   "aircraft": "ATR 72-212 A",
+   "location": "On approach to Cornwall Airport, Newquay ",
+   "summary": "Aircraft diverted because the flaps could not be fully extended on approach to Cornwall Airport, Newquay, 15 April 2025",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Short Bros SD3-60, N915GD",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-short-bros-sd3-60-n915gd",
+   "published": "2025-10-09",
+   "occurred": "2024-11-06",
+   "aircraft": "Short Bros SD3-60",
+   "location": "Terrance B Lettsome International Airport, British Virgin Islands",
+   "summary": "Runway undershoot at Terrance B. Lettsome International Airport, British Virgin Islands, 6 November 2024",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "runway"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Piper PA-23-250, G-BKJW",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-piper-pa-23-250-g-bkjw",
+   "published": "2025-06-26",
+   "occurred": "2023-07-06",
+   "aircraft": "Piper PA-23-250",
+   "location": "1 nm south-west of Bagby Airfield, North Yorkshire",
+   "summary": "Struck the ground in a steep descent while on approach to land, 1 nm south-west of Bagby Airfield, North Yorkshire, 6 July 2023",
+   "report_type": "field-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to ATR 42-500, G-LMSA",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-atr-42-500-g-lmsa",
+   "published": "2025-06-19",
+   "occurred": "2024-07-23",
+   "aircraft": "ATR 42-500",
+   "location": "North-east of Aberdeen International Airport",
+   "summary": "Engine failure during cruise, north-east of Aberdeen International Airport, 23 July 2024",
+   "report_type": "field-investigation",
+   "tags": [
+    "engine"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Boeing 777-236, G-VIIT",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-777-236-g-viit",
+   "published": "2025-05-08",
+   "occurred": "2024-06-28",
+   "aircraft": "Boeing 777-236",
+   "location": "London Gatwick Airport",
+   "summary": "Inadvertent thrust reduction during the takeoff roll, London Gatwick Airport, 28 June 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Airbus A320-214, G-EJCI ",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a320-214-g-ejci",
+   "published": "2025-04-10",
+   "occurred": "2023-07-30",
+   "aircraft": "Airbus A320-214",
+   "location": "After departure from Toulouse-Blagnac Airport, France",
+   "summary": "Aircraft lined up from incorrect intersection at Toulouse-Blagnac Airport, France, 30 July 2023 ",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Airbus A320-214, G-EZGY",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a320-214-g-ezgy",
+   "published": "2025-04-10",
+   "occurred": "2024-06-20",
+   "aircraft": "Airbus A320-214",
+   "location": "Kerkira Airport, Corfu",
+   "summary": "Rejected baulked landing go-around, Kerkira Airport, Corfu, 19 June 2024 ",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to ATR 72-212 A, G-CMJM",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-atr-72-212-a-g-cmjm",
+   "published": "2025-04-03",
+   "occurred": "2023-10-31",
+   "aircraft": "ATR 72-212 A",
+   "location": "On departure from Edinburgh Airport",
+   "summary": "Right nosewheel detached on takeoff, on departure from Edinburgh Airport, 31 October 2023",
+   "report_type": "field-investigation",
+   "tags": [
+    "landing gear"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Boeing 737-8200, EI-HGG",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-737-8200-ei-hgg",
+   "published": "2025-03-13",
+   "occurred": "2024-03-08",
+   "aircraft": "Boeing 737-8200",
+   "location": "London Stansted Airport",
+   "summary": "Level bust after a go-around, London Stansted Airport, 8 March 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to EMB-145EP, G-SAJE",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-emb-145ep-g-saje",
+   "published": "2025-03-13",
+   "occurred": "2024-12-10",
+   "aircraft": "EMB-145EP",
+   "location": "During initial climb out from Edinburgh Airport",
+   "summary": "Cabin crew member slipped on fluid during initial climb out from Edinburgh Airport, 10 December 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to ATR 72-500 (72-212A), LY-JUP",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-atr-72-500-72-212a-ly-jup",
+   "published": "2025-02-27",
+   "occurred": "2024-08-12",
+   "aircraft": "ATR 72-500 (72-212A)",
+   "location": "Guernsey Airport",
+   "summary": "Continued approach in fog, Guernsey Airport, 12 August 2024",
+   "report_type": "field-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Socata TB-20 Trinidad, N33NW",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-socata-tb-20-trinidad-n33nw",
+   "published": "2025-02-13",
+   "occurred": "2023-10-10",
+   "aircraft": "Socata TB-20 Trinidad",
+   "location": "Langham Airfield, Norfolk",
+   "summary": "Collision with trees during takeoff, Langham Airfield, Norfolk, 10 October 2023",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "ground"
+   ]
+  },
+  {
+   "title": "AAIB investigation to Boeing 787-8, G-TUIB",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-787-8-g-tuib",
+   "published": "2025-02-13",
+   "occurred": "2023-12-21",
+   "aircraft": "Boeing 787-8",
+   "location": "Birmingham Airport",
+   "summary": "Declaration of a fuel emergency following a missed approach due to windshear, Birmingham Airport, 21 December 2023",
+   "report_type": "correspondence-investigation",
+   "tags": [
+    "fuel"
+   ]
+  },
+  {
+   "title": "AAIB investigation to EMB-145EP, G-SAJK",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-emb-145ep-g-sajk",
+   "published": "2025-01-09",
+   "occurred": "2024-10-10",
+   "aircraft": "EMB-145EP",
+   "location": "Aberdeen Airport",
+   "summary": "EMB-145EP (G-SAJK), cabin crew member suffered fractured foot during turn-around, Aberdeen Airport, 10 October 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Boeing 747-433, G-UNET",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-boeing-747-433-g-unet",
+   "published": "2025-01-09",
+   "occurred": "2024-01-06",
+   "aircraft": "Boeing 747-433",
+   "location": "London Heathrow Airport",
+   "summary": "Boeing 747-433 (G-UNET), left upper wing panel detached during landing, London Heathrow Airport, 6 January 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to AW189, G-FSAR ",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-aw189-g-fsar",
+   "published": "2025-01-09",
+   "occurred": "2024-07-22",
+   "aircraft": "AW189",
+   "location": "Approx 190 nm East of Stanley Airfield, Falkland Islands",
+   "summary": "AW189 (G-FSAR), Search and Rescue operation, approx 190 nm East of Stanley Airfield, Falkland Islands, 22 July 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to LBL 90A, G-JEMI",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-lbl-90a-g-jemi",
+   "published": "2024-12-12",
+   "occurred": "2024-08-10",
+   "aircraft": "LBL 90A",
+   "location": "Forncett End, Norfolk",
+   "summary": "LBL 90A (G-JEMI), heavy landing, Forncett End, Norfolk, 10 August 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation to Rans S6-ES, G-BZKO",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-rans-s6-es-g-bzko",
+   "published": "2024-12-12",
+   "occurred": "2024-02-26",
+   "aircraft": "Rans S6-ES",
+   "location": "Near Newtownards Airport, County Down",
+   "summary": "Rans S6-ES (G-BZKO), windscreen and skylight assemblies shattered in-flight, near Newtownards Airport, County Down, 26 February 2024",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  },
+  {
+   "title": "AAIB investigation Diamond DA 40 NG, G-LDGB",
+   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-diamond-da-40-ng-g-ldgb",
+   "published": "2024-12-12",
+   "occurred": "2024-05-16",
+   "aircraft": "Diamond DA 40 NG",
+   "location": "3 nm north-west of Oxford Airport",
+   "summary": "Diamond DA 40 NG (G-LDGB), rear passenger door detached from aircraft, 3 nm north-west of Oxford Airport, 16 May 2023",
+   "report_type": "correspondence-investigation",
+   "tags": []
+  }
+ ],
+ "collected_at": "2026-11-15T14:37:12+00:00"
+}
