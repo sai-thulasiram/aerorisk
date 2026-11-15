@@ -1,0 +1,75 @@
+name: probe-sources
+on:
+  push:
+    branches: [probe]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CADORS
+        run: |
+          for f in Occurrence_Category Occurrence_Information Occurrence_Event_Information Aircraft_Information Aircraft_Event_Information; do
+            echo "=== $f"; curl -sSI "https://opendatatc.tc.canada.ca/CADORS_$f.csv" | grep -iE "^HTTP|content-length|last-modified|content-type"
+            curl -sS -r 0-1500 "https://opendatatc.tc.canada.ca/CADORS_$f.csv" | head -c 1500; echo
+          done
+          for m in OCCURRENCE_CATEGORY OCCURRENCE_INFORMATION OCCURRENCE_EVENT_INFORMATION AIRCRAFT_INFORMATION AIRCRAFT_EVENT_INFORMATION; do
+            echo "=== META $m"; curl -sS "https://opendatatc.blob.core.windows.net/opendatatc/CADORS_${m}_METADATA.TXT" | head -c 4000; echo
+          done
+      - name: CADORS full download sample
+        run: |
+          curl -sS -o occ.csv https://opendatatc.tc.canada.ca/CADORS_Occurrence_Information.csv && ls -la occ.csv && wc -l occ.csv && file occ.csv
+          head -c 600 occ.csv | od -c | head -5
+          tail -n 3 occ.csv
+          curl -sS -o cat.csv https://opendatatc.tc.canada.ca/CADORS_Occurrence_Category.csv && wc -l cat.csv
+          python3 - <<'PY'
+          import csv, collections
+          for name in ("cat.csv",):
+              with open(name, newline="", encoding="utf-8-sig", errors="replace") as fh:
+                  r = csv.reader(fh); hdr = next(r); print(name, hdr)
+                  c = collections.Counter()
+                  for row in r:
+                      for i,h in enumerate(hdr):
+                          if "ENGLISH" in h.upper() or "CATEGORY" in h.upper(): c[(h,row[i])] += 1
+                  for k,v in c.most_common(80): print(v, k)
+          PY
+          curl -sS -o ac.csv https://opendatatc.tc.canada.ca/CADORS_Aircraft_Information.csv && wc -l ac.csv && head -3 ac.csv
+          python3 - <<'PY'
+          import csv, collections
+          with open("ac.csv", newline="", encoding="utf-8-sig", errors="replace") as fh:
+              r = csv.DictReader(fh); print(r.fieldnames)
+              c = collections.Counter()
+              for row in r:
+                  for k in row:
+                      if "OPERATOR" in k.upper(): c[row[k]] += 1
+              for k,v in c.most_common(60): print(v, k)
+          PY
+          python3 - <<'PY'
+          import csv
+          with open("occ.csv", newline="", encoding="utf-8-sig", errors="replace") as fh:
+              r = csv.DictReader(fh); print(r.fieldnames)
+              rows = list(r)
+          print(len(rows)); print(rows[-1]); print(rows[-2])
+          PY
+          curl -sS -o aev.csv https://opendatatc.tc.canada.ca/CADORS_Aircraft_Event_Information.csv && wc -l aev.csv && head -3 aev.csv
+          curl -sS -o oev.csv https://opendatatc.tc.canada.ca/CADORS_Occurrence_Event_Information.csv && wc -l oev.csv && head -3 oev.csv
+          python3 - <<'PY'
+          import csv, collections
+          for name in ("aev.csv","oev.csv"):
+              with open(name, newline="", encoding="utf-8-sig", errors="replace") as fh:
+                  r = csv.DictReader(fh); print(name, r.fieldnames)
+                  c = collections.Counter()
+                  for row in r:
+                      for k in row:
+                          if "ENGLISH" in k.upper() or "EVENT" in k.upper(): c[(k,row[k])] += 1
+                  for k,v in c.most_common(70): print(v, k)
+          PY
+      - name: GOV.UK AAIB
+        run: |
+          curl -sS "https://www.gov.uk/api/search.json?filter_format=aaib_report&count=3&order=-public_timestamp&fields=title,link,public_timestamp,aircraft_category,report_type,date_of_occurrence,aircraft_type,location,description" | python3 -m json.tool | head -120
+          curl -sS "https://www.gov.uk/api/search.json?filter_format=aaib_report&count=0&facet_aircraft_category=20&facet_report_type=20" | python3 -m json.tool | head -80
+      - name: AAIB India
+        run: |
+          curl -sSL -m 30 https://aaib.gov.in/ | sed 's/<[^>]*>/ /g' | tr -s ' \n' | head -c 3000; echo
+          curl -sSL -m 30 https://aaib.gov.in/index.html -o a.html; grep -oiE 'href="[^"]+"' a.html | sort -u | head -80
