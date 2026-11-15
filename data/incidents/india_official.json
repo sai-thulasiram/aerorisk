@@ -1,0 +1,68 @@
+{
+  "_readme": "Hand-curated from answers given in India's Parliament. Every figure carries its source. 'official' = the ministry's or Parliament's own PDF; 'press' = a news report of the answer (the official PDF was not available or not readable).",
+  "fault_rates": {
+    "title": "Technical faults reported to DGCA, per airline, with flights flown",
+    "definition": "Instances of malfunctioning (technical faults) of scheduled private airlines' aircraft reported to DGCA.",
+    "periods": [
+      {"label": "2023", "key": "2023"},
+      {"label": "2024 (to Jan 2025)", "key": "2024"}
+    ],
+    "rows": [
+      {"airline": "IndiGo", "iata": "6E", "2023": {"flights": 678313, "faults": 115}, "2024": {"flights": 610061, "faults": 118}},
+      {"airline": "SpiceJet", "iata": "SG", "2023": {"flights": 71131, "faults": 150}, "2024": {"flights": 46079, "faults": 23}},
+      {"airline": "Air India", "iata": "AI", "2023": {"flights": 146579, "faults": 62}, "2024": {"flights": 135280, "faults": 66}},
+      {"airline": "Vistara (merged into Air India, Nov 2024)", "iata": "UK", "2023": {"flights": 102938, "faults": 14}, "2024": {"flights": 98501, "faults": 8}},
+      {"airline": "Air India Express", "iata": "IX", "2023": {"flights": 36248, "faults": 23}, "2024": {"flights": 66616, "faults": 26}},
+      {"airline": "AIX Connect / AirAsia India (merged into Air India Express)", "iata": "I5", "2023": {"flights": 69962, "faults": 16}, "2024": {"flights": 39868, "faults": 18}},
+      {"airline": "Akasa Air", "iata": "QP", "2023": {"flights": 39773, "faults": 0}, "2024": {"flights": 38162, "faults": 5}},
+      {"airline": "Fly Big", "iata": "S9", "2023": {"flights": 5214, "faults": 3}, "2024": {"flights": 2093, "faults": 3}},
+      {"airline": "Blue Dart Aviation (cargo)", "iata": "BZ", "2023": {"flights": 5949, "faults": 1}, "2024": {"flights": 5933, "faults": 1}}
+    ],
+    "totals": {"2023": {"flights": 1156107, "faults": 384}, "2024": {"flights": 1042593, "faults": 268}},
+    "source": {"kind": "official", "label": "Lok Sabha unstarred question 1411, 13 Feb 2025 (annexure)",
+               "url": "https://eparlib.sansad.in/bitstream/123456789/2988684/1/AU1411_w9atKt.pdf"}
+  },
+  "yearly_defects": {
+    "title": "Technical defects reported by Indian airlines, all airlines",
+    "rows": [
+      {"year": "2021", "count": 514, "src": "official"},
+      {"year": "2022", "count": 528, "src": "official"},
+      {"year": "2023", "count": 448, "src": "official"},
+      {"year": "2024", "count": 421, "src": "press"},
+      {"year": "2025 (to June/July)", "count": 183, "src": "official"}
+    ],
+    "note": "These totals come from a different question than the per-airline table above and use a different definition, so they don't add up to the same numbers.",
+    "sources": [
+      {"kind": "official", "label": "Lok Sabha unstarred question 1868, July 2025 (2024 figure unreadable in the PDF)", "url": "https://www.civilaviation.gov.in/sites/default/files/2025-08/1868%20E.pdf"},
+      {"kind": "press", "label": "Free Press Journal, 24 Jul 2025 (2024 figure: 421)", "url": "https://www.freepressjournal.in/india/183-aircraft-technical-issues-reported-in-2025-so-far-air-india-tops-with-85-defects-government"}
+    ]
+  },
+  "airline_2025": {
+    "title": "Technical defects reported in 2025, to 21 July, by airline",
+    "rows": [
+      {"airline": "Air India and Air India Express", "count": 85},
+      {"airline": "IndiGo", "count": 62},
+      {"airline": "Akasa Air", "count": 28},
+      {"airline": "SpiceJet", "count": 8}
+    ],
+    "note": "No flight counts were given, so these can't be compared fairly between airlines.",
+    "source": {"kind": "press", "label": "Free Press Journal, 24 Jul 2025, reporting the Lok Sabha answer", "url": "https://www.freepressjournal.in/india/183-aircraft-technical-issues-reported-in-2025-so-far-air-india-tops-with-85-defects-government"}
+  },
+  "serious_events_2025": {
+    "title": "Engine shutdowns and Mayday calls, January to July 2025",
+    "rows": [
+      {"airline": "IndiGo", "engine_shutdowns": 2, "mayday": 1},
+      {"airline": "SpiceJet", "engine_shutdowns": 2, "mayday": 0},
+      {"airline": "Air India", "engine_shutdowns": 1, "mayday": 1},
+      {"airline": "Alliance Air", "engine_shutdowns": 1, "mayday": 0},
+      {"airline": "Air India Express", "engine_shutdowns": 0, "mayday": 1}
+    ],
+    "note": "Air India's Mayday was flight AI 171, which crashed at Ahmedabad on 12 June 2025.",
+    "source": {"kind": "press", "label": "Lokmat Times, 5 Aug 2025, reporting the Rajya Sabha answer", "url": "https://www.lokmattimes.com/technology/6-aircraft-engine-shutdowns-three-mayday-calls-this-year-civil-aviation-minister-2/amp"}
+  },
+  "emergency_landings": {
+    "text": "10 emergency landings due to technical snags and 2 turbulence incidents were reported from January 2024 to early August 2025 (all Indian airlines; no airline breakdown given).",
+    "source": {"kind": "press", "label": "Scroll, 12 Aug 2025, reporting the Rajya Sabha answer", "url": "https://scroll.in/latest/1085453/scroll_in"}
+  },
+  "curated_at": "2026-11-15"
+}
