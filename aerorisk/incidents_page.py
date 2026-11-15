@@ -127,11 +127,13 @@ def _india(india: dict[str, Any] | None, seat_maps_by_iata: dict[str, str]) -> s
 <p class="small muted">{_e(fr["definition"])} A higher rate can also mean stricter reporting, so it isn't a safety score.</p>
 {_src(fr["source"])}"""]
 
-    a25 = india.get("airline_2025")
-    if a25:
-        out.append(f'<h3 class="h4">{_e(a25["title"])}</h3><ul>' +
-                   "".join(f'<li>{_e(r["airline"])}: <strong>{r["count"]}</strong></li>' for r in a25["rows"]) +
-                   f'</ul><p class="small muted">{_e(a25["note"])}</p>{_src(a25["source"])}')
+    for key in ("airline_2026", "airline_2025"):
+        blk = india.get(key)
+        if blk:
+            out.append(f'<h3 class="h4">{_e(blk["title"])}</h3>' +
+                       hbars([(r["airline"], r["count"], str(r["count"])) for r in blk["rows"]], blk["title"], "short") +
+                       f'<p class="small muted">{_e(blk["note"])}</p>{_src(blk["source"])}' +
+                       "".join(_src(x) for x in blk.get("extra_sources", [])))
     se = india.get("serious_events_2025")
     if se:
         rows = "".join(f'<tr><th scope="row">{_e(r["airline"])}</th><td>{r["engine_shutdowns"]}</td><td>{r["mayday"]}</td></tr>'
@@ -145,8 +147,8 @@ def _india(india: dict[str, Any] | None, seat_maps_by_iata: dict[str, str]) -> s
     yd = india.get("yearly_defects")
     if yd:
         out.append(f'<h3 class="h4">{_e(yd["title"])}</h3>' +
-                   hbars([(r["year"], r["count"], _fmt(r["count"]) + (" *" if r["src"] == "press" else "")) for r in yd["rows"]], "Defects per year", "short") +
-                   f'<p class="small muted">{_e(yd["note"])} * from a press report of the answer.</p>' +
+                   hbars([(r["year"], r["count"], _fmt(r["count"]) + "") for r in yd["rows"]], "Defects per year", "short") +
+                   f'<p class="small muted">{_e(yd["note"])}</p>' +
                    "".join(_src(x) for x in yd["sources"]))
     out.append("</section>")
     return "\n".join(out)
