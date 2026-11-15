@@ -836,7 +836,7 @@ __LUCKY_FIELDS__
     body = body.replace("__LUCKY_OPTIONS__", "".join(opts)).replace("__LUCKY_FIELDS__", lucky_fields("lh-"))
     band = """<h1>Find your <span>lucky seat</span>, and know the plane you're on</h1>
 <p class="lede">Your moon sign, sun sign or zodiac animal picks a lucky seat, just for fun. Then see the real thing: exit rows, cabin sections, what crash studies found, and the aircraft behind your flight, every fact sourced.</p>
-<p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#lookup">Which plane is my flight?</a></p>"""
+<p class="bandcta"><a class="btn btn-yellow" href="#luckyhome">Find my lucky seat</a> <a class="btn btn-ghost" href="#lookup">Which plane is my flight?</a> <a class="btn btn-ghost" href="/incidents/">Incident stats</a></p>"""
     return shell(s, head(s, title=f"{s.name}: {s.tagline}", description=desc, path="/",
                          jsonld=[site_ld, org_ld, catalog]), body, band=band, band_cls="band-home")
 
