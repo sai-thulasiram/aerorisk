@@ -7,17 +7,6 @@
  "scope": "Reports on commercial fixed-wing aircraft (airliners and cargo), newest first.",
  "reports": [
   {
-   "title": "AAIB investigation to Sikorsky S-92A, G-CIJC",
-   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-sikorsky-s-92a-g-cijc",
-   "published": "2026-11-12",
-   "occurred": "2026-03-05",
-   "aircraft": "Sikorsky S-92A",
-   "location": "Aberdeen Airport",
-   "summary": "Excessive vibration due to main rotor damper component failure, Aberdeen Airport, 5 March 2026",
-   "report_type": "correspondence-investigation",
-   "tags": []
-  },
-  {
    "title": "AAIB investigation to Airbus A300-600F, D-AEAG",
    "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-airbus-a300-600f-d-aeag",
    "published": "2026-11-12",
@@ -76,7 +65,7 @@
    "occurred": "2026-01-06",
    "aircraft": "Cessna Citation CJ2+",
    "location": "London Biggin Hill Airport\r\n",
-   "summary": "Runway excursion following rejected takeoff, London Biggin Hill Airport, 6 January 2026\r\n",
+   "summary": "Runway excursion following rejected takeoff, London Biggin Hill Airport, 6 January 2026",
    "report_type": "correspondence-investigation",
    "tags": [
     "runway"
@@ -89,7 +78,7 @@
    "occurred": "2024-02-08",
    "aircraft": "Boeing 747-433",
    "location": "After departure from London Heathrow Airport",
-   "summary": "Water ingress leading to loss of two AC buses, and ice leading to unreliable airspeed, after departure from London Heathrow Airport, 8 February 2024 ",
+   "summary": "Water ingress leading to loss of two AC buses, and ice leading to unreliable airspeed, after departure from London Heathrow Airport, 8 February 2024",
    "report_type": "field-investigation",
    "tags": []
   },
@@ -227,7 +216,7 @@
    "occurred": "2024-12-06",
    "aircraft": "Airbus A380-841",
    "location": "Over the Atlantic Ocean, south of Greenland",
-   "summary": "Turbulence encounter over the Atlantic Ocean, south of Greenland, 6 December 2024\r\n",
+   "summary": "Turbulence encounter over the Atlantic Ocean, south of Greenland, 6 December 2024",
    "report_type": "correspondence-investigation",
    "tags": [
     "turbulence"
@@ -321,7 +310,7 @@
    "occurred": "2023-07-30",
    "aircraft": "Airbus A320-214",
    "location": "After departure from Toulouse-Blagnac Airport, France",
-   "summary": "Aircraft lined up from incorrect intersection at Toulouse-Blagnac Airport, France, 30 July 2023 ",
+   "summary": "Aircraft lined up from incorrect intersection at Toulouse-Blagnac Airport, France, 30 July 2023",
    "report_type": "correspondence-investigation",
    "tags": []
   },
@@ -332,7 +321,7 @@
    "occurred": "2024-06-20",
    "aircraft": "Airbus A320-214",
    "location": "Kerkira Airport, Corfu",
-   "summary": "Rejected baulked landing go-around, Kerkira Airport, Corfu, 19 June 2024 ",
+   "summary": "Rejected baulked landing go-around, Kerkira Airport, Corfu, 19 June 2024",
    "report_type": "correspondence-investigation",
    "tags": []
   },
@@ -431,17 +420,6 @@
    "tags": []
   },
   {
-   "title": "AAIB investigation to AW189, G-FSAR ",
-   "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-aw189-g-fsar",
-   "published": "2025-01-09",
-   "occurred": "2024-07-22",
-   "aircraft": "AW189",
-   "location": "Approx 190 nm East of Stanley Airfield, Falkland Islands",
-   "summary": "AW189 (G-FSAR), Search and Rescue operation, approx 190 nm East of Stanley Airfield, Falkland Islands, 22 July 2024",
-   "report_type": "correspondence-investigation",
-   "tags": []
-  },
-  {
    "title": "AAIB investigation to LBL 90A, G-JEMI",
    "url": "https://www.gov.uk/aaib-reports/aaib-investigation-to-lbl-90a-g-jemi",
    "published": "2024-12-12",
@@ -475,5 +453,5 @@
    "tags": []
   }
  ],
- "collected_at": "2026-11-15T14:37:12+00:00"
+ "collected_at": "2026-11-15T14:41:09+00:00"
 }
