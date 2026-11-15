@@ -8,68 +8,61 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: CADORS
+      - name: CADORS deep
         run: |
-          for f in Occurrence_Category Occurrence_Information Occurrence_Event_Information Aircraft_Information Aircraft_Event_Information; do
-            echo "=== $f"; curl -sSI "https://opendatatc.tc.canada.ca/CADORS_$f.csv" | grep -iE "^HTTP|content-length|last-modified|content-type"
-            curl -sS -r 0-1500 "https://opendatatc.tc.canada.ca/CADORS_$f.csv" | head -c 1500; echo
+          for f in Occurrence_Information Aircraft_Information Aircraft_Event_Information; do curl -sS -o $f.csv https://opendatatc.tc.canada.ca/CADORS_$f.csv; done
+          python3 - <<'PY'
+          import csv, collections, re
+          occ = {}
+          with open("Occurrence_Information.csv", newline="", encoding="utf-8-sig") as fh:
+              for r in csv.DictReader(fh): occ[r["cadorsnumber"]] = r
+          dates = sorted(r["occurrencedate"] for r in occ.values() if r["occurrencedate"])
+          print("occ rows", len(occ), "min", dates[0], "max", dates[-1])
+          print("by year", sorted(collections.Counter(d[:4] for d in dates).items())[-6:])
+          print("by month 2026", sorted((k,v) for k,v in collections.Counter(d[:7] for d in dates if d >= "2025-09").items()))
+          print("occ types", collections.Counter(r["occurrencetypedescriptione"] for r in occ.values()).most_common())
+          print("class types", collections.Counter(r["occurrence_class_type_elbl"] for r in occ.values()).most_common(10))
+          print("countries", collections.Counter(r["country_enm"] for r in occ.values()).most_common(8))
+          with open("Aircraft_Information.csv", newline="", encoding="utf-8-sig") as fh:
+              rd = csv.DictReader(fh); print("AC FIELDS", rd.fieldnames); ac = list(rd)
+          print("sample", ac[1])
+          recent = [a for a in ac if occ.get(a["cadorsnumber"], {}).get("occurrencedate", "") >= "2025-11-01"]
+          print("recent aircraft rows", len(recent))
+          opk = [k for k in rd.fieldnames if "operator" in k.lower()]
+          print("operator keys", opk)
+          for k in rd.fieldnames:
+              vals = collections.Counter(a[k] for a in recent)
+              if len(vals) < 40: print("FIELD", k, vals.most_common(12))
+          ops = collections.Counter()
+          for a in recent:
+              for k in opk:
+                  if a[k]: ops[(k, a[k])] += 1
+          for k, v in ops.most_common(120): print(v, k)
+          for pat in ("AIR INDIA", "INDIGO", "INTERGLOBE", "EMIRATES", "LUFTHANSA", "RYANAIR", "EASYJET"):
+              hits = collections.Counter(a[k] for a in ac for k in opk if pat in a[k].upper())
+              print("PAT", pat, hits.most_common(6))
+          ev = collections.defaultdict(list)
+          with open("Aircraft_Event_Information.csv", newline="", encoding="utf-8-sig") as fh:
+              for r in csv.DictReader(fh): ev[(r["cadorsnumber"], r["aircraftnumber"].split(".")[0])].append(r["event_name_enm"])
+          ai = [a for a in recent if any("AIR INDIA" in a[k].upper() for k in opk)]
+          for a in ai[:15]:
+              o = occ[a["cadorsnumber"]]
+              print("AI", o["occurrencedate"], a["cadorsnumber"], a.get("flightnumber"), a["aircraft_make_name_nm"], a["aircraft_model_name_nm"], o["aerodromeid"], ev.get((a["cadorsnumber"], a["aircraftnumber"].split(".")[0])))
+          print("event keys sample", list(ev.items())[:3])
+          print("join check", sum(1 for a in recent if (a["cadorsnumber"], a["aircraftnumber"].split(".")[0]) in ev), "of", len(recent))
+          PY
+      - name: GOV.UK AAIB categories
+        run: |
+          curl -sS "https://www.gov.uk/api/search.json?filter_format=aaib_report&count=300&order=-public_timestamp&fields=aircraft_category,report_type" | python3 -c "
+          import json,sys,collections; d=json.load(sys.stdin); c=collections.Counter(); t=collections.Counter()
+          for r in d['results']:
+              for x in r.get('aircraft_category',[]): c[x]+=1
+              for x in r.get('report_type',[]): t[x]+=1
+          print(c); print(t)"
+          curl -sS "https://www.gov.uk/api/search.json?filter_format=aaib_report&filter_aircraft_category=commercial-fixed-wing&count=5&order=-public_timestamp&fields=title,link,public_timestamp,report_type,date_of_occurrence,aircraft_type,location,description" | python3 -m json.tool | head -80
+      - name: civilaviation.gov.in parliament listing
+        run: |
+          for u in "https://www.civilaviation.gov.in/parliament-questions" "https://www.civilaviation.gov.in/en/parliament-questions" "https://www.civilaviation.gov.in/parliament-qa"; do
+            echo "=== $u"; curl -sSL -m 30 -o p.html -w "%{http_code} %{url_effective}\n" "$u"; grep -oiE 'href="[^"]*(pdf|question|parliament)[^"]*"' p.html | sort -u | head -40
           done
-          for m in OCCURRENCE_CATEGORY OCCURRENCE_INFORMATION OCCURRENCE_EVENT_INFORMATION AIRCRAFT_INFORMATION AIRCRAFT_EVENT_INFORMATION; do
-            echo "=== META $m"; curl -sS "https://opendatatc.blob.core.windows.net/opendatatc/CADORS_${m}_METADATA.TXT" | head -c 4000; echo
-          done
-      - name: CADORS full download sample
-        run: |
-          curl -sS -o occ.csv https://opendatatc.tc.canada.ca/CADORS_Occurrence_Information.csv && ls -la occ.csv && wc -l occ.csv && file occ.csv
-          head -c 600 occ.csv | od -c | head -5
-          tail -n 3 occ.csv
-          curl -sS -o cat.csv https://opendatatc.tc.canada.ca/CADORS_Occurrence_Category.csv && wc -l cat.csv
-          python3 - <<'PY'
-          import csv, collections
-          for name in ("cat.csv",):
-              with open(name, newline="", encoding="utf-8-sig", errors="replace") as fh:
-                  r = csv.reader(fh); hdr = next(r); print(name, hdr)
-                  c = collections.Counter()
-                  for row in r:
-                      for i,h in enumerate(hdr):
-                          if "ENGLISH" in h.upper() or "CATEGORY" in h.upper(): c[(h,row[i])] += 1
-                  for k,v in c.most_common(80): print(v, k)
-          PY
-          curl -sS -o ac.csv https://opendatatc.tc.canada.ca/CADORS_Aircraft_Information.csv && wc -l ac.csv && head -3 ac.csv
-          python3 - <<'PY'
-          import csv, collections
-          with open("ac.csv", newline="", encoding="utf-8-sig", errors="replace") as fh:
-              r = csv.DictReader(fh); print(r.fieldnames)
-              c = collections.Counter()
-              for row in r:
-                  for k in row:
-                      if "OPERATOR" in k.upper(): c[row[k]] += 1
-              for k,v in c.most_common(60): print(v, k)
-          PY
-          python3 - <<'PY'
-          import csv
-          with open("occ.csv", newline="", encoding="utf-8-sig", errors="replace") as fh:
-              r = csv.DictReader(fh); print(r.fieldnames)
-              rows = list(r)
-          print(len(rows)); print(rows[-1]); print(rows[-2])
-          PY
-          curl -sS -o aev.csv https://opendatatc.tc.canada.ca/CADORS_Aircraft_Event_Information.csv && wc -l aev.csv && head -3 aev.csv
-          curl -sS -o oev.csv https://opendatatc.tc.canada.ca/CADORS_Occurrence_Event_Information.csv && wc -l oev.csv && head -3 oev.csv
-          python3 - <<'PY'
-          import csv, collections
-          for name in ("aev.csv","oev.csv"):
-              with open(name, newline="", encoding="utf-8-sig", errors="replace") as fh:
-                  r = csv.DictReader(fh); print(name, r.fieldnames)
-                  c = collections.Counter()
-                  for row in r:
-                      for k in row:
-                          if "ENGLISH" in k.upper() or "EVENT" in k.upper(): c[(k,row[k])] += 1
-                  for k,v in c.most_common(70): print(v, k)
-          PY
-      - name: GOV.UK AAIB
-        run: |
-          curl -sS "https://www.gov.uk/api/search.json?filter_format=aaib_report&count=3&order=-public_timestamp&fields=title,link,public_timestamp,aircraft_category,report_type,date_of_occurrence,aircraft_type,location,description" | python3 -m json.tool | head -120
-          curl -sS "https://www.gov.uk/api/search.json?filter_format=aaib_report&count=0&facet_aircraft_category=20&facet_report_type=20" | python3 -m json.tool | head -80
-      - name: AAIB India
-        run: |
-          curl -sSL -m 30 https://aaib.gov.in/ | sed 's/<[^>]*>/ /g' | tr -s ' \n' | head -c 3000; echo
-          curl -sSL -m 30 https://aaib.gov.in/index.html -o a.html; grep -oiE 'href="[^"]+"' a.html | sort -u | head -80
+          curl -sSL -m 30 https://www.civilaviation.gov.in/ | grep -oiE 'href="[^"]*"' | grep -iE "parlia|question|lok|rajya" | sort -u | head
