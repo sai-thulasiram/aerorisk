@@ -738,6 +738,24 @@
  ],
  "notable": [
   {
+   "cadors": "2026U0057",
+   "date": "2026-11-12",
+   "name": "PAL Airlines",
+   "flight": "PVL411",
+   "aircraft": "Dehavilland Dhc-8-402",
+   "airport": null,
+   "phase": "En Route",
+   "damage": "No Damage",
+   "events": [
+    "Blown tire/wheel failure",
+    "Diversion"
+   ],
+   "groups": [
+    "diversion",
+    "landing_gear"
+   ]
+  },
+  {
    "cadors": "2026C4698",
    "date": "2026-08-16",
    "name": "Perimeter Aviation",
@@ -753,6 +771,39 @@
    "groups": [
     "diversion",
     "hydraulic_flight_controls"
+   ]
+  },
+  {
+   "cadors": "2026C4832",
+   "date": "2026-08-15",
+   "name": "WestJet Encore",
+   "flight": "WEN3460",
+   "aircraft": "Dehavilland Dhc-8-402",
+   "airport": null,
+   "phase": "Approach",
+   "damage": "No Damage",
+   "events": [
+    "Windshield/window (aircraft)",
+    "Declared emergency/priority"
+   ],
+   "groups": [
+    "declared_emergency"
+   ]
+  },
+  {
+   "cadors": "2026C4821",
+   "date": "2026-08-15",
+   "name": "Canadian North",
+   "flight": "AKT677",
+   "aircraft": "Atr-Gie Atr 42-500",
+   "airport": "CYZF",
+   "phase": "Standing",
+   "damage": "No Damage",
+   "events": [
+    "Smoke/fumes - aircraft"
+   ],
+   "groups": [
+    "smoke_fire"
    ]
   },
   {
@@ -1400,63 +1451,6 @@
     "diversion",
     "landing_gear"
    ]
-  },
-  {
-   "cadors": "2026P2128",
-   "date": "2026-07-23",
-   "name": "WestJet Encore",
-   "flight": "WEN3561",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYLW",
-   "phase": "Takeoff",
-   "damage": "No Damage",
-   "events": [
-    "Engine failure",
-    "Rejected take-off"
-   ],
-   "groups": [
-    "engine",
-    "rejected_takeoff"
-   ]
-  },
-  {
-   "cadors": "2026C4111",
-   "date": "2026-07-23",
-   "name": "British Airways",
-   "flight": "BAW5WB",
-   "aircraft": "Boeing 787-10",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Smoke/fumes - aircraft",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion",
-    "smoke_fire"
-   ]
-  },
-  {
-   "cadors": "2026O2171",
-   "date": "2026-07-22",
-   "name": "Air Canada",
-   "flight": "ACA145",
-   "aircraft": "Airbus A321-211",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Decompression/pressurization",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion"
-   ]
   }
  ],
  "site_airlines": {
@@ -1680,5 +1674,5 @@
    }
   ]
  },
- "collected_at": "2026-11-17T09:16:36+00:00"
+ "collected_at": "2026-11-18T08:35:59+00:00"
 }
