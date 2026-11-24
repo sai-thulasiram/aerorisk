@@ -10,23 +10,23 @@
   "to": "2026-07-31"
  },
  "data_through": "2026-07-31",
- "reports": 9722,
+ "reports": 0,
  "groups": {
-  "declared_emergency": 351,
-  "landing_gear": 217,
-  "engine": 77,
-  "smoke_fire": 56,
-  "diversion": 860,
-  "rejected_takeoff": 303,
-  "hydraulic_flight_controls": 152,
-  "bird_strike": 785,
-  "turbulence": 174,
-  "medical": 656,
-  "gnss": 444
+  "declared_emergency": 0,
+  "landing_gear": 0,
+  "engine": 0,
+  "smoke_fire": 0,
+  "diversion": 0,
+  "rejected_takeoff": 0,
+  "hydraulic_flight_controls": 0,
+  "bird_strike": 0,
+  "turbulence": 0,
+  "medical": 0,
+  "gnss": 0
  },
  "declared_emergencies": {
-  "count": 351,
-  "no_damage": 348,
+  "count": 0,
+  "no_damage": 0,
   "fatal": 0,
   "injured": 0
  },
@@ -34,1645 +34,225 @@
  "monthly": [
   {
    "month": "2024-08",
-   "reports": 800,
-   "declared_emergency": 33,
-   "landing_gear": 9,
-   "engine": 12,
-   "smoke_fire": 7,
-   "hydraulic_flight_controls": 12
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2024-09",
-   "reports": 765,
-   "declared_emergency": 27,
-   "landing_gear": 13,
-   "engine": 2,
-   "smoke_fire": 5,
-   "hydraulic_flight_controls": 7
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2024-10",
-   "reports": 716,
-   "declared_emergency": 30,
-   "landing_gear": 10,
-   "engine": 8,
-   "smoke_fire": 4,
-   "hydraulic_flight_controls": 19
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2024-11",
-   "reports": 665,
-   "declared_emergency": 35,
-   "landing_gear": 15,
-   "engine": 13,
-   "smoke_fire": 10,
-   "hydraulic_flight_controls": 18
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2024-12",
-   "reports": 729,
-   "declared_emergency": 34,
-   "landing_gear": 12,
-   "engine": 5,
-   "smoke_fire": 6,
-   "hydraulic_flight_controls": 12
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-01",
-   "reports": 657,
-   "declared_emergency": 28,
-   "landing_gear": 18,
-   "engine": 10,
-   "smoke_fire": 6,
-   "hydraulic_flight_controls": 16
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-02",
-   "reports": 612,
-   "declared_emergency": 40,
-   "landing_gear": 12,
-   "engine": 7,
-   "smoke_fire": 9,
-   "hydraulic_flight_controls": 11
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-03",
-   "reports": 853,
-   "declared_emergency": 34,
-   "landing_gear": 10,
-   "engine": 10,
-   "smoke_fire": 10,
-   "hydraulic_flight_controls": 12
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-04",
-   "reports": 1166,
-   "declared_emergency": 22,
-   "landing_gear": 8,
-   "engine": 8,
-   "smoke_fire": 6,
-   "hydraulic_flight_controls": 9
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-05",
-   "reports": 1245,
-   "declared_emergency": 25,
-   "landing_gear": 11,
-   "engine": 7,
-   "smoke_fire": 6,
-   "hydraulic_flight_controls": 13
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-06",
-   "reports": 996,
-   "declared_emergency": 28,
-   "landing_gear": 17,
-   "engine": 6,
-   "smoke_fire": 3,
-   "hydraulic_flight_controls": 7
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-07",
-   "reports": 1064,
-   "declared_emergency": 37,
-   "landing_gear": 10,
-   "engine": 6,
-   "smoke_fire": 14,
-   "hydraulic_flight_controls": 17
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-08",
-   "reports": 1035,
-   "declared_emergency": 29,
-   "landing_gear": 21,
-   "engine": 7,
-   "smoke_fire": 5,
-   "hydraulic_flight_controls": 14
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-09",
-   "reports": 948,
-   "declared_emergency": 42,
-   "landing_gear": 24,
-   "engine": 8,
-   "smoke_fire": 6,
-   "hydraulic_flight_controls": 11
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-10",
-   "reports": 762,
-   "declared_emergency": 33,
-   "landing_gear": 11,
-   "engine": 6,
-   "smoke_fire": 3,
-   "hydraulic_flight_controls": 12
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-11",
-   "reports": 758,
-   "declared_emergency": 28,
-   "landing_gear": 12,
-   "engine": 6,
-   "smoke_fire": 5,
-   "hydraulic_flight_controls": 14
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2025-12",
-   "reports": 796,
-   "declared_emergency": 35,
-   "landing_gear": 19,
-   "engine": 9,
-   "smoke_fire": 5,
-   "hydraulic_flight_controls": 13
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2026-01",
-   "reports": 753,
-   "declared_emergency": 29,
-   "landing_gear": 25,
-   "engine": 8,
-   "smoke_fire": 3,
-   "hydraulic_flight_controls": 12
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2026-02",
-   "reports": 622,
-   "declared_emergency": 33,
-   "landing_gear": 21,
-   "engine": 6,
-   "smoke_fire": 5,
-   "hydraulic_flight_controls": 8
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2026-03",
-   "reports": 744,
-   "declared_emergency": 26,
-   "landing_gear": 20,
-   "engine": 5,
-   "smoke_fire": 4,
-   "hydraulic_flight_controls": 16
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2026-04",
-   "reports": 760,
-   "declared_emergency": 14,
-   "landing_gear": 9,
-   "engine": 5,
-   "smoke_fire": 4,
-   "hydraulic_flight_controls": 6
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2026-05",
-   "reports": 752,
-   "declared_emergency": 27,
-   "landing_gear": 14,
-   "engine": 2,
-   "smoke_fire": 3,
-   "hydraulic_flight_controls": 13
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2026-06",
-   "reports": 842,
-   "declared_emergency": 26,
-   "landing_gear": 20,
-   "engine": 10,
-   "smoke_fire": 8,
-   "hydraulic_flight_controls": 20
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   },
   {
    "month": "2026-07",
-   "reports": 950,
-   "declared_emergency": 29,
-   "landing_gear": 21,
-   "engine": 5,
-   "smoke_fire": 5,
-   "hydraulic_flight_controls": 13
+   "reports": 0,
+   "declared_emergency": 0,
+   "landing_gear": 0,
+   "engine": 0,
+   "smoke_fire": 0,
+   "hydraulic_flight_controls": 0
   }
  ],
- "airlines": [
-  {
-   "id": "5262",
-   "name": "Air Canada",
-   "reports": 1379,
-   "groups": {
-    "declared_emergency": 55,
-    "landing_gear": 13,
-    "engine": 6,
-    "smoke_fire": 9,
-    "diversion": 69,
-    "rejected_takeoff": 37,
-    "hydraulic_flight_controls": 24,
-    "bird_strike": 174,
-    "turbulence": 6,
-    "medical": 85,
-    "gnss": 37
-   },
-   "iata": null
-  },
-  {
-   "id": "8893",
-   "name": "WestJet",
-   "reports": 1067,
-   "groups": {
-    "declared_emergency": 35,
-    "landing_gear": 12,
-    "engine": 11,
-    "smoke_fire": 5,
-    "diversion": 68,
-    "rejected_takeoff": 24,
-    "hydraulic_flight_controls": 7,
-    "bird_strike": 117,
-    "turbulence": 5,
-    "medical": 106
-   },
-   "iata": null
-  },
-  {
-   "id": "5002",
-   "name": "Jazz (Air Canada Express)",
-   "reports": 740,
-   "groups": {
-    "declared_emergency": 45,
-    "landing_gear": 33,
-    "engine": 4,
-    "smoke_fire": 5,
-    "diversion": 77,
-    "rejected_takeoff": 36,
-    "hydraulic_flight_controls": 20,
-    "bird_strike": 123,
-    "turbulence": 7,
-    "medical": 18,
-    "gnss": 1
-   },
-   "iata": null
-  },
-  {
-   "id": "15266",
-   "name": "Porter Airlines",
-   "reports": 717,
-   "groups": {
-    "declared_emergency": 21,
-    "landing_gear": 14,
-    "engine": 2,
-    "smoke_fire": 6,
-    "diversion": 60,
-    "rejected_takeoff": 17,
-    "hydraulic_flight_controls": 7,
-    "bird_strike": 60,
-    "turbulence": 3,
-    "medical": 97
-   },
-   "iata": null
-  },
-  {
-   "id": "17903",
-   "name": "WestJet Encore",
-   "reports": 632,
-   "groups": {
-    "declared_emergency": 31,
-    "landing_gear": 34,
-    "engine": 6,
-    "smoke_fire": 2,
-    "diversion": 59,
-    "rejected_takeoff": 26,
-    "hydraulic_flight_controls": 11,
-    "bird_strike": 71,
-    "turbulence": 10,
-    "medical": 39,
-    "gnss": 1
-   },
-   "iata": null
-  },
-  {
-   "id": "5421",
-   "name": "Air France",
-   "reports": 292,
-   "groups": {
-    "declared_emergency": 1,
-    "diversion": 8,
-    "rejected_takeoff": 2,
-    "bird_strike": 2,
-    "turbulence": 13,
-    "medical": 7
-   },
-   "iata": null
-  },
-  {
-   "id": "14941",
-   "name": "Flair Airlines",
-   "reports": 225,
-   "groups": {
-    "declared_emergency": 4,
-    "landing_gear": 2,
-    "engine": 1,
-    "diversion": 8,
-    "rejected_takeoff": 2,
-    "bird_strike": 30,
-    "turbulence": 1,
-    "medical": 27
-   },
-   "iata": null
-  },
-  {
-   "id": "17978",
-   "name": "Air Canada Rouge",
-   "reports": 221,
-   "groups": {
-    "declared_emergency": 21,
-    "landing_gear": 1,
-    "engine": 3,
-    "smoke_fire": 7,
-    "diversion": 15,
-    "rejected_takeoff": 2,
-    "hydraulic_flight_controls": 6,
-    "bird_strike": 33,
-    "turbulence": 1,
-    "medical": 25
-   },
-   "iata": null
-  },
-  {
-   "id": "4881",
-   "name": "United Airlines",
-   "reports": 220,
-   "groups": {
-    "declared_emergency": 7,
-    "engine": 3,
-    "smoke_fire": 2,
-    "diversion": 36,
-    "rejected_takeoff": 1,
-    "hydraulic_flight_controls": 2,
-    "bird_strike": 4,
-    "turbulence": 5,
-    "medical": 24,
-    "gnss": 18
-   },
-   "iata": null
-  },
-  {
-   "id": "624",
-   "name": "Delta Air Lines",
-   "reports": 202,
-   "groups": {
-    "declared_emergency": 11,
-    "engine": 4,
-    "smoke_fire": 3,
-    "diversion": 32,
-    "rejected_takeoff": 2,
-    "bird_strike": 3,
-    "turbulence": 1,
-    "medical": 15
-   },
-   "iata": null
-  },
-  {
-   "id": "15150",
-   "name": "Etihad Airways",
-   "reports": 171,
-   "groups": {
-    "diversion": 3,
-    "turbulence": 1,
-    "medical": 3,
-    "gnss": 125
-   },
-   "iata": null
-  },
-  {
-   "id": "2659",
-   "name": "PAL Airlines",
-   "reports": 166,
-   "groups": {
-    "declared_emergency": 3,
-    "landing_gear": 12,
-    "engine": 1,
-    "diversion": 43,
-    "rejected_takeoff": 19,
-    "hydraulic_flight_controls": 6,
-    "bird_strike": 15,
-    "medical": 11,
-    "gnss": 1
-   },
-   "iata": null
-  },
-  {
-   "id": "5311",
-   "name": "Air Transat",
-   "reports": 153,
-   "groups": {
-    "declared_emergency": 9,
-    "landing_gear": 5,
-    "engine": 1,
-    "smoke_fire": 1,
-    "diversion": 9,
-    "rejected_takeoff": 2,
-    "hydraulic_flight_controls": 1,
-    "bird_strike": 8,
-    "turbulence": 2,
-    "medical": 15
-   },
-   "iata": null
-  },
-  {
-   "id": "15711",
-   "name": "Emirates",
-   "reports": 148,
-   "groups": {
-    "diversion": 2,
-    "turbulence": 2,
-    "medical": 2,
-    "gnss": 85
-   },
-   "iata": null
-  },
-  {
-   "id": "17640",
-   "name": "Qatar Airways",
-   "reports": 138,
-   "groups": {
-    "turbulence": 3,
-    "medical": 2,
-    "gnss": 77
-   },
-   "iata": null
-  },
-  {
-   "id": "11674",
-   "name": "Cargojet",
-   "reports": 132,
-   "groups": {
-    "declared_emergency": 14,
-    "landing_gear": 7,
-    "engine": 7,
-    "smoke_fire": 1,
-    "diversion": 5,
-    "rejected_takeoff": 10,
-    "hydraulic_flight_controls": 7,
-    "bird_strike": 16,
-    "turbulence": 2
-   },
-   "iata": null
-  },
-  {
-   "id": "107",
-   "name": "Canadian North",
-   "reports": 126,
-   "groups": {
-    "declared_emergency": 10,
-    "landing_gear": 4,
-    "engine": 1,
-    "smoke_fire": 5,
-    "diversion": 32,
-    "rejected_takeoff": 6,
-    "hydraulic_flight_controls": 5,
-    "bird_strike": 9,
-    "medical": 17,
-    "gnss": 3
-   },
-   "iata": null
-  },
-  {
-   "id": "1861",
-   "name": "Perimeter Aviation",
-   "reports": 120,
-   "groups": {
-    "declared_emergency": 4,
-    "landing_gear": 4,
-    "engine": 5,
-    "diversion": 31,
-    "rejected_takeoff": 20,
-    "hydraulic_flight_controls": 6,
-    "bird_strike": 4,
-    "medical": 10
-   },
-   "iata": null
-  },
-  {
-   "id": "2955",
-   "name": "Air Inuit",
-   "reports": 98,
-   "groups": {
-    "declared_emergency": 8,
-    "landing_gear": 7,
-    "engine": 1,
-    "diversion": 23,
-    "rejected_takeoff": 8,
-    "hydraulic_flight_controls": 7,
-    "bird_strike": 5,
-    "turbulence": 1,
-    "medical": 6
-   },
-   "iata": null
-  },
-  {
-   "id": "1298",
-   "name": "Lufthansa",
-   "reports": 97,
-   "groups": {
-    "declared_emergency": 2,
-    "diversion": 9,
-    "rejected_takeoff": 1,
-    "bird_strike": 2,
-    "turbulence": 1,
-    "medical": 11
-   },
-   "iata": null
-  },
-  {
-   "id": "5412",
-   "name": "American Airlines",
-   "reports": 92,
-   "groups": {
-    "declared_emergency": 6,
-    "landing_gear": 2,
-    "smoke_fire": 1,
-    "diversion": 16,
-    "rejected_takeoff": 2,
-    "hydraulic_flight_controls": 4,
-    "bird_strike": 3,
-    "turbulence": 1,
-    "medical": 13,
-    "gnss": 26
-   },
-   "iata": null
-  },
-  {
-   "id": "15690",
-   "name": "Republic Airways",
-   "reports": 86,
-   "groups": {
-    "declared_emergency": 1,
-    "landing_gear": 2,
-    "diversion": 2,
-    "rejected_takeoff": 1,
-    "bird_strike": 4,
-    "medical": 4
-   },
-   "iata": null
-  },
-  {
-   "id": "358",
-   "name": "KLM",
-   "reports": 82,
-   "groups": {
-    "engine": 1,
-    "diversion": 4,
-    "bird_strike": 2,
-    "turbulence": 2,
-    "medical": 3
-   },
-   "iata": null
-  },
-  {
-   "id": "15405",
-   "name": "Turkish Airlines",
-   "reports": 73,
-   "groups": {
-    "diversion": 12,
-    "turbulence": 3,
-    "medical": 12,
-    "gnss": 22
-   },
-   "iata": null
-  },
-  {
-   "id": "17940",
-   "name": "Summit Air",
-   "reports": 73,
-   "groups": {
-    "declared_emergency": 4,
-    "landing_gear": 11,
-    "engine": 2,
-    "diversion": 24,
-    "rejected_takeoff": 5,
-    "hydraulic_flight_controls": 3,
-    "bird_strike": 4,
-    "medical": 2
-   },
-   "iata": null
-  },
-  {
-   "id": "3999",
-   "name": "Central Mountain Air",
-   "reports": 68,
-   "groups": {
-    "declared_emergency": 2,
-    "landing_gear": 3,
-    "diversion": 11,
-    "rejected_takeoff": 5,
-    "hydraulic_flight_controls": 2,
-    "bird_strike": 3
-   },
-   "iata": null
-  },
-  {
-   "id": "8982",
-   "name": "Air Creebec",
-   "reports": 67,
-   "groups": {
-    "declared_emergency": 2,
-    "landing_gear": 1,
-    "engine": 2,
-    "diversion": 12,
-    "rejected_takeoff": 5,
-    "hydraulic_flight_controls": 2,
-    "bird_strike": 7,
-    "medical": 5
-   },
-   "iata": null
-  },
-  {
-   "id": "8741",
-   "name": "SkyWest Airlines",
-   "reports": 66,
-   "groups": {
-    "diversion": 1,
-    "rejected_takeoff": 3,
-    "hydraulic_flight_controls": 1,
-    "bird_strike": 7,
-    "medical": 1
-   },
-   "iata": null
-  },
-  {
-   "id": "10377",
-   "name": "Endeavor Air",
-   "reports": 65,
-   "groups": {
-    "declared_emergency": 3,
-    "landing_gear": 1,
-    "smoke_fire": 2,
-    "diversion": 1,
-    "rejected_takeoff": 1,
-    "bird_strike": 3,
-    "turbulence": 1
-   },
-   "iata": null
-  },
-  {
-   "id": "1487",
-   "name": "Calm Air",
-   "reports": 62,
-   "groups": {
-    "declared_emergency": 1,
-    "landing_gear": 2,
-    "engine": 2,
-    "smoke_fire": 1,
-    "diversion": 17,
-    "rejected_takeoff": 3,
-    "bird_strike": 5,
-    "medical": 4,
-    "gnss": 1
-   },
-   "iata": null
-  },
-  {
-   "id": "1743",
-   "name": "Air India",
-   "reports": 29,
-   "groups": {
-    "turbulence": 3,
-    "gnss": 5
-   },
-   "iata": "AI"
-  }
- ],
- "notable": [
-  {
-   "cadors": "2026U0057",
-   "date": "2026-11-12",
-   "name": "PAL Airlines",
-   "flight": "PVL411",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Blown tire/wheel failure",
-    "Diversion"
-   ],
-   "groups": [
-    "diversion",
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026C4698",
-   "date": "2026-08-16",
-   "name": "Perimeter Aviation",
-   "flight": "PAG109",
-   "aircraft": "Dehavilland Dhc-8-314",
-   "airport": "CYWG",
-   "phase": "Initial Climb",
-   "damage": "No Damage",
-   "events": [
-    "Flight control systems (ailerons, rudder, rotors, flaps, main, tail)",
-    "Diversion"
-   ],
-   "groups": [
-    "diversion",
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026C4832",
-   "date": "2026-08-15",
-   "name": "WestJet Encore",
-   "flight": "WEN3460",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": null,
-   "phase": "Approach",
-   "damage": "No Damage",
-   "events": [
-    "Windshield/window (aircraft)",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency"
-   ]
-  },
-  {
-   "cadors": "2026C4821",
-   "date": "2026-08-15",
-   "name": "Canadian North",
-   "flight": "AKT677",
-   "aircraft": "Atr-Gie Atr 42-500",
-   "airport": "CYZF",
-   "phase": "Standing",
-   "damage": "No Damage",
-   "events": [
-    "Smoke/fumes - aircraft"
-   ],
-   "groups": [
-    "smoke_fire"
-   ]
-  },
-  {
-   "cadors": "2026O2617",
-   "date": "2026-08-14",
-   "name": "Porter Airlines",
-   "flight": "POE478",
-   "aircraft": "Embraer Erj 190-400",
-   "airport": "CYHM",
-   "phase": "Landing",
-   "damage": "No Damage",
-   "events": [
-    "Hydraulic problem"
-   ],
-   "groups": [
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026C4816",
-   "date": "2026-08-14",
-   "name": "WestJet",
-   "flight": "WJA130",
-   "aircraft": "Boeing 737-8",
-   "airport": "CYYC",
-   "phase": "Approach",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear",
-    "Missed approach/Go-around"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026C4800",
-   "date": "2026-08-14",
-   "name": "WestJet",
-   "flight": "WJA755",
-   "aircraft": "Boeing 737-8",
-   "airport": "CYQR",
-   "phase": "Landing",
-   "damage": "No Damage",
-   "events": [
-    "Engine shut down",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency",
-    "engine"
-   ]
-  },
-  {
-   "cadors": "2026O2615",
-   "date": "2026-08-13",
-   "name": "Delta Air Lines",
-   "flight": "DAL2468",
-   "aircraft": "Boeing 737",
-   "airport": "CYYZ",
-   "phase": "Takeoff",
-   "damage": "No Damage",
-   "events": [
-    "Brakes - overheated",
-    "Blown tire/wheel failure",
-    "Evacuation (aircraft)"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026Q3262",
-   "date": "2026-08-12",
-   "name": "PAL Airlines",
-   "flight": "PVL834",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYQB",
-   "phase": "Takeoff",
-   "damage": "No Damage",
-   "events": [
-    "Mechanical/technical malfunction of aircraft - other",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency"
-   ]
-  },
-  {
-   "cadors": "2026C4756",
-   "date": "2026-08-11",
-   "name": "Porter Airlines",
-   "flight": "POE269",
-   "aircraft": "Embraer Erj 190-400",
-   "airport": "CYYC",
-   "phase": "Taxi",
-   "damage": "No Damage",
-   "events": [
-    "Brakes - overheated",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency"
-   ]
-  },
-  {
-   "cadors": "2026C4733",
-   "date": "2026-08-11",
-   "name": "Central Mountain Air",
-   "flight": "GLR8130",
-   "aircraft": "Dehavilland Dhc-8-311",
-   "airport": "CYYC",
-   "phase": "Takeoff",
-   "damage": "No Damage",
-   "events": [
-    "Diversion",
-    "Landing gear"
-   ],
-   "groups": [
-    "diversion",
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026P2559",
-   "date": "2026-08-09",
-   "name": "Helijet International",
-   "flight": "JBA987",
-   "aircraft": "Sikorsky S-76A",
-   "airport": "CYVR",
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Mechanical/technical malfunction of aircraft - other",
-    "Engine failure",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion",
-    "engine"
-   ]
-  },
-  {
-   "cadors": "2026P2527",
-   "date": "2026-08-07",
-   "name": "Flair Airlines",
-   "flight": "FLE703",
-   "aircraft": "Boeing 737-8",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Medical emergency",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency",
-    "medical"
-   ]
-  },
-  {
-   "cadors": "2026C4634",
-   "date": "2026-08-07",
-   "name": "Sunwest Aviation",
-   "flight": "CNK214",
-   "aircraft": "Beech 1900",
-   "airport": null,
-   "phase": "Takeoff",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026A1228",
-   "date": "2026-08-07",
-   "name": "PAL Airlines",
-   "flight": "PVL7714",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYFC",
-   "phase": "Approach",
-   "damage": "No Damage",
-   "events": [
-    "Flight control systems (ailerons, rudder, rotors, flaps, main, tail)",
-    "Missed approach/Go-around"
-   ],
-   "groups": [
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026O2515",
-   "date": "2026-08-06",
-   "name": "Netjets Aviation",
-   "flight": "EJA425",
-   "aircraft": "Embraer Emb-505",
-   "airport": "CYQA",
-   "phase": "Approach",
-   "damage": "No Damage",
-   "events": [
-    "Missed approach/Go-around",
-    "Flight control systems (ailerons, rudder, rotors, flaps, main, tail)",
-    "Diversion"
-   ],
-   "groups": [
-    "diversion",
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026O2508",
-   "date": "2026-08-06",
-   "name": "Delta Air Lines",
-   "flight": "DAL2886",
-   "aircraft": "Airbus A321-271Nx",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Engine - malfunction",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion",
-    "engine"
-   ]
-  },
-  {
-   "cadors": "2026O2530",
-   "date": "2026-08-05",
-   "name": "Porter Airlines",
-   "flight": "POE448",
-   "aircraft": "Embraer Erj 190-400",
-   "airport": "CYOW",
-   "phase": "Landing",
-   "damage": "No Damage",
-   "events": [
-    "Blown tire/wheel failure"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026O2497",
-   "date": "2026-08-05",
-   "name": "Porter Airlines",
-   "flight": "POE422",
-   "aircraft": "Embraer Erj 190-400",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Hydraulic problem",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency",
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026C4581",
-   "date": "2026-08-04",
-   "name": "Canadian North",
-   "flight": "AKT882",
-   "aircraft": "Aerospatiale/Aeritalia Atr 42-500",
-   "airport": null,
-   "phase": "Unknown",
-   "damage": "No Damage",
-   "events": [
-    "Medical emergency",
-    "Diversion",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion",
-    "medical"
-   ]
-  },
-  {
-   "cadors": "2026A1279",
-   "date": "2026-08-04",
-   "name": "American Airlines",
-   "flight": "AAL755",
-   "aircraft": "Boeing 787-9",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Medical emergency",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion",
-    "medical"
-   ]
-  },
-  {
-   "cadors": "2026P2436",
-   "date": "2026-08-01",
-   "name": "Jazz (Air Canada Express)",
-   "flight": "JZA8169",
-   "aircraft": "Dehavilland Dhc-8-400",
-   "airport": "CYYJ",
-   "phase": "Approach",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear",
-    "Missed approach/Go-around"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026O2388",
-   "date": "2026-08-01",
-   "name": "Lufthansa",
-   "flight": "DLH2P",
-   "aircraft": "Airbus A350-900",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion"
-   ]
-  },
-  {
-   "cadors": "2026O2257",
-   "date": "2026-08-01",
-   "name": "Porter Airlines",
-   "flight": "PTR2339",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYOW",
-   "phase": "Pushback/Towing",
-   "damage": "No Damage",
-   "events": [
-    "Smoke/fumes - aircraft"
-   ],
-   "groups": [
-    "smoke_fire"
-   ]
-  },
-  {
-   "cadors": "2026Q3038",
-   "date": "2026-07-31",
-   "name": "Jazz (Air Canada Express)",
-   "flight": "JZA8096",
-   "aircraft": "Bombardier Cl600 2D24 (Rj900)",
-   "airport": "CYUL",
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Flight control systems (ailerons, rudder, rotors, flaps, main, tail)",
-    "Aircraft navigation/communication equipment",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion",
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026P2290",
-   "date": "2026-07-31",
-   "name": "Jazz (Air Canada Express)",
-   "flight": "JZA8366",
-   "aircraft": "Dehavilland - Can Dhc 8 401",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Hydraulic problem",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion",
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026P2194",
-   "date": "2026-07-31",
-   "name": "WestJet Encore",
-   "flight": "WEN3702",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYVR",
-   "phase": "Approach",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear",
-    "Missed approach/Go-around"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026O2365",
-   "date": "2026-07-31",
-   "name": "Jazz (Air Canada Express)",
-   "flight": "JZA8427",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYYZ",
-   "phase": "Initial Climb",
-   "damage": "No Damage",
-   "events": [
-    "Flight control systems (ailerons, rudder, rotors, flaps, main, tail)",
-    "Diversion"
-   ],
-   "groups": [
-    "diversion",
-    "hydraulic_flight_controls"
-   ]
-  },
-  {
-   "cadors": "2026C4513",
-   "date": "2026-07-31",
-   "name": "WestJet",
-   "flight": "WJA240",
-   "aircraft": "Boeing 737 700",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026A1203",
-   "date": "2026-07-31",
-   "name": "PAL Airlines",
-   "flight": "PVL907",
-   "aircraft": "Dehavilland Dhc-8-101",
-   "airport": null,
-   "phase": "Takeoff",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026C4331",
-   "date": "2026-07-30",
-   "name": "Virgin Atlantic",
-   "flight": "VIR20V",
-   "aircraft": "Airbus 350-1000",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion"
-   ]
-  },
-  {
-   "cadors": "2026O2536",
-   "date": "2026-07-29",
-   "name": "Jazz (Air Canada Express)",
-   "flight": "JZA7873",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYOW",
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Other operational incident",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion"
-   ]
-  },
-  {
-   "cadors": "2026O2314",
-   "date": "2026-07-29",
-   "name": "Jazz (Air Canada Express)",
-   "flight": "JZA7873",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": null,
-   "phase": "Takeoff",
-   "damage": "No Damage",
-   "events": [
-    "Part or pieces separate from an aircraft",
-    "Declared emergency/priority",
-    "Diversion"
-   ],
-   "groups": [
-    "declared_emergency",
-    "diversion"
-   ]
-  },
-  {
-   "cadors": "2026A1175",
-   "date": "2026-07-29",
-   "name": "WestJet",
-   "flight": "WJA792",
-   "aircraft": "Boeing 737-8",
-   "airport": "CYHZ",
-   "phase": "Approach",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear",
-    "Missed approach/Go-around"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026P2239",
-   "date": "2026-07-28",
-   "name": "Air Canada",
-   "flight": "ACA65",
-   "aircraft": "Boeing 787-9",
-   "airport": "CYVR",
-   "phase": "Taxi",
-   "damage": "No Damage",
-   "events": [
-    "Smoke/fumes - aircraft",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency",
-    "smoke_fire"
-   ]
-  },
-  {
-   "cadors": "2026O2343",
-   "date": "2026-07-28",
-   "name": "Air Canada Rouge",
-   "flight": "ROU1801",
-   "aircraft": "Airbus A319-114",
-   "airport": "CYYZ",
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Blown tire/wheel failure"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026A1222",
-   "date": "2026-07-28",
-   "name": "Atlas Air",
-   "flight": "GTI8608",
-   "aircraft": "Boeing 777F",
-   "airport": "CYHZ",
-   "phase": "Landing",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear",
-    "Part or pieces separate from an aircraft"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026C4252",
-   "date": "2026-07-27",
-   "name": "WestJet Encore",
-   "flight": "WEN3405",
-   "aircraft": "Dehavilland Dhc-8-402",
-   "airport": "CYQR",
-   "phase": "Landing",
-   "damage": "No Damage",
-   "events": [
-    "Landing gear",
-    "Declared emergency/priority"
-   ],
-   "groups": [
-    "declared_emergency",
-    "landing_gear"
-   ]
-  },
-  {
-   "cadors": "2026A1167",
-   "date": "2026-07-25",
-   "name": "Cargojet",
-   "flight": "CJT1893",
-   "aircraft": "Boeing 767 300",
-   "airport": "CYHZ",
-   "phase": "Taxi",
-   "damage": "No Damage",
-   "events": [
-    "Hydraulic problem",
-    "Smoke/fumes - aircraft",
-    "Engine shut down",
-    "Aerodrome, runway or taxiway shutdown"
-   ],
-   "groups": [
-    "engine",
-    "hydraulic_flight_controls",
-    "smoke_fire"
-   ]
-  },
-  {
-   "cadors": "2026C4220",
-   "date": "2026-07-24",
-   "name": "Summit Air",
-   "flight": "SUT8591",
-   "aircraft": "British Aerospace Avro 146 Series Rj85",
-   "airport": null,
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Diversion",
-    "Landing gear"
-   ],
-   "groups": [
-    "diversion",
-    "landing_gear"
-   ]
-  }
- ],
+ "airlines": [],
+ "notable": [],
  "site_airlines": {
-  "AI": [
-   {
-    "cadors": "2026P2476",
-    "date": "2026-07-31",
-    "name": "Air India",
-    "flight": "AIC185",
-    "aircraft": "Boeing 777-333Er",
-    "airport": "CYVR",
-    "phase": "Approach",
-    "damage": "No Damage",
-    "events": [
-     "Conflict - potential"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2026P2133",
-    "date": "2026-07-20",
-    "name": "Air India",
-    "flight": "AIC186",
-    "aircraft": "Boeing 777 300 Series",
-    "airport": null,
-    "phase": "En Route",
-    "damage": "No Damage",
-    "events": [
-     "TCAS alert"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2026A0792",
-    "date": "2026-05-29",
-    "name": "Air India",
-    "flight": "AIC116",
-    "aircraft": "Boeing 777-333Er",
-    "airport": null,
-    "phase": "En Route",
-    "damage": "No Damage",
-    "events": [
-     "Weather - clear air turbulence (CAT)/turbulence"
-    ],
-    "groups": [
-     "turbulence"
-    ]
-   },
-   {
-    "cadors": "2026O1380",
-    "date": "2026-05-21",
-    "name": "Air India",
-    "flight": "AIC187",
-    "aircraft": "Boeing 777-333Er",
-    "airport": "CYYZ",
-    "phase": "Approach",
-    "damage": "No Damage",
-    "events": [
-     "Navigation error",
-     "Conflict - potential"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2026A0676",
-    "date": "2026-05-07",
-    "name": "Air India",
-    "flight": "AIC102",
-    "aircraft": "Airbus A350-900",
-    "airport": null,
-    "phase": "En Route",
-    "damage": "No Damage",
-    "events": [
-     "Weather - clear air turbulence (CAT)/turbulence"
-    ],
-    "groups": [
-     "turbulence"
-    ]
-   },
-   {
-    "cadors": "2026P0811",
-    "date": "2026-04-10",
-    "name": "Air India",
-    "flight": "AIC185",
-    "aircraft": "Boeing 777-333Er",
-    "airport": null,
-    "phase": "En Route",
-    "damage": "No Damage",
-    "events": [
-     "Disruptive passenger"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2026O0658",
-    "date": "2026-03-11",
-    "name": "Air India",
-    "flight": "AIC188",
-    "aircraft": "Boeing 777 300 Series",
-    "airport": null,
-    "phase": "Initial Climb",
-    "damage": "No Damage",
-    "events": [
-     "Navigation error"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2026P0279",
-    "date": "2026-02-09",
-    "name": "Air India",
-    "flight": "AIC185",
-    "aircraft": "Boeing 777 300 Series",
-    "airport": "CYVR",
-    "phase": "Approach",
-    "damage": "No Damage",
-    "events": [
-     "Missed approach/Go-around"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2026O0071",
-    "date": "2026-01-08",
-    "name": "Air India",
-    "flight": "AIC187",
-    "aircraft": "Boeing 777 300 Series",
-    "airport": "CYYZ",
-    "phase": "Landing",
-    "damage": "No Damage",
-    "events": [],
-    "groups": []
-   },
-   {
-    "cadors": "2026A0015",
-    "date": "2026-01-03",
-    "name": "Air India",
-    "flight": "AIC119",
-    "aircraft": "Boeing 777-333Er",
-    "airport": null,
-    "phase": "En Route",
-    "damage": "No Damage",
-    "events": [
-     "Loss of Global Navigation Satellite System (GNSS) or GNSS Anomalies"
-    ],
-    "groups": [
-     "gnss"
-    ]
-   },
-   {
-    "cadors": "2026P0025",
-    "date": "2026-01-03",
-    "name": "Air India",
-    "flight": "AIC185",
-    "aircraft": "Boeing 777-333Er",
-    "airport": "CYVR",
-    "phase": "Taxi",
-    "damage": "No Damage",
-    "events": [
-     "Other operational incident"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2025O3647",
-    "date": "2025-12-27",
-    "name": "Air India",
-    "flight": "AIC187",
-    "aircraft": "Boeing 777 300 Series",
-    "airport": "CYYZ",
-    "phase": "Approach",
-    "damage": "No Damage",
-    "events": [
-     "Missed approach/Go-around"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2025O3711",
-    "date": "2025-12-27",
-    "name": "Air India",
-    "flight": "AIC187",
-    "aircraft": "Boeing 777 300 Series",
-    "airport": "CYYZ",
-    "phase": "Approach",
-    "damage": "No Damage",
-    "events": [
-     "Missed approach/Go-around"
-    ],
-    "groups": []
-   },
-   {
-    "cadors": "2025A2164",
-    "date": "2025-12-15",
-    "name": "Air India",
-    "flight": "AIC101",
-    "aircraft": "Airbus A350-900",
-    "airport": null,
-    "phase": "En Route",
-    "damage": "No Damage",
-    "events": [
-     "Loss of Global Navigation Satellite System (GNSS) or GNSS Anomalies"
-    ],
-    "groups": [
-     "gnss"
-    ]
-   },
-   {
-    "cadors": "2025O3600",
-    "date": "2025-12-14",
-    "name": "Air India",
-    "flight": "AIC187",
-    "aircraft": "Boeing 777 300 Series",
-    "airport": "CYYZ",
-    "phase": "Landing",
-    "damage": "No Damage",
-    "events": [
-     "Missed approach/Go-around"
-    ],
-    "groups": []
-   }
-  ]
+  "AI": []
  },
- "collected_at": "2026-11-23T09:10:25+00:00"
+ "collected_at": "2026-11-24T11:00:45+00:00"
 }
