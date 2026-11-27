@@ -10,11 +10,11 @@
   "to": "2026-07-31"
  },
  "data_through": "2026-07-31",
- "reports": 9722,
+ "reports": 9723,
  "groups": {
   "declared_emergency": 351,
   "landing_gear": 217,
-  "engine": 77,
+  "engine": 78,
   "smoke_fire": 56,
   "diversion": 860,
   "rejected_takeoff": 303,
@@ -223,10 +223,10 @@
   },
   {
    "month": "2026-05",
-   "reports": 752,
+   "reports": 753,
    "declared_emergency": 27,
    "landing_gear": 14,
-   "engine": 2,
+   "engine": 3,
    "smoke_fire": 3,
    "hydraulic_flight_controls": 13
   },
@@ -1680,5 +1680,5 @@
    }
   ]
  },
- "collected_at": "2026-11-26T09:36:38+00:00"
+ "collected_at": "2026-11-27T09:43:02+00:00"
 }
