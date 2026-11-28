@@ -6,41 +6,32 @@
  },
  "scope": "Commercial aeroplanes with jet or turboprop engines, in Canadian airspace or at Canadian airports.",
  "window": {
-  "from": "2025-08-01",
-  "to": "2026-07-31"
+  "from": "2025-09-01",
+  "to": "2026-08-31"
  },
- "data_through": "2026-07-31",
- "reports": 9723,
+ "data_through": "2026-08-31",
+ "reports": 9314,
  "groups": {
-  "declared_emergency": 351,
-  "landing_gear": 217,
-  "engine": 78,
-  "smoke_fire": 56,
-  "diversion": 860,
-  "rejected_takeoff": 303,
-  "hydraulic_flight_controls": 152,
-  "bird_strike": 785,
-  "turbulence": 174,
-  "medical": 656,
-  "gnss": 444
+  "declared_emergency": 336,
+  "landing_gear": 203,
+  "engine": 76,
+  "smoke_fire": 54,
+  "diversion": 816,
+  "rejected_takeoff": 288,
+  "hydraulic_flight_controls": 143,
+  "bird_strike": 746,
+  "turbulence": 179,
+  "medical": 633,
+  "gnss": 422
  },
  "declared_emergencies": {
-  "count": 351,
-  "no_damage": 348,
+  "count": 336,
+  "no_damage": 333,
   "fatal": 0,
   "injured": 0
  },
- "fatal_reports": 0,
+ "fatal_reports": 1,
  "monthly": [
-  {
-   "month": "2024-08",
-   "reports": 800,
-   "declared_emergency": 33,
-   "landing_gear": 9,
-   "engine": 12,
-   "smoke_fire": 7,
-   "hydraulic_flight_controls": 12
-  },
   {
    "month": "2024-09",
    "reports": 765,
@@ -247,98 +238,107 @@
    "engine": 5,
    "smoke_fire": 5,
    "hydraulic_flight_controls": 13
+  },
+  {
+   "month": "2026-08",
+   "reports": 626,
+   "declared_emergency": 14,
+   "landing_gear": 7,
+   "engine": 5,
+   "smoke_fire": 3,
+   "hydraulic_flight_controls": 5
   }
  ],
  "airlines": [
   {
    "id": "5262",
    "name": "Air Canada",
-   "reports": 1379,
+   "reports": 1327,
    "groups": {
-    "declared_emergency": 55,
+    "declared_emergency": 53,
     "landing_gear": 13,
     "engine": 6,
-    "smoke_fire": 9,
-    "diversion": 69,
+    "smoke_fire": 10,
+    "diversion": 64,
     "rejected_takeoff": 37,
-    "hydraulic_flight_controls": 24,
-    "bird_strike": 174,
+    "hydraulic_flight_controls": 20,
+    "bird_strike": 165,
     "turbulence": 6,
-    "medical": 85,
-    "gnss": 37
+    "medical": 81,
+    "gnss": 35
    },
    "iata": null
   },
   {
    "id": "8893",
    "name": "WestJet",
-   "reports": 1067,
+   "reports": 1000,
    "groups": {
-    "declared_emergency": 35,
-    "landing_gear": 12,
-    "engine": 11,
-    "smoke_fire": 5,
-    "diversion": 68,
+    "declared_emergency": 34,
+    "landing_gear": 13,
+    "engine": 12,
+    "smoke_fire": 3,
+    "diversion": 61,
     "rejected_takeoff": 24,
-    "hydraulic_flight_controls": 7,
-    "bird_strike": 117,
+    "hydraulic_flight_controls": 5,
+    "bird_strike": 114,
     "turbulence": 5,
-    "medical": 106
-   },
-   "iata": null
-  },
-  {
-   "id": "5002",
-   "name": "Jazz (Air Canada Express)",
-   "reports": 740,
-   "groups": {
-    "declared_emergency": 45,
-    "landing_gear": 33,
-    "engine": 4,
-    "smoke_fire": 5,
-    "diversion": 77,
-    "rejected_takeoff": 36,
-    "hydraulic_flight_controls": 20,
-    "bird_strike": 123,
-    "turbulence": 7,
-    "medical": 18,
-    "gnss": 1
+    "medical": 100
    },
    "iata": null
   },
   {
    "id": "15266",
    "name": "Porter Airlines",
-   "reports": 717,
+   "reports": 716,
    "groups": {
-    "declared_emergency": 21,
-    "landing_gear": 14,
+    "declared_emergency": 23,
+    "landing_gear": 13,
     "engine": 2,
-    "smoke_fire": 6,
-    "diversion": 60,
-    "rejected_takeoff": 17,
-    "hydraulic_flight_controls": 7,
-    "bird_strike": 60,
+    "smoke_fire": 7,
+    "diversion": 59,
+    "rejected_takeoff": 18,
+    "hydraulic_flight_controls": 8,
+    "bird_strike": 63,
     "turbulence": 3,
-    "medical": 97
+    "medical": 99
+   },
+   "iata": null
+  },
+  {
+   "id": "5002",
+   "name": "Jazz (Air Canada Express)",
+   "reports": 702,
+   "groups": {
+    "declared_emergency": 44,
+    "landing_gear": 31,
+    "engine": 4,
+    "smoke_fire": 5,
+    "diversion": 75,
+    "rejected_takeoff": 31,
+    "hydraulic_flight_controls": 20,
+    "bird_strike": 117,
+    "turbulence": 7,
+    "medical": 16,
+    "gnss": 1
    },
    "iata": null
   },
   {
    "id": "17903",
    "name": "WestJet Encore",
-   "reports": 632,
+   "reports": 599,
    "groups": {
-    "declared_emergency": 31,
-    "landing_gear": 34,
+    "declared_emergency": 29,
+    "landing_gear": 29,
     "engine": 6,
     "smoke_fire": 2,
-    "diversion": 59,
-    "rejected_takeoff": 26,
-    "hydraulic_flight_controls": 11,
-    "bird_strike": 71,
+    "diversion": 58,
+    "rejected_takeoff": 24,
+    "hydraulic_flight_controls": 10,
+    "bird_strike": 75,
     "turbulence": 10,
-    "medical": 39,
+    "medical": 42,
     "gnss": 1
    },
    "iata": null
@@ -346,118 +346,117 @@
   {
    "id": "5421",
    "name": "Air France",
-   "reports": 292,
+   "reports": 285,
    "groups": {
-    "declared_emergency": 1,
+    "declared_emergency": 2,
     "diversion": 8,
-    "rejected_takeoff": 2,
+    "rejected_takeoff": 1,
     "bird_strike": 2,
     "turbulence": 13,
-    "medical": 7
-   },
-   "iata": null
-  },
-  {
-   "id": "14941",
-   "name": "Flair Airlines",
-   "reports": 225,
-   "groups": {
-    "declared_emergency": 4,
-    "landing_gear": 2,
-    "engine": 1,
-    "diversion": 8,
-    "rejected_takeoff": 2,
-    "bird_strike": 30,
-    "turbulence": 1,
-    "medical": 27
+    "medical": 8
    },
    "iata": null
   },
   {
    "id": "17978",
    "name": "Air Canada Rouge",
-   "reports": 221,
+   "reports": 242,
    "groups": {
-    "declared_emergency": 21,
+    "declared_emergency": 18,
     "landing_gear": 1,
     "engine": 3,
-    "smoke_fire": 7,
+    "smoke_fire": 6,
     "diversion": 15,
-    "rejected_takeoff": 2,
-    "hydraulic_flight_controls": 6,
-    "bird_strike": 33,
+    "rejected_takeoff": 3,
+    "hydraulic_flight_controls": 5,
+    "bird_strike": 37,
     "turbulence": 1,
-    "medical": 25
+    "medical": 23
    },
    "iata": null
   },
   {
    "id": "4881",
    "name": "United Airlines",
-   "reports": 220,
+   "reports": 222,
    "groups": {
-    "declared_emergency": 7,
+    "declared_emergency": 4,
     "engine": 3,
-    "smoke_fire": 2,
-    "diversion": 36,
+    "diversion": 34,
     "rejected_takeoff": 1,
     "hydraulic_flight_controls": 2,
-    "bird_strike": 4,
+    "bird_strike": 3,
     "turbulence": 5,
-    "medical": 24,
-    "gnss": 18
+    "medical": 26,
+    "gnss": 16
+   },
+   "iata": null
+  },
+  {
+   "id": "14941",
+   "name": "Flair Airlines",
+   "reports": 207,
+   "groups": {
+    "declared_emergency": 5,
+    "landing_gear": 2,
+    "diversion": 7,
+    "rejected_takeoff": 2,
+    "bird_strike": 24,
+    "turbulence": 1,
+    "medical": 29
    },
    "iata": null
   },
   {
    "id": "624",
    "name": "Delta Air Lines",
-   "reports": 202,
+   "reports": 203,
    "groups": {
     "declared_emergency": 11,
-    "engine": 4,
+    "landing_gear": 1,
+    "engine": 5,
     "smoke_fire": 3,
-    "diversion": 32,
+    "diversion": 29,
     "rejected_takeoff": 2,
-    "bird_strike": 3,
+    "bird_strike": 2,
     "turbulence": 1,
-    "medical": 15
-   },
-   "iata": null
-  },
-  {
-   "id": "15150",
-   "name": "Etihad Airways",
-   "reports": 171,
-   "groups": {
-    "diversion": 3,
-    "turbulence": 1,
-    "medical": 3,
-    "gnss": 125
+    "medical": 12
    },
    "iata": null
   },
   {
    "id": "2659",
    "name": "PAL Airlines",
-   "reports": 166,
+   "reports": 162,
    "groups": {
-    "declared_emergency": 3,
+    "declared_emergency": 5,
     "landing_gear": 12,
-    "engine": 1,
-    "diversion": 43,
-    "rejected_takeoff": 19,
-    "hydraulic_flight_controls": 6,
-    "bird_strike": 15,
-    "medical": 11,
+    "engine": 2,
+    "diversion": 45,
+    "rejected_takeoff": 15,
+    "hydraulic_flight_controls": 7,
+    "bird_strike": 12,
+    "medical": 13,
     "gnss": 1
+   },
+   "iata": null
+  },
+  {
+   "id": "15150",
+   "name": "Etihad Airways",
+   "reports": 161,
+   "groups": {
+    "diversion": 1,
+    "turbulence": 1,
+    "medical": 1,
+    "gnss": 120
    },
    "iata": null
   },
   {
    "id": "5311",
    "name": "Air Transat",
-   "reports": 153,
+   "reports": 144,
    "groups": {
     "declared_emergency": 9,
     "landing_gear": 5,
@@ -466,48 +465,48 @@
     "diversion": 9,
     "rejected_takeoff": 2,
     "hydraulic_flight_controls": 1,
-    "bird_strike": 8,
+    "bird_strike": 7,
     "turbulence": 2,
-    "medical": 15
-   },
-   "iata": null
-  },
-  {
-   "id": "15711",
-   "name": "Emirates",
-   "reports": 148,
-   "groups": {
-    "diversion": 2,
-    "turbulence": 2,
-    "medical": 2,
-    "gnss": 85
+    "medical": 11
    },
    "iata": null
   },
   {
    "id": "17640",
    "name": "Qatar Airways",
-   "reports": 138,
+   "reports": 140,
    "groups": {
     "turbulence": 3,
     "medical": 2,
-    "gnss": 77
+    "gnss": 81
+   },
+   "iata": null
+  },
+  {
+   "id": "15711",
+   "name": "Emirates",
+   "reports": 139,
+   "groups": {
+    "diversion": 2,
+    "turbulence": 2,
+    "medical": 2,
+    "gnss": 82
    },
    "iata": null
   },
   {
    "id": "11674",
    "name": "Cargojet",
-   "reports": 132,
+   "reports": 127,
    "groups": {
-    "declared_emergency": 14,
+    "declared_emergency": 11,
     "landing_gear": 7,
-    "engine": 7,
+    "engine": 5,
     "smoke_fire": 1,
-    "diversion": 5,
+    "diversion": 4,
     "rejected_takeoff": 10,
-    "hydraulic_flight_controls": 7,
-    "bird_strike": 16,
+    "hydraulic_flight_controls": 6,
+    "bird_strike": 13,
     "turbulence": 2
    },
    "iata": null
@@ -515,17 +514,17 @@
   {
    "id": "107",
    "name": "Canadian North",
-   "reports": 126,
+   "reports": 120,
    "groups": {
-    "declared_emergency": 10,
+    "declared_emergency": 11,
     "landing_gear": 4,
     "engine": 1,
-    "smoke_fire": 5,
-    "diversion": 32,
-    "rejected_takeoff": 6,
+    "smoke_fire": 6,
+    "diversion": 31,
+    "rejected_takeoff": 7,
     "hydraulic_flight_controls": 5,
-    "bird_strike": 9,
-    "medical": 17,
+    "bird_strike": 7,
+    "medical": 18,
     "gnss": 3
    },
    "iata": null
@@ -533,15 +532,29 @@
   {
    "id": "1861",
    "name": "Perimeter Aviation",
-   "reports": 120,
+   "reports": 119,
    "groups": {
     "declared_emergency": 4,
-    "landing_gear": 4,
-    "engine": 5,
-    "diversion": 31,
-    "rejected_takeoff": 20,
-    "hydraulic_flight_controls": 6,
-    "bird_strike": 4,
+    "landing_gear": 3,
+    "engine": 4,
+    "diversion": 33,
+    "rejected_takeoff": 19,
+    "hydraulic_flight_controls": 7,
+    "bird_strike": 6,
+    "medical": 9
+   },
+   "iata": null
+  },
+  {
+   "id": "1298",
+   "name": "Lufthansa",
+   "reports": 96,
+   "groups": {
+    "declared_emergency": 2,
+    "diversion": 10,
+    "rejected_takeoff": 1,
+    "bird_strike": 2,
+    "turbulence": 2,
     "medical": 10
    },
    "iata": null
@@ -549,62 +562,48 @@
   {
    "id": "2955",
    "name": "Air Inuit",
-   "reports": 98,
+   "reports": 91,
    "groups": {
     "declared_emergency": 8,
-    "landing_gear": 7,
+    "landing_gear": 6,
     "engine": 1,
-    "diversion": 23,
-    "rejected_takeoff": 8,
+    "diversion": 20,
+    "rejected_takeoff": 9,
     "hydraulic_flight_controls": 7,
-    "bird_strike": 5,
+    "bird_strike": 6,
     "turbulence": 1,
-    "medical": 6
-   },
-   "iata": null
-  },
-  {
-   "id": "1298",
-   "name": "Lufthansa",
-   "reports": 97,
-   "groups": {
-    "declared_emergency": 2,
-    "diversion": 9,
-    "rejected_takeoff": 1,
-    "bird_strike": 2,
-    "turbulence": 1,
-    "medical": 11
+    "medical": 5
    },
    "iata": null
   },
   {
    "id": "5412",
    "name": "American Airlines",
-   "reports": 92,
+   "reports": 85,
    "groups": {
     "declared_emergency": 6,
     "landing_gear": 2,
     "smoke_fire": 1,
-    "diversion": 16,
-    "rejected_takeoff": 2,
+    "diversion": 19,
+    "rejected_takeoff": 1,
     "hydraulic_flight_controls": 4,
-    "bird_strike": 3,
+    "bird_strike": 2,
     "turbulence": 1,
-    "medical": 13,
-    "gnss": 26
+    "medical": 15,
+    "gnss": 23
    },
    "iata": null
   },
   {
    "id": "15690",
    "name": "Republic Airways",
-   "reports": 86,
+   "reports": 83,
    "groups": {
     "declared_emergency": 1,
     "landing_gear": 2,
     "diversion": 2,
     "rejected_takeoff": 1,
-    "bird_strike": 4,
+    "bird_strike": 3,
     "medical": 4
    },
    "iata": null
@@ -612,70 +611,28 @@
   {
    "id": "358",
    "name": "KLM",
-   "reports": 82,
+   "reports": 68,
    "groups": {
     "engine": 1,
     "diversion": 4,
-    "bird_strike": 2,
+    "bird_strike": 1,
     "turbulence": 2,
     "medical": 3
    },
    "iata": null
   },
   {
-   "id": "15405",
-   "name": "Turkish Airlines",
-   "reports": 73,
-   "groups": {
-    "diversion": 12,
-    "turbulence": 3,
-    "medical": 12,
-    "gnss": 22
-   },
-   "iata": null
-  },
-  {
-   "id": "17940",
-   "name": "Summit Air",
-   "reports": 73,
-   "groups": {
-    "declared_emergency": 4,
-    "landing_gear": 11,
-    "engine": 2,
-    "diversion": 24,
-    "rejected_takeoff": 5,
-    "hydraulic_flight_controls": 3,
-    "bird_strike": 4,
-    "medical": 2
-   },
-   "iata": null
-  },
-  {
-   "id": "3999",
-   "name": "Central Mountain Air",
-   "reports": 68,
-   "groups": {
-    "declared_emergency": 2,
-    "landing_gear": 3,
-    "diversion": 11,
-    "rejected_takeoff": 5,
-    "hydraulic_flight_controls": 2,
-    "bird_strike": 3
-   },
-   "iata": null
-  },
-  {
    "id": "8982",
    "name": "Air Creebec",
-   "reports": 67,
+   "reports": 64,
    "groups": {
     "declared_emergency": 2,
     "landing_gear": 1,
     "engine": 2,
-    "diversion": 12,
+    "diversion": 10,
     "rejected_takeoff": 5,
     "hydraulic_flight_controls": 2,
-    "bird_strike": 7,
+    "bird_strike": 8,
     "medical": 5
    },
    "iata": null
@@ -683,43 +640,85 @@
   {
    "id": "8741",
    "name": "SkyWest Airlines",
-   "reports": 66,
+   "reports": 64,
    "groups": {
     "diversion": 1,
     "rejected_takeoff": 3,
     "hydraulic_flight_controls": 1,
-    "bird_strike": 7,
+    "bird_strike": 6,
     "medical": 1
    },
    "iata": null
   },
   {
-   "id": "10377",
-   "name": "Endeavor Air",
-   "reports": 65,
+   "id": "3999",
+   "name": "Central Mountain Air",
+   "reports": 64,
+   "groups": {
+    "declared_emergency": 1,
+    "landing_gear": 2,
+    "diversion": 10,
+    "rejected_takeoff": 5,
+    "hydraulic_flight_controls": 2,
+    "bird_strike": 1
+   },
+   "iata": null
+  },
+  {
+   "id": "17940",
+   "name": "Summit Air",
+   "reports": 63,
    "groups": {
     "declared_emergency": 3,
-    "landing_gear": 1,
-    "smoke_fire": 2,
-    "diversion": 1,
+    "landing_gear": 9,
+    "engine": 2,
+    "diversion": 21,
+    "rejected_takeoff": 5,
+    "hydraulic_flight_controls": 1,
+    "bird_strike": 2,
+    "medical": 1
+   },
+   "iata": null
+  },
+  {
+   "id": "15405",
+   "name": "Turkish Airlines",
+   "reports": 61,
+   "groups": {
+    "diversion": 12,
+    "turbulence": 3,
+    "medical": 12,
+    "gnss": 16
+   },
+   "iata": null
+  },
+  {
+   "id": "5430",
+   "name": "British Airways",
+   "reports": 60,
+   "groups": {
+    "declared_emergency": 4,
+    "engine": 2,
+    "smoke_fire": 1,
+    "diversion": 8,
     "rejected_takeoff": 1,
-    "bird_strike": 3,
-    "turbulence": 1
+    "bird_strike": 1,
+    "turbulence": 13,
+    "medical": 10
    },
    "iata": null
   },
   {
    "id": "1487",
    "name": "Calm Air",
-   "reports": 62,
+   "reports": 60,
    "groups": {
-    "declared_emergency": 1,
     "landing_gear": 2,
-    "engine": 2,
+    "engine": 1,
     "smoke_fire": 1,
     "diversion": 17,
     "rejected_takeoff": 3,
-    "bird_strike": 5,
+    "bird_strike": 4,
     "medical": 4,
     "gnss": 1
    },
@@ -728,10 +727,12 @@
   {
    "id": "1743",
    "name": "Air India",
-   "reports": 29,
+   "reports": 26,
    "groups": {
+    "diversion": 2,
     "turbulence": 3,
-    "gnss": 5
+    "medical": 2,
+    "gnss": 3
    },
    "iata": "AI"
   }
@@ -752,6 +753,23 @@
    ],
    "groups": [
     "diversion",
+    "landing_gear"
+   ]
+  },
+  {
+   "cadors": "2026P2712",
+   "date": "2026-08-18",
+   "name": "WestJet",
+   "flight": "WJA1601",
+   "aircraft": "Boeing 737-800",
+   "airport": "CYVR",
+   "phase": "Approach",
+   "damage": "No Damage",
+   "events": [
+    "Missed approach/Go-around",
+    "Landing gear"
+   ],
+   "groups": [
     "landing_gear"
    ]
   },
@@ -1436,26 +1454,28 @@
     "declared_emergency",
     "smoke_fire"
    ]
-  },
-  {
-   "cadors": "2026O2343",
-   "date": "2026-07-28",
-   "name": "Air Canada Rouge",
-   "flight": "ROU1801",
-   "aircraft": "Airbus A319-114",
-   "airport": "CYYZ",
-   "phase": "En Route",
-   "damage": "No Damage",
-   "events": [
-    "Blown tire/wheel failure"
-   ],
-   "groups": [
-    "landing_gear"
-   ]
   }
  ],
  "site_airlines": {
   "AI": [
+   {
+    "cadors": "2026P2689",
+    "date": "2026-08-17",
+    "name": "Air India",
+    "flight": "AIC186",
+    "aircraft": "Boeing 777 300 Series",
+    "airport": null,
+    "phase": "En Route",
+    "damage": "No Damage",
+    "events": [
+     "Medical emergency",
+     "Diversion"
+    ],
+    "groups": [
+     "diversion",
+     "medical"
+    ]
+   },
    {
     "cadors": "2026C4925",
     "date": "2026-08-17",
@@ -1661,24 +1681,8 @@
      "Missed approach/Go-around"
     ],
     "groups": []
-   },
-   {
-    "cadors": "2025A2164",
-    "date": "2025-12-15",
-    "name": "Air India",
-    "flight": "AIC101",
-    "aircraft": "Airbus A350-900",
-    "airport": null,
-    "phase": "En Route",
-    "damage": "No Damage",
-    "events": [
-     "Loss of Global Navigation Satellite System (GNSS) or GNSS Anomalies"
-    ],
-    "groups": [
-     "gnss"
-    ]
    }
   ]
  },
- "collected_at": "2026-11-27T09:43:02+00:00"
+ "collected_at": "2026-11-28T08:57:02+00:00"
 }
